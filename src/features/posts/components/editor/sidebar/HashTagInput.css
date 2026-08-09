@@ -1,0 +1,97 @@
+.tag-title {
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  color: #30374f;
+}
+
+.tag-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 10px;
+}
+
+.tag-chip {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  background: #eef3f8;
+
+  color: #5a6578;
+
+  border-radius: 16px;
+
+  padding: 5px 10px;
+
+  font-size: 12px;
+}
+
+.tag-chip svg {
+  cursor: pointer;
+}
+
+.tag-input-wrapper {
+  display: flex;
+
+  gap: 8px;
+}
+
+.tag-input-wrapper input {
+  flex: 1;
+
+  height: 42px;
+
+  border: 1px solid #d6deea;
+
+  border-radius: 8px;
+
+  padding: 0 14px;
+
+  outline: none;
+
+  font-size: 14px;
+}
+
+.tag-input-wrapper input:focus {
+  border-color: #163c92;
+}
+
+.tag-input-wrapper button {
+  width: 42px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #e8ecff;
+
+  color: #163c92;
+
+  cursor: pointer;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  transition: 0.2s;
+}
+
+.tag-input-wrapper button:hover {
+  background: #163c92;
+
+  color: white;
+}

@@ -1,0 +1,37 @@
+.sidebar-card{
+
+    background:#fff;
+
+    border:1px solid #E8ECF5;
+
+    border-radius:16px;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    margin-top:18px;
+
+}
+
+.sidebar-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:#1B2E6B;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+}

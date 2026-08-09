@@ -1,0 +1,45 @@
+.notification-title{
+
+    font-weight:600;
+
+    color:#30374F;
+
+}
+
+.detail-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    border:none;
+
+    background:#163C92;
+
+    color:white;
+
+    border-radius:8px;
+
+    padding:8px 14px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.detail-btn:hover{
+
+    transform:translateY(-1px);
+
+    box-shadow:0 8px 18px rgba(22,60,146,.18);
+
+}
+
+.detail-btn svg{
+
+    flex-shrink:0;
+
+}

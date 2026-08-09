@@ -1,0 +1,76 @@
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(18,30,54,.45);
+    backdrop-filter:blur(4px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.approve-modal{
+    width:430px;
+    background:#fff;
+    border-radius:18px;
+    padding:38px 36px;
+    text-align:center;
+    box-shadow:0 20px 45px rgba(0,0,0,.18);
+}
+
+.approve-icon{
+    width:76px;
+    height:76px;
+    margin:auto;
+    border-radius:50%;
+    background:#FFF4DD;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#8B5E00;
+    box-shadow:0 6px 16px rgba(0,0,0,.08);
+}
+
+.approve-modal h2{
+    margin:28px 0 14px;
+    color:#173A8F;
+    font-size:34px;
+    font-weight:700;
+}
+
+.approve-modal p{
+    margin-bottom:32px;
+    color:#5F6472;
+    line-height:1.7;
+    font-size:16px;
+}
+
+.backToListPost{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:10px;
+    background:#143A8C;
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.backToListPost:hover{
+    background:#0F2F75;
+}
+
+.text-btn{
+    margin-top:20px;
+    border:none;
+    background:none;
+    color:#6B7280;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.text-btn:hover{
+    color:#111827;
+}

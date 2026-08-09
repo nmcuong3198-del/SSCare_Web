@@ -1,0 +1,99 @@
+.select-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.select-group label {
+  margin-bottom: 10px; /* Đồng bộ 10px giống NotificationForm.css */
+  font-size: 14px;
+  font-weight: 600;
+  color: #2f3b52; /* Màu chữ chuẩn của form */
+}
+
+/* 1. Khung control bọc ngoài ô select */
+.react-select__control {
+  min-height: 46px !important;
+  border: 1px solid #d6deea !important;
+  border-radius: 10px !important;
+  padding: 0 6px;
+  box-shadow: none !important;
+  transition: 0.25s;
+  background-color: white !important;
+}
+
+/* Khi đang focus vào ô select */
+.react-select__control--is-focused {
+  border-color: #163c92 !important;
+  box-shadow: 0 0 0 3px rgba(22, 60, 146, 0.08) !important;
+}
+
+/* 2. Menu Droplist xổ xuống */
+.react-select__menu {
+  border-radius: 10px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #edf2fa !important;
+  overflow: hidden;
+  z-index: 110 !important;
+}
+
+/* Danh sách bọc các option bên trong */
+.react-select__menu-list {
+  padding: 6px 0 !important;
+}
+
+/* 3. Từng dòng Option trong menu (SỬA LỖI MÀU NỀN TẠI ĐÂY) */
+.react-select__option {
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px 14px !important;
+  font-size: 14px;
+  color: #2f3b52 !important; /* Chữ luôn rõ ràng */
+  background-color: white !important; /* Nền mặc định luôn trắng */
+  cursor: pointer;
+}
+
+/* Khi di chuột qua dòng (Hover) */
+.react-select__option--is-focused {
+  background-color: #edf4ff !important; /* Màu nền xanh nhẹ nhàng khi hover */
+  color: #163c92 !important; /* Màu chữ đổi sang xanh đậm */
+}
+
+/* Khi option ĐÃ ĐƯỢC CHỌN - Giữ nền trắng nhẹ để không nuốt mất chữ */
+.react-select__option--is-selected {
+  background-color: #f4f7fc !important;
+  color: #163c92 !important;
+  font-weight: 500;
+}
+
+/* 4. Định dạng các ô Tag (Multi-value) hiển thị khi chọn nhiều người */
+.react-select__multi-value {
+  background-color: #edf4ff !important;
+  border-radius: 6px !important;
+  margin: 3px !important;
+}
+
+.react-select__multi-value__label {
+  color: #163c92 !important;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 3px 6px !important;
+}
+
+.react-select__multi-value__remove {
+  color: #8893a8 !important;
+  cursor: pointer;
+}
+
+.react-select__multi-value__remove:hover {
+  background-color: #dbe7ff !important;
+  color: #ff4d4f !important;
+}
+
+/* Custom lại ô checkbox nhỏ bên trong danh sách cho đẹp hơn */
+.react-select__option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #163c92; /* Đổi màu tick đồng bộ hệ thống */
+  margin-right: 10px;
+  cursor: pointer;
+}

@@ -1,0 +1,27 @@
+.recipient-list{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.recipient-item{
+    font-size:13px;
+    color:#2f3a4b;
+}
+
+.recipient-more{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    width:34px;
+    height:22px;
+
+    border-radius:999px;
+
+    background:#EEF4FF;
+    color:#163C92;
+
+    font-size:12px;
+    font-weight:600;
+}

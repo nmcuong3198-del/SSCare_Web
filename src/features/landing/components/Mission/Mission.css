@@ -1,0 +1,63 @@
+.mission{
+
+    padding:120px 0 90px;
+
+    text-align:center;
+
+}
+
+.quote-icon{
+
+    font-size:60px;
+
+    color:#d2b26d;
+
+}
+
+.mission h3{
+
+    margin-top:20px;
+
+    font-size:38px;
+
+    color:#173d8f;
+
+}
+
+.mission h2{
+
+    margin:35px auto;
+
+    width:900px;
+
+    line-height:1.5;
+
+    color:#173d8f;
+
+    font-size:42px;
+
+    font-weight:700;
+
+}
+
+.mission h2 span{
+
+    color:#173d8f;
+
+    font-weight:800;
+
+}
+
+.mission-line{
+
+    width:90px;
+
+    height:4px;
+
+    background:#d2b26d;
+
+    margin:auto;
+
+    border-radius:50px;
+
+}

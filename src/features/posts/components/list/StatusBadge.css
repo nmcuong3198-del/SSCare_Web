@@ -1,0 +1,43 @@
+.status{
+
+    padding:7px 18px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.published{
+
+    background:#DDF9E7;
+
+    color:#148A4B;
+
+}
+
+.pending{
+
+    background:#FFEFD8;
+
+    color:#E46B00;
+
+}
+
+.draft{
+
+    background:#EEEEEE;
+
+    color:#666;
+
+}
+
+.rejected{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}

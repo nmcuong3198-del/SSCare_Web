@@ -1,0 +1,77 @@
+.section-card{
+
+    background:white;
+
+    border:1px solid #E5EAF3;
+
+    border-radius:14px;
+
+    padding:20px;
+
+    margin-bottom:22px;
+
+}
+
+.section-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+.section-header span{
+
+    color:#18398B;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+}
+
+.section-header button{
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    color:#7A8799;
+
+}
+
+.section-card input,
+
+.section-card textarea{
+
+    width:100%;
+
+    border:1px solid #D9E0EB;
+
+    border-radius:8px;
+
+    padding:14px;
+
+    margin-top:12px;
+
+    font-size:14px;
+
+    outline:none;
+
+}
+
+.section-card textarea{
+
+    resize:vertical;
+
+    min-height:120px;
+
+}

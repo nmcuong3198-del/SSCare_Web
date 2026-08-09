@@ -1,0 +1,35 @@
+.content-title{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:#163C92;
+
+    margin:45px 0 25px;
+
+    position:relative;
+
+    padding-left:18px;
+
+}
+
+.content-title::before{
+
+    content:"";
+
+    width:4px;
+
+    height:34px;
+
+    background:#F5B42D;
+
+    position:absolute;
+
+    left:0;
+
+    top:4px;
+
+    border-radius:10px;
+
+}

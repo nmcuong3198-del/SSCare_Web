@@ -1,0 +1,32 @@
+.server-unavailable-content {
+  padding: 8px 0;
+}
+
+.server-unavailable-content p {
+  margin: 0 0 12px;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.server-unavailable-content ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.server-unavailable-content li {
+  margin-bottom: 8px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.server-unavailable-content .tip {
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 6px;
+  color: #ad6800;
+  font-size: 14px;
+}

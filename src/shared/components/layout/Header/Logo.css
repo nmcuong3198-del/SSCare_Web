@@ -1,0 +1,36 @@
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.logo-image {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.logo-text {
+    font-size: 30px;
+    font-weight: 700;
+    color: #163C92;
+    letter-spacing: 0.5px;
+}
+
+.logo:hover .logo-text {
+    color: #1B4DB8;
+}
+
+@media (max-width: 768px) {
+    .logo-image {
+        width: 36px;
+        height: 36px;
+    }
+
+    .logo-text {
+        font-size: 24px;
+    }
+}

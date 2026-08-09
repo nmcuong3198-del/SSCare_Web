@@ -1,0 +1,129 @@
+.notification-status{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:110px;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.published{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.draft{
+
+    background:#F3F4F6;
+
+    color:#6B7280;
+
+}
+
+.failed{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}
+
+.scheduled{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+}
+
+.cancelled{
+
+    background:#E5E7EB;
+
+    color:#374151;
+
+}
+
+.default{
+
+    background:#F4F4F5;
+
+    color:#52525B;
+
+}
+
+.failed{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}
+
+.scheduled{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+}
+
+.cancelled{
+
+    background:#E5E7EB;
+
+    color:#374151;
+
+}
+
+.default{
+
+    background:#F4F4F5;
+
+    color:#52525B;
+
+}
+
+.notification-status{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:8px 16px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.status-dot{
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+}

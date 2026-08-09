@@ -1,0 +1,20 @@
+:root{
+
+    --primary:#173D8F;
+    --primary-hover:#0f2f74;
+
+    --secondary:#F4F7FD;
+
+    --text:#333333;
+
+    --gray:#666666;
+
+    --border:#E6E6E6;
+
+    --white:#FFFFFF;
+
+    --radius:16px;
+
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+
+}

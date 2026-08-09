@@ -1,0 +1,53 @@
+.notification-action{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    border:none;
+
+    background:#163C92;
+
+    color:white;
+
+    height:38px;
+
+    padding:0 16px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.notification-action:hover{
+
+    transform:translateY(-1px);
+
+    background:#1D4DB7;
+
+    box-shadow:0 8px 18px rgba(22,60,146,.16);
+
+}
+
+.notification-action:active{
+
+    transform:scale(.98);
+
+}
+
+.notification-action svg{
+
+    flex-shrink:0;
+
+}

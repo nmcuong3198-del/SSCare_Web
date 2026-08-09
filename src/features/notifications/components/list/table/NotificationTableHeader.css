@@ -1,0 +1,39 @@
+.notification-table-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:24px;
+
+}
+
+.notification-table-header h3{
+
+    margin:0;
+
+    color:#163C92;
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+.notification-table-header p{
+
+    margin-top:6px;
+
+    color:#7A8197;
+
+    font-size:14px;
+
+}
+
+.notification-table-header strong{
+
+    color:#163C92;
+
+}

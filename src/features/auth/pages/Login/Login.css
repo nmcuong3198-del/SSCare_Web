@@ -1,0 +1,738 @@
+/* =========================================================
+   SSCARE LOGIN UI
+   Author: ChatGPT
+========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --primary: #2f6bff;
+  --primary-dark: #1f53d9;
+
+  --bg-1: #fff4e8;
+  --bg-2: #fff8f2;
+  --bg-3: #fffdfb;
+
+  --orange: #ffd6b5;
+  --pink: #ffd8e4;
+
+  --text: #26324b;
+  --text-light: #77839a;
+
+  --border: #e8ecf3;
+
+  --shadow: 0 20px 60px rgba(26, 40, 80, 0.08);
+
+  --radius: 28px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: #f7f8fc;
+  color: var(--text);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.login-page {
+  position: relative;
+
+  width: 100%;
+  min-height:100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow-x:hidden;
+
+  background: linear-gradient(
+    180deg,
+    var(--bg-1) 0%,
+    var(--bg-2) 55%,
+    var(--bg-3) 100%
+  );
+}
+
+/* =========================================================
+   DECORATION
+========================================================= */
+
+.blob {
+  position: absolute;
+
+  border-radius: 50%;
+
+  filter: blur(45px);
+
+  z-index: 0;
+
+  animation: blobMove 12s ease-in-out infinite;
+}
+
+.blob-1 {
+  width: 700px;
+  height: 700px;
+
+  top: -320px;
+  left: -250px;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 185, 120, 0.75),
+    rgba(255, 185, 120, 0)
+  );
+}
+
+.blob-2 {
+  width: 700px;
+  height: 700px;
+
+  bottom: -300px;
+  right: -260px;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 175, 195, 0.65),
+    rgba(255, 175, 195, 0)
+  );
+
+  animation-delay: 3s;
+}
+
+/* =========================================================
+   WAVES
+========================================================= */
+
+.wave {
+  position: absolute;
+
+  border-radius: 50%;
+
+  border: 2px solid rgba(255, 180, 120, 0.14);
+
+  z-index: 0;
+}
+
+.wave-1 {
+  width: 900px;
+  height: 900px;
+
+  top: -430px;
+  left: -260px;
+}
+
+.wave-2 {
+  width: 700px;
+  height: 700px;
+
+  bottom: -330px;
+  right: -150px;
+}
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+.particle {
+  position: absolute;
+
+  width: 12px;
+  height: 12px;
+
+  border-radius: 50%;
+
+  background: white;
+
+  opacity: 0.65;
+
+  animation: float 8s ease-in-out infinite;
+
+  z-index: 0;
+}
+
+.p1 {
+  top: 18%;
+  left: 18%;
+}
+
+.p2 {
+  top: 70%;
+  left: 12%;
+
+  animation-delay: 2s;
+}
+
+.p3 {
+  right: 18%;
+  top: 24%;
+
+  animation-delay: 1s;
+}
+
+.p4 {
+  right: 14%;
+  bottom: 18%;
+
+  animation-delay: 4s;
+}
+
+.p5 {
+  top: 52%;
+  right: 32%;
+
+  animation-delay: 3s;
+}
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.login-card {
+  position: relative;
+
+  z-index: 5;
+
+  width:min(430px,100%);
+
+  background: rgba(255, 255, 255, 0.92);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, 0.75);
+
+  border-radius: var(--radius);
+
+  padding: 85px 40px 40px;
+
+  box-shadow: var(--shadow);
+
+  animation: cardShow 0.8s ease;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.login-card h2 {
+  text-align: center;
+
+  font-size: 30px;
+
+  font-weight: 700;
+
+  color: var(--text);
+
+  margin-bottom: 15px;
+
+  letter-spacing: 0.3px;
+}
+
+.login-card > p {
+  text-align: center;
+
+  color: var(--text-light);
+
+  font-size: 15px;
+
+  margin-bottom: 35px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: var(--text);
+}
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.input-box {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  height: 58px;
+
+  background: white;
+
+  border: 1px solid var(--border);
+
+  border-radius: 16px;
+
+  transition: 0.35s;
+
+  overflow: hidden;
+}
+
+.input-box:hover {
+  border-color: #c7d7ff;
+}
+
+.input-box:focus-within {
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 5px rgba(47, 107, 255, 0.12);
+}
+
+.icon {
+  width: 58px;
+
+  text-align: center;
+
+  color: #9aa6c1;
+
+  font-size: 18px;
+
+  transition: 0.3s;
+}
+
+.input-box:focus-within .icon {
+  color: var(--primary);
+}
+
+.input-box input {
+  flex: 1;
+
+  height: 100%;
+
+  border: none;
+
+  outline: none;
+
+  background: none;
+
+  padding-right: 15px;
+
+  font-size: 15px;
+
+  color: var(--text);
+
+  font-family: inherit;
+}
+
+.input-box input::placeholder {
+  color: #b5bfd2;
+}
+
+/* =========================================================
+   PASSWORD BUTTON
+========================================================= */
+
+.eye-btn {
+  width: 55px;
+
+  height: 100%;
+
+  border: none;
+
+  background: none;
+
+  cursor: pointer;
+
+  color: #aab5c9;
+
+  transition: 0.3s;
+}
+
+.eye-btn:hover {
+  color: var(--primary);
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.login-btn {
+  width: 100%;
+
+  height: 58px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: white;
+
+  background: linear-gradient(135deg, #2f6bff, #4a86ff);
+
+  box-shadow: 0 15px 30px rgba(47, 107, 255, 0.28);
+
+  transition: 0.35s;
+}
+
+.login-btn:hover {
+  box-shadow: 0 25px 40px rgba(47, 107, 255, 0.35);
+}
+
+/* .login-btn:active {
+  transform: scale(0.98);
+} */
+
+.login-btn:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.75;
+}
+
+/* =========================================================
+   SMALL EFFECT
+========================================================= */
+
+.input-box::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  bottom: 0;
+
+  width: 0;
+
+  height: 2px;
+
+  background: var(--primary);
+
+  transition: 0.35s;
+}
+
+.input-box:focus-within::after {
+  width: 100%;
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes cardShow {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes blobMove {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(40px, -30px) scale(1.05);
+  }
+
+  50% {
+    transform: translate(10px, 20px) scale(0.96);
+  }
+
+  75% {
+    transform: translate(-25px, -15px) scale(1.03);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: translateY(-25px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+}
+
+/* =========================================================
+   GLASS SHINE
+========================================================= */
+
+/* .login-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 80%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+
+  transition: 1.2s;
+}
+
+.login-card:hover::before {
+  left: 150%;
+} */
+
+/* =========================================================
+   CARD HOVER
+========================================================= */
+
+/* .login-card {
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+} */
+
+/* .login-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow: 0 30px 70px rgba(30, 60, 120, 0.12);
+} */
+
+/* =========================================================
+   PARTICLE GLOW
+========================================================= */
+
+.particle {
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.8);
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d5dcea;
+
+  border-radius: 50px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 992px) {
+  .login-card {
+    width: 420px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+  }
+
+  .login-page {
+    padding: 30px;
+  }
+
+  .login-card {
+    width: 100%;
+
+    max-width: 430px;
+
+    padding: 75px 30px 35px;
+  }
+
+  .blob-1 {
+    width: 500px;
+    height: 500px;
+
+    left: -220px;
+    top: -220px;
+  }
+
+  .blob-2 {
+    width: 500px;
+    height: 500px;
+
+    right: -220px;
+    bottom: -220px;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-card {
+    border-radius: 24px;
+
+    padding: 70px 24px 30px;
+  }
+
+  .login-card h2 {
+    font-size: 26px;
+  }
+
+  .login-card > p {
+    font-size: 14px;
+
+    margin-bottom: 28px;
+  }
+
+  .input-box {
+    height: 54px;
+  }
+
+  .login-btn {
+    height: 54px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-page {
+    padding: 18px;
+  }
+
+  .input-box {
+    border-radius: 14px;
+  }
+
+  .login-btn {
+    border-radius: 14px;
+  }
+}
+
+/* =========================================================
+   BACKGROUND LIGHT
+========================================================= */
+
+.login-page::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+
+      rgba(255, 255, 255, 0.45),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+
+      rgba(255, 255, 255, 0.35),
+      transparent 30%
+    );
+
+  pointer-events: none;
+}
+
+.login-page::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.35) 1px,
+
+    transparent 1px
+  );
+
+  background-size: 55px 55px;
+
+  opacity: 0.25;
+
+  pointer-events: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active{
+
+    -webkit-box-shadow:0 0 0 1000px #ffffff inset !important;
+
+    -webkit-text-fill-color:#26324B !important;
+
+    transition:background-color 9999s ease-in-out 0s;
+
+    font-family:"Poppins",sans-serif;
+
+}
+
+.login-error {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #d32f2f;
+  background: rgba(211, 47, 47, 0.08);
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  padding: 10px 12px;
+  margin: 10px 0 16px;
+
+  opacity: 0;
+  transition: all .2s ease;
+}
+
+.login-error.show {
+  opacity: 1;
+  border-color: rgba(211, 47, 47, .25);
+}

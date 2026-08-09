@@ -1,0 +1,133 @@
+/* Giữ nguyên phần overlay và modal cũ, chỉ cập nhật / thay thế cụm CSS Icon dưới đây */
+
+/* Vòng tròn lớn ngoài cùng (Màu vàng cam nhạt) */
+.success-icon-outer {
+  width: 72px;
+  height: 72px;
+  background-color: #ffda93; /* Màu nền cam nhạt chuẩn từ ảnh */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+/* Vòng tròn nhỏ bên trong (Có border cam đậm, nền trong suốt) */
+.success-icon-inner {
+  width: 40px;
+  height: 40px;
+  border: 3.5px solid #785300; /* Màu viền cam đậm */
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Dấu tích chính giữa */
+.success-icon-tick {
+  color: #785300; /* Cùng màu cam đậm với border */
+}
+
+/* Các thuộc tính CSS khác giữ nguyên từ bản trước của bạn... */
+.success-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+}
+
+.success-modal {
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+  padding: 40px 36px 32px 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.success-modal-title {
+  color: #002060;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+}
+
+.success-modal-desc {
+  color: #64748b;
+  font-size: 14.5px;
+  line-height: 1.55;
+  margin: 0 0 28px 0;
+}
+
+.success-modal-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.success-btn {
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #002060;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #001746;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.success-modal-divider {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #f1f5f9;
+  margin: 0 0 16px 0;
+}
+
+.success-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+}

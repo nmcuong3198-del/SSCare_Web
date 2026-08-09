@@ -1,0 +1,45 @@
+.pagination{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:20px;
+
+    background:#EEF4FF;
+
+}
+
+.page-group{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.page-group button{
+
+    width:36px;
+
+    height:36px;
+
+    border:none;
+
+    background:white;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.page-group .active{
+
+    background:#173B92;
+
+    color:white;
+
+}

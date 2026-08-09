@@ -1,0 +1,732 @@
+/* Responsive refinements shared by the active application tree. */
+
+main,
+main > * {
+  min-width: 0;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+.search-bar input,
+.user-info span {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    max-width: calc(100% - 32px);
+  }
+
+  .hero-container {
+    gap: 42px;
+  }
+
+  .hero h1 {
+    font-size: clamp(34px, 4.6vw, 40px);
+  }
+
+  .mission h2 {
+    width: min(100%, 820px);
+    font-size: clamp(32px, 4.5vw, 42px);
+  }
+
+  .testimonial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .testimonial-card:last-child {
+    grid-column: 1 / -1;
+    width: min(100%, 560px);
+    justify-self: center;
+  }
+
+  .notification-editor-layout,
+  .editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .notification-right {
+    width: min(100%, 430px);
+    margin: 0 auto;
+  }
+
+  .editor-left,
+  .editor-right {
+    min-height: auto;
+  }
+
+  .statistic-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-container {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 44px;
+    text-align: center;
+  }
+
+  .hero-left,
+  .hero-right {
+    width: 100%;
+  }
+
+  .hero p {
+    max-width: 720px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .hero-btn {
+    width: min(100%, 240px);
+  }
+
+  .hero-right img {
+    display: block;
+    max-height: 520px;
+    object-fit: cover;
+  }
+
+  .post-list-page > .page-header,
+  .notification-page > .page-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .page-action {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .page-action .search-bar {
+    min-width: 260px;
+    flex: 1;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-grid .stat-card:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: calc(100% - 28px);
+  }
+
+  section {
+    padding-top: 58px;
+    padding-bottom: 58px;
+  }
+
+  .hero {
+    padding: 52px 0 58px;
+  }
+
+  .badge {
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+
+  .hero h1 {
+    font-size: clamp(31px, 9vw, 38px);
+    line-height: 1.25;
+  }
+
+  .hero p {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  .hero-btn {
+    height: 54px;
+    margin-top: 30px;
+    font-size: 18px;
+  }
+
+  .hero-right img {
+    border-radius: 20px;
+  }
+
+  .mission {
+    padding: 68px 0;
+  }
+
+  .quote-icon {
+    font-size: 46px;
+  }
+
+  .mission h3 {
+    font-size: 27px;
+  }
+
+  .mission h2 {
+    width: 100%;
+    margin: 24px auto 30px;
+    font-size: clamp(27px, 7.5vw, 34px);
+    line-height: 1.45;
+  }
+
+  .testimonials {
+    padding: 62px 0 72px;
+  }
+
+  .testimonial-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .testimonial-header h2 {
+    font-size: 31px;
+  }
+
+  .arrow-group {
+    display: none;
+  }
+
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .testimonial-card,
+  .testimonial-card:last-child {
+    grid-column: auto;
+    width: 100%;
+    padding: 26px 22px;
+  }
+
+  .review {
+    min-height: auto;
+    margin: 20px 0 28px;
+  }
+
+  .download-title span {
+    margin-top: 5px;
+  }
+
+  .download-features {
+    gap: 18px 12px;
+  }
+
+  .download-feature strong {
+    white-space: normal;
+  }
+
+  .post-list-page,
+  .notification-page,
+  .notification-editor-page,
+  .editor-page {
+    margin-top: 26px;
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .post-list-page > .page-header,
+  .notification-page > .page-header {
+    margin-bottom: 26px;
+  }
+
+  .post-list-page > .page-header h1,
+  .notification-page > .page-header h1,
+  .editor-header h1 {
+    font-size: clamp(30px, 8vw, 38px);
+    line-height: 1.2;
+  }
+
+  .new-post-btn,
+  .new-notification-btn {
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  .new-post-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 17px;
+  }
+
+  .page-action {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-action .search-bar,
+  .new-notification-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .stat-grid,
+  .statistic-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .stat-grid .stat-card:last-child {
+    grid-column: auto;
+  }
+
+  .stat-card,
+  .statistic-card {
+    padding: 18px;
+  }
+
+  .stat-value,
+  .card-content h2 {
+    font-size: 28px;
+  }
+
+  /* Article table becomes a readable card list on phones. */
+  .article-table-wrapper {
+    overflow: visible;
+  }
+
+  .article-table,
+  .article-table tbody,
+  .article-table tr,
+  .article-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .article-table {
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .article-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .article-table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .article-table tbody tr {
+    overflow: hidden;
+    border: 1px solid #e4eaf4;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(28, 48, 86, 0.06);
+  }
+
+  .article-table td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #edf1f6;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .article-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .article-table td::before {
+    flex: 0 0 92px;
+    color: #6b748a;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    text-transform: uppercase;
+    content: attr(data-label);
+  }
+
+  .article-table .detail-btn {
+    justify-content: flex-end;
+  }
+
+  /* Notification table follows the same mobile card pattern. */
+  .notification-table-wrapper {
+    margin-top: 22px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .notification-table-wrapper .table-header {
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .notification-table,
+  .notification-table tbody,
+  .notification-table tr,
+  .notification-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .notification-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .notification-table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .notification-table tbody tr {
+    overflow: hidden;
+    border: 1px solid #e4eaf4;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(28, 48, 86, 0.06);
+  }
+
+  .notification-table td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 13px 16px;
+    border-bottom: 1px solid #edf1f6;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .notification-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .notification-table td::before {
+    flex: 0 0 104px;
+    color: #6b748a;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    text-transform: uppercase;
+    content: attr(data-label);
+  }
+
+  .notification-table .recipient-list {
+    align-items: flex-end;
+  }
+
+  .notification-table .notification-action {
+    margin-left: auto;
+  }
+
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .pagination-summary {
+    text-align: center;
+  }
+
+  .page-group {
+    max-width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .page-group button {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .notification-editor-page,
+  .editor-page {
+    padding-bottom: 42px;
+  }
+
+  .notification-editor-layout,
+  .editor-layout {
+    gap: 18px;
+  }
+
+  .editor-header {
+    margin-bottom: 22px;
+  }
+
+  .editor-card,
+  .sidebar-card,
+  .notification-form-card,
+  .preview-card {
+    border-radius: 12px;
+  }
+
+  .card-body,
+  .editor-card {
+    padding: 18px;
+  }
+
+  .card-header {
+    height: 28px;
+  }
+
+  .notification-schedule {
+    padding: 16px;
+  }
+
+  .ProseMirror {
+    min-height: 180px;
+    padding: 14px;
+  }
+
+  .emoji-picker-wrapper {
+    left: 0;
+    width: min(320px, calc(100vw - 64px));
+  }
+
+  .EmojiPickerReact {
+    width: 100% !important;
+    max-width: 320px;
+  }
+
+  .preview-card {
+    padding: 16px;
+  }
+
+  .preview-phone-shell {
+    width: min(100%, 322px);
+  }
+
+  .preview-phone {
+    min-height: 570px;
+    border-width: 6px;
+    border-radius: 42px;
+  }
+
+  .phone-lock-heading time {
+    font-size: 64px;
+  }
+
+  .content-title {
+    margin: 32px 0 20px;
+    font-size: 27px;
+  }
+
+  .bottom-bar {
+    position: static;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 16px;
+    border: 1px solid #e5e8f3;
+    border-radius: 14px;
+  }
+
+  .bottom-bar > button,
+  .admin-actions,
+  .admin-actions button {
+    width: 100%;
+  }
+
+  .admin-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reject-btn,
+  .approve-btn {
+    min-width: 0;
+  }
+
+  .draft-info {
+    order: 3;
+    text-align: center;
+  }
+
+  .notification-bottom-bar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .notification-bottom-bar button {
+    min-width: 0;
+    flex: 1 1 190px;
+    height: 50px;
+  }
+
+  .success-modal-overlay,
+  .modal-overlay {
+    padding: 16px;
+  }
+
+  .success-modal,
+  .submit-modal,
+  .approve-modal,
+  .reject-modal {
+    width: 100%;
+    max-width: 480px;
+    padding: 30px 22px;
+  }
+
+  .success-modal h2,
+  .submit-modal h2,
+  .approve-modal h2 {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 600px) {
+  .download-features {
+    grid-template-columns: 1fr;
+    width: min(100%, 330px);
+  }
+
+  .download-feature {
+    align-items: center;
+    text-align: left;
+  }
+
+  .download-qr-list {
+    width: 100%;
+  }
+
+  .download-qr-card {
+    width: min(100%, 260px);
+  }
+
+  .admin-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-bottom-bar {
+    flex-direction: column;
+  }
+
+  .notification-bottom-bar button {
+    width: 100%;
+    flex-basis: auto;
+  }
+
+  .schedule-picker-row,
+  .select-row {
+    gap: 14px;
+  }
+
+  .session-timeout-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    max-width: calc(100% - 22px);
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .mission h2 {
+    font-size: 26px;
+  }
+
+  .download-title {
+    font-size: 33px;
+    letter-spacing: -1px;
+  }
+
+  .download-description {
+    line-height: 1.65;
+  }
+
+  .download-visual {
+    min-height: 560px;
+    margin-bottom: -300px;
+    transform: translateX(-50%) scale(0.5);
+  }
+
+  .article-table td,
+  .notification-table td {
+    gap: 12px;
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .article-table td::before {
+    flex-basis: 82px;
+  }
+
+  .notification-table td::before {
+    flex-basis: 94px;
+  }
+
+  .notification-table-wrapper .table-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-body,
+  .editor-card,
+  .sidebar-card {
+    padding: 15px;
+  }
+
+  .preview-card {
+    padding: 14px;
+  }
+
+  .preview-live-badge {
+    display: none;
+  }
+
+  .preview-phone {
+    min-height: 540px;
+    border-width: 5px;
+    border-radius: 38px;
+  }
+
+  .phone-lock-heading {
+    padding-top: 24px;
+  }
+
+  .phone-lock-heading time {
+    font-size: 58px;
+  }
+
+  .success-modal,
+  .submit-modal,
+  .approve-modal,
+  .reject-modal {
+    padding: 26px 18px;
+    border-radius: 16px;
+  }
+}
