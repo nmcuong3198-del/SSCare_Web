@@ -4,9 +4,9 @@
   overflow: hidden;
   margin-top: 72px;
   background:
-    radial-gradient(circle at 12% 15%, rgba(46, 101, 207, 0.34), transparent 30%),
-    radial-gradient(circle at 88% 70%, rgba(248, 180, 46, 0.16), transparent 28%),
-    linear-gradient(135deg, #06163f 0%, #0a2865 55%, #0c347f 100%);
+          radial-gradient(circle at 12% 15%, rgba(46, 101, 207, 0.34), transparent 30%),
+          radial-gradient(circle at 88% 70%, rgba(248, 180, 46, 0.16), transparent 28%),
+          linear-gradient(135deg, #06163f 0%, #0a2865 55%, #0c347f 100%);
   color: #dce7ff;
 }
 
@@ -238,6 +238,17 @@
   font-size: 12px;
 }
 
+.footer-testing-notice {
+  width: min(100% - 48px, 1200px);
+  margin: 0 auto;
+  padding: 0 0 18px;
+  color: #ffd66d;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.6;
+  text-align: center;
+}
+
 @media (max-width: 980px) {
   .footer-container {
     grid-template-columns: minmax(260px, 1.4fr) repeat(2, minmax(150px, 1fr));
@@ -284,6 +295,11 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .footer-testing-notice {
+    width: min(100% - 36px, 1200px);
+    padding-bottom: 16px;
   }
 }
 
