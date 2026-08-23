@@ -4,7 +4,7 @@ import "./UploadCover.css";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const VALID_TYPES = ["image/jpeg", "image/jpg", "image/png"];
-const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api")
+const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "/api")
   .replace(/\/api\/?$/, "")
   .replace(/\/$/, "");
 
