@@ -4,9 +4,9 @@
   overflow: hidden;
   margin-top: 72px;
   background:
-          radial-gradient(circle at 12% 15%, rgba(46, 101, 207, 0.34), transparent 30%),
-          radial-gradient(circle at 88% 70%, rgba(248, 180, 46, 0.16), transparent 28%),
-          linear-gradient(135deg, #06163f 0%, #0a2865 55%, #0c347f 100%);
+          radial-gradient(circle at 14% 18%, rgba(22, 137, 201, 0.34), transparent 32%),
+          radial-gradient(circle at 88% 18%, rgba(250, 204, 57, 0.14), transparent 26%),
+          linear-gradient(135deg, #002058 0%, #004078 48%, #0878b5 100%);
   color: #dce7ff;
 }
 
@@ -17,7 +17,7 @@
   right: 0;
   left: 0;
   height: 4px;
-  background: linear-gradient(90deg, #f5b82e 0%, #ffd66d 45%, #f5b82e 100%);
+  background: linear-gradient(90deg, #003b78 0%, #1596d0 58%, #facc39 100%);
   content: "";
 }
 
@@ -72,7 +72,7 @@
   border-radius: 15px;
   background: linear-gradient(145deg, #ffd66d, #f5a912);
   box-shadow: 0 12px 28px rgba(1, 12, 43, 0.28);
-  color: #09245d;
+  color: #002058;
   font-size: 25px;
 }
 
@@ -212,7 +212,7 @@
 
 .footer-bottom-wrap {
   border-top: 1px solid rgba(255, 255, 255, 0.11);
-  background: rgba(1, 13, 48, 0.28);
+  background: rgba(0, 32, 88, 0.32);
 }
 
 .footer-bottom {

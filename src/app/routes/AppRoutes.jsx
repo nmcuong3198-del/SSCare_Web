@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import MainLayout from "@/app/layouts/MainLayout";
 import ProtectedRoute from "@/features/auth/components/ProtectedRoute/ProtectedRoute";
 import Login from "@/features/auth/pages/Login/Login";
+import AccountManagement from "@/features/accounts/pages/AccountManagement";
 import Home from "@/features/landing/pages/Home";
 import About from "@/features/landing/pages/About/About";
 import DownloadPage from "@/features/landing/pages/Download/DownloadPage";
@@ -21,13 +22,20 @@ export default function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/download" element={<DownloadPage />} />
 
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute roles={["ADMIN", "CONTENT_EDITOR"]} />}>
           <Route path="/posts" element={<PostList />} />
           <Route path="/posts/new" element={<PostEditor />} />
           <Route path="/posts/:code" element={<PostEditor />} />
+        </Route>
+
+        <Route element={<ProtectedRoute roles={["ADMIN", "NOTIFICATION_MANAGER"]} />}>
           <Route path="/notifications" element={<NotificationList />} />
           <Route path="/notifications/new" element={<NotificationEditor />} />
           <Route path="/notifications/:code" element={<NotificationEditor />} />
+        </Route>
+
+        <Route element={<ProtectedRoute roles={["ADMIN"]} />}>
+          <Route path="/accounts" element={<AccountManagement />} />
         </Route>
       </Route>
     </Routes>
