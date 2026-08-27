@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlusCircle, FaRegFileAlt } from "react-icons/fa";
-import { FiMessageSquare } from "react-icons/fi";
-import { IoEyeOutline } from "react-icons/io5";
+import { FiClock, FiEdit3 } from "react-icons/fi";
 
 import authService from "@/features/auth/services/authService";
 import ArticleTable from "@/features/posts/components/list/ArticleTable";
@@ -20,10 +19,10 @@ export default function PostList() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const user = authService.getCurrentUser();
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = authService.isAdmin();
 
   useEffect(() => {
     let cancelled = false;
@@ -44,6 +43,25 @@ export default function PostList() {
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [page]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    articleService
+      .getStats()
+      .then((data) => {
+        if (!cancelled) setStats(data);
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error("Không thể tải thống kê bài viết:", error);
+        }
       });
 
     return () => {
@@ -84,16 +102,16 @@ export default function PostList() {
         />
 
         <StatisticCard
-          icon={<IoEyeOutline />}
-          title="Lượt xem"
-          value="1.2K"
+          icon={<FiClock />}
+          title="Chờ duyệt"
+          value={stats ? stats.pending : "—"}
           color="#FDBE4C"
         />
 
         <StatisticCard
-          icon={<FiMessageSquare />}
-          title="Thảo luận"
-          value="86"
+          icon={<FiEdit3 />}
+          title="Bản nháp"
+          value={stats ? stats.draft : "—"}
           color="#BFD7FF"
         />
       </div>

@@ -8,7 +8,9 @@ export default function ConclusionEditor({
   readOnly,
   loading,
 }) {
-
+  // Null for any article whose body has no conclusion block, which is everything not written
+  // in this editor: the app's own content, and anything imported.
+  const conclusion = article.conclusion ?? "";
 
   const handleChange = (event) => {
 
@@ -37,13 +39,13 @@ export default function ConclusionEditor({
         maxLength={MAX_LENGTH}
         disabled={loading}
         placeholder="Viết thông điệp cuối cùng hoặc lời khuyên tổng kết..."
-        value={article.conclusion}
+        value={conclusion}
         onChange={handleChange}
         readOnly={readOnly}
       />
 
       <div className="char-counter">
-        {article.conclusion.length}/{MAX_LENGTH}
+        {conclusion.length}/{MAX_LENGTH}
       </div>
 
     </div>

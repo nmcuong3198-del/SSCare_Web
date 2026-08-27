@@ -9,7 +9,7 @@ export function isArticleReadyForQualityCheck(article, imageFile) {
     hasText(article.title) &&
       imageFile &&
       hasText(article.summary) &&
-      article.cateId &&
+      hasText(article.cateName) &&
       Array.isArray(article.hashtags) &&
       article.hashtags.length > 0 &&
       sections.length > 0 &&
@@ -36,8 +36,8 @@ export function validateArticle(article, imageFile) {
     return false;
   }
 
-  if (!article.cateId) {
-    toast.error("Vui lòng chọn thư mục liên quan.");
+  if (!hasText(article.cateName)) {
+    toast.error("Vui lòng chọn thư mục đăng tải bài viết.");
     return false;
   }
 

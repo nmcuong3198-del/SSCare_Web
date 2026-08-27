@@ -1,6 +1,16 @@
 import axiosClient from "@/shared/services/http/axiosClient";
 
 const articleService = {
+  //Danh mục bài viết
+  getCategories() {
+    return axiosClient.get("/articles/categories");
+  },
+
+  //Thống kê biên tập
+  getStats() {
+    return axiosClient.get("/articles/stats");
+  },
+
   //Danh sách bài viết
   getList(page, size) {
     return axiosClient.get("/articles", {
@@ -32,8 +42,18 @@ const articleService = {
   },
 
   //Cập nhật
-  update(id, data) {
-    return axiosClient.put(`/articles/${id}`, data);
+  update(code, formData) {
+    return axiosClient.put(
+      `/articles/${code}`,
+
+      formData,
+
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
   },
 
   //Cập nhật trạng thái
@@ -42,8 +62,10 @@ const articleService = {
   },
 
   //Xóa
-  remove(id) {
-    return axiosClient.delete(`/articles/${id}`);
+  remove(code, { deletedBy, reason } = {}) {
+    return axiosClient.delete(`/articles/${code}`, {
+      params: { deletedBy, reason },
+    });
   },
 };
 
