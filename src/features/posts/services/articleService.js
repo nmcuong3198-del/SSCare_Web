@@ -42,8 +42,18 @@ const articleService = {
   },
 
   //Cập nhật
-  update(id, data) {
-    return axiosClient.put(`/articles/${id}`, data);
+  update(code, formData) {
+    return axiosClient.put(
+      `/articles/${code}`,
+
+      formData,
+
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
   },
 
   //Cập nhật trạng thái
@@ -52,8 +62,10 @@ const articleService = {
   },
 
   //Xóa
-  remove(id) {
-    return axiosClient.delete(`/articles/${id}`);
+  remove(code, { deletedBy, reason } = {}) {
+    return axiosClient.delete(`/articles/${code}`, {
+      params: { deletedBy, reason },
+    });
   },
 };
 
