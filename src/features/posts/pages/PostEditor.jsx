@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import authService from "@/features/auth/services/authService";
 import ArticleBasicInfo from "@/features/posts/components/editor/basic/ArticleBasicInfo";
@@ -13,18 +14,20 @@ import Sidebar from "@/features/posts/components/editor/sidebar/Sidebar";
 import { createEmptyArticle } from "@/features/posts/model/articleDefault";
 import articleService from "@/features/posts/services/articleService";
 import { createArticleFormData } from "@/features/posts/utils/articlePayload";
+import { canEditArticle } from "@/features/posts/utils/articlePermissions";
 import { validateArticle } from "@/features/posts/utils/articleValidator";
 
 import "./PostEditor.css";
 
 export default function PostEditor() {
   const { code } = useParams();
-  const isViewMode = Boolean(code);
+  const isExisting = Boolean(code);
 
   const [article, setArticle] = useState(createEmptyArticle);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(Boolean(code));
   const [revision, setRevision] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -32,6 +35,7 @@ export default function PostEditor() {
 
   const requestInFlightRef = useRef(false);
   const submittedRef = useRef(false);
+  const loadedRef = useRef(null);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -43,6 +47,7 @@ export default function PostEditor() {
       .then((data) => {
         if (cancelled) return;
 
+        loadedRef.current = { article: data, imageFile: data.imageUrl ?? null };
         setArticle(data);
         setImageFile(data.imageUrl ?? null);
       })
@@ -63,6 +68,9 @@ export default function PostEditor() {
   const markAsChanged = useCallback(() => {
     setRevision((currentRevision) => currentRevision + 1);
   }, []);
+
+  const canEdit = isExisting && canEditArticle(article.status);
+  const readOnly = isExisting && !isEditing;
 
   const handleArticleChange = useCallback(
     (updater) => {
@@ -96,6 +104,63 @@ export default function PostEditor() {
 
   const handlePreview = () => {
     setShowPreview(true);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    if (loadedRef.current) {
+      setArticle(loadedRef.current.article);
+      setImageFile(loadedRef.current.imageFile);
+    }
+    setIsEditing(false);
+  };
+
+  const handleSave = async () => {
+    if (!validateArticle(article, imageFile) || requestInFlightRef.current) {
+      return;
+    }
+
+    // Readers keep their place by contentVersion, which the server bumps when published
+    // content changes, so this is not a silent edit.
+    if (
+      article.status === "published" &&
+      !window.confirm(
+        "Bài viết đang hiển thị trên ứng dụng. Lưu thay đổi sẽ đặt lại tiến độ đọc của người dùng. Tiếp tục?",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      requestInFlightRef.current = true;
+      setLoading(true);
+
+      const formData = createArticleFormData(article, imageFile, {
+        status: article.status,
+        createdBy: article.createdBy,
+      });
+
+      const updated = await articleService.update(code, formData);
+
+      loadedRef.current = {
+        article: updated,
+        imageFile: updated.imageUrl ?? null,
+      };
+      setArticle(updated);
+      setImageFile(updated.imageUrl ?? null);
+      setIsEditing(false);
+      toast.success("Đã lưu thay đổi.");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.detail || "Không thể lưu thay đổi bài viết.",
+      );
+    } finally {
+      requestInFlightRef.current = false;
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -161,7 +226,11 @@ export default function PostEditor() {
   return (
     <div className="editor-page">
       <div className="editor-header">
-        <h1>{code ? `Chi tiết bài viết ${code}` : "Tạo bài viết mới"}</h1>
+        <h1>
+          {code
+            ? `${isEditing ? "Chỉnh sửa" : "Chi tiết"} bài viết ${code}`
+            : "Tạo bài viết mới"}
+        </h1>
       </div>
 
       <div className="editor-layout">
@@ -171,14 +240,14 @@ export default function PostEditor() {
             setArticle={handleArticleChange}
             imageFile={imageFile}
             setImageFile={handleImageChange}
-            readOnly={isViewMode}
+            readOnly={readOnly}
             loading={loading}
           />
 
           <ContentEditor
             article={article}
             setArticle={handleArticleChange}
-            readOnly={isViewMode}
+            readOnly={readOnly}
           />
         </div>
 
@@ -189,7 +258,7 @@ export default function PostEditor() {
             revision={revision}
             setArticle={handleArticleChange}
             setQualityChecked={setArticle}
-            readOnly={isViewMode}
+            readOnly={readOnly}
           />
         </div>
       </div>
@@ -200,7 +269,12 @@ export default function PostEditor() {
         onSubmit={handleSubmit}
         onReject={handleReject}
         onApprove={handleApprove}
-        readOnly={isViewMode}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onCancelEdit={handleCancelEdit}
+        canEdit={canEdit}
+        isEditing={isEditing}
+        readOnly={readOnly}
       />
 
       <ArticlePreviewModal

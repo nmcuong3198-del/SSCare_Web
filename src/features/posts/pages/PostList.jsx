@@ -22,8 +22,7 @@ export default function PostList() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const user = authService.getCurrentUser();
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = authService.isAdmin();
 
   useEffect(() => {
     let cancelled = false;
