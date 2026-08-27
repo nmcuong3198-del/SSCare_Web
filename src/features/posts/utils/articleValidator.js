@@ -20,11 +20,7 @@ export function isArticleReadyForQualityCheck(article, imageFile) {
   );
 }
 
-export function validateArticle(
-  article,
-  imageFile,
-  { requireQualityCheck = true } = {},
-) {
+export function validateArticle(article, imageFile) {
   if (!hasText(article.title)) {
     toast.error("Vui lòng nhập tiêu đề bài viết.");
     return false;
@@ -74,7 +70,7 @@ export function validateArticle(
     return false;
   }
 
-  if (requireQualityCheck && article.qualityChecked !== true) {
+  if (article.qualityChecked !== true) {
     toast.error("Vui lòng kiểm tra từ cấm trước khi gửi bài viết.");
     return false;
   }

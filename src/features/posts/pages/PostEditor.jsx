@@ -119,12 +119,7 @@ export default function PostEditor() {
   };
 
   const handleSave = async () => {
-    // The banned-word gate belongs to submitting for review, not to correcting an existing
-    // article, so saving an edit does not force a re-check.
-    if (
-      !validateArticle(article, imageFile, { requireQualityCheck: false }) ||
-      requestInFlightRef.current
-    ) {
+    if (!validateArticle(article, imageFile) || requestInFlightRef.current) {
       return;
     }
 
