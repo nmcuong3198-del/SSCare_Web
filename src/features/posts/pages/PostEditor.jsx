@@ -6,6 +6,7 @@ import ArticleBasicInfo from "@/features/posts/components/editor/basic/ArticleBa
 import ContentEditor from "@/features/posts/components/editor/content/ContentEditor";
 import BottomActionBar from "@/features/posts/components/editor/footer/BottomBar";
 import ApproveSuccessModal from "@/features/posts/components/editor/popup/ApproveSuccessModal";
+import ArticlePreviewModal from "@/features/posts/components/editor/preview/ArticlePreviewModal";
 import RejectSuccessModal from "@/features/posts/components/editor/popup/RejectSuccessModal";
 import SubmitSuccessModal from "@/features/posts/components/editor/popup/SubmitSuccessModal";
 import Sidebar from "@/features/posts/components/editor/sidebar/Sidebar";
@@ -27,6 +28,7 @@ export default function PostEditor() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const requestInFlightRef = useRef(false);
   const submittedRef = useRef(false);
@@ -93,7 +95,7 @@ export default function PostEditor() {
   );
 
   const handlePreview = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setShowPreview(true);
   };
 
   const handleSubmit = async () => {
@@ -199,6 +201,13 @@ export default function PostEditor() {
         onReject={handleReject}
         onApprove={handleApprove}
         readOnly={isViewMode}
+      />
+
+      <ArticlePreviewModal
+        open={showPreview}
+        onClose={() => setShowPreview(false)}
+        article={article}
+        imageFile={imageFile}
       />
 
       <SubmitSuccessModal

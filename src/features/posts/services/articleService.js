@@ -6,6 +6,11 @@ const articleService = {
     return axiosClient.get("/articles/categories");
   },
 
+  //Thống kê biên tập
+  getStats() {
+    return axiosClient.get("/articles/stats");
+  },
+
   //Danh sách bài viết
   getList(page, size) {
     return axiosClient.get("/articles", {

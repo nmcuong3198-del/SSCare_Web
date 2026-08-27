@@ -1,0 +1,215 @@
+/* Colours and type scale mirror the app's AppColors and ArticleContentView style sheet. */
+.article-preview__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(25, 28, 32, 0.55);
+}
+
+.article-preview {
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+.article-preview__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e1e2e8;
+}
+
+.article-preview__bar strong {
+  font-size: 15px;
+  color: #191c20;
+}
+
+.article-preview__hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #424750;
+}
+
+.article-preview__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #424750;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+}
+
+.article-preview__close:hover {
+  background: #f3f3f9;
+}
+
+.article-preview__phone {
+  padding: 16px;
+  overflow-y: auto;
+  background: #f9f9ff;
+}
+
+.article-preview__body {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.article-preview__cover {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.article-preview__meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.article-preview__chip {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #003e74;
+  background: #d4e3ff;
+  border-radius: 999px;
+}
+
+.article-preview__minutes {
+  font-size: 12px;
+  color: #424750;
+}
+
+.article-preview__title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: #191c20;
+}
+
+.article-preview__excerpt {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #424750;
+}
+
+.article-preview__block + .article-preview__block {
+  margin-top: 24px; /* matches the app's 24px gap between blocks */
+}
+
+.article-preview__block :is(h1, h2) {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #003e74;
+}
+
+.article-preview__block h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #191c20;
+}
+
+.article-preview__block p {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #191c20;
+}
+
+.article-preview__block p:last-child {
+  margin-bottom: 0;
+}
+
+.article-preview__block strong {
+  font-weight: 700;
+}
+
+.article-preview__block blockquote {
+  padding: 12px 16px;
+  margin: 0 0 12px;
+  font-style: italic;
+  color: #424750;
+  background: #f3f3f9;
+  border-left: 3px solid #003e74;
+}
+
+.article-preview__block ul {
+  padding-left: 24px;
+  margin: 0 0 12px;
+  list-style: disc outside; /* the app shows bullets; a global reset strips them here */
+}
+
+.article-preview__block ol {
+  padding-left: 24px;
+  margin: 0 0 12px;
+  list-style: decimal outside;
+}
+
+.article-preview__block li {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #191c20;
+}
+
+.article-preview__block li::marker {
+  font-weight: 700;
+  color: #003e74;
+}
+
+.article-preview__dropped-image {
+  display: block;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #ba1a1a;
+  background: #fff1f1;
+  border: 1px dashed #ba1a1a;
+  border-radius: 8px;
+}
+
+.article-preview__empty {
+  margin: 0;
+  font-size: 14px;
+  color: #727781;
+}
+
+.article-preview__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.article-preview__tags span {
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #424750;
+  background: #f3f3f9;
+  border-radius: 999px;
+}
