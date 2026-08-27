@@ -16,10 +16,13 @@ export default function BottomActionBar({
   onCancelEdit,
   canEdit = false,
   isEditing = false,
+  isExisting = false,
   readOnly,
 }) {
   const navigate = useNavigate();
-  const isAdmin = authService.isAdmin();
+  // Approving only makes sense for an article that exists; on the create form the author
+  // still needs the submit button, whatever their role.
+  const isAdmin = authService.isAdmin() && isExisting;
 
   if (isEditing) {
     return (
