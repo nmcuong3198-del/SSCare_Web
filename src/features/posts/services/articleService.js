@@ -1,6 +1,11 @@
 import axiosClient from "@/shared/services/http/axiosClient";
 
 const articleService = {
+  //Danh mục bài viết
+  getCategories() {
+    return axiosClient.get("/articles/categories");
+  },
+
   //Danh sách bài viết
   getList(page, size) {
     return axiosClient.get("/articles", {

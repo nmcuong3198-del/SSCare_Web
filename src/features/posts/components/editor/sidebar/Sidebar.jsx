@@ -2,7 +2,6 @@ import { Shapes } from "lucide-react";
 
 import "./Sidebar.css";
 
-import CategorySelect from "@/features/posts/components/editor/sidebar/CategorySelect";
 import HashTagInput from "@/features/posts/components/editor/sidebar/HashTagInput";
 import QualityChecker from "@/features/posts/components/editor/sidebar/QualityChecker";
 import PublishFolderSelect from "@/features/posts/components/editor/sidebar/PublishFolderSelect";
@@ -28,12 +27,6 @@ export default function Sidebar({
 
           <span>PHÂN LOẠI & GẮN THẺ</span>
         </div>
-
-        <CategorySelect
-          article={article}
-          setArticle={setArticle}
-          readOnly={readOnly}
-        />
 
         <HashTagInput
           article={article}

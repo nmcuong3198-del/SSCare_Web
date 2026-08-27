@@ -1,31 +1,56 @@
+import { useEffect, useState } from "react";
 import { FolderOpen } from "lucide-react";
+import articleService from "@/features/posts/services/articleService";
 import "./PublishFolderSelect.css";
 
-const DEFAULT_FOLDER_LIST = [
-  { id: 1, name: "Nuôi dưỡng tinh thần" },
-  { id: 2, name: "Phát triển thể chất" },
-  { id: 3, name: "Bồi đắp kỹ năng" },
-  { id: 4, name: "Sự kiện cảnh báo" },
-];
-
+// The keys come from the server because they are the vocabulary the mobile app uses to build
+// its library tabs; a folder the app does not know about would be unreachable content.
 export default function PublishFolderSelect({
   article,
   setArticle,
-  folders = DEFAULT_FOLDER_LIST,
   loading = false,
   readOnly = false,
 }) {
-  const handleChange = (event) => {
-    const folderId = Number(event.target.value);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
-    const selectedFolder = folders.find(
-      (folder) => folder.id === folderId
-    );
+  useEffect(() => {
+    let cancelled = false;
+
+    articleService
+      .getCategories()
+      .then((data) => {
+        if (cancelled) return;
+
+        const list = Array.isArray(data) ? data : [];
+        setCategories(list);
+
+        setArticle((previousArticle) =>
+          previousArticle.cateName || list.length === 0
+            ? previousArticle
+            : { ...previousArticle, cateName: list[0].key },
+        );
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error("Không thể tải thư mục bài viết:", error);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCategories(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setArticle]);
+
+  const handleChange = (event) => {
+    const { value } = event.target;
 
     setArticle((previousArticle) => ({
       ...previousArticle,
-      folderId: selectedFolder?.id ?? "",
-      folderName: selectedFolder?.name ?? "",
+      cateName: value,
     }));
   };
 
@@ -41,13 +66,17 @@ export default function PublishFolderSelect({
 
         <select
           id="publish-folder-select"
-          value={article?.folderId ?? ""}
+          value={article?.cateName ?? ""}
           onChange={handleChange}
-          disabled={loading || readOnly}
+          disabled={loading || readOnly || loadingCategories}
         >
-          {folders.map((folder) => (
-            <option key={folder.id} value={folder.id}>
-              {folder.name}
+          <option value="" disabled>
+            {loadingCategories ? "Đang tải thư mục..." : "Chọn thư mục"}
+          </option>
+
+          {categories.map((category) => (
+            <option key={category.key} value={category.key}>
+              {category.label}
             </option>
           ))}
         </select>
