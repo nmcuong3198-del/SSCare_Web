@@ -90,6 +90,16 @@ export default function BottomActionBar({
         <div className="admin-actions">
           <button
             type="button"
+            className="preview-btn"
+            onClick={() => navigate("/posts")}
+            disabled={loading}
+          >
+            <ArrowLeft size={18} />
+            <span>Trở về</span>
+          </button>
+
+          <button
+            type="button"
             className="reject-btn"
             onClick={onReject}
             disabled={loading}
