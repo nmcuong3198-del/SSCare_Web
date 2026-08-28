@@ -140,15 +140,41 @@ export default function Footer() {
                 <p>
                   <span>Người chịu trách nhiệm quản lý nội dung:</span> Nguyễn Thị Hương
                 </p>
+
                 <div className="footer-license">
-                  <span className="footer-license-title">Giấy phép mạng xã hội</span>
-                  <img
-                      src={socialNetworkLicense}
-                      alt="Biểu tượng Đã cấp phép"
-                      className="footer-license-badge"
-                  />
-                  <small>
-                    Số giấy phép, ngày cấp và cơ quan cấp: Đang cập nhật sau khi được cấp.
+                  <div className="footer-license-header">
+                    <span className="footer-license-title">Thông tin cấp phép mạng xã hội</span>
+                    <span className="footer-license-status">Sẽ bổ sung khi được cấp</span>
+                  </div>
+
+                  <div className="footer-license-body">
+                    <div className="footer-license-badge-wrap">
+                      <img
+                          src={socialNetworkLicense}
+                          alt="Biểu tượng Đã cấp phép"
+                          className="footer-license-badge"
+                      />
+                    </div>
+
+                    <div className="footer-license-info">
+                      <div className="footer-license-row">
+                        <span>Số giấy phép</span>
+                        <strong>Sẽ bổ sung</strong>
+                      </div>
+                      <div className="footer-license-row">
+                        <span>Ngày cấp</span>
+                        <strong>Sẽ bổ sung</strong>
+                      </div>
+                      <div className="footer-license-row">
+                        <span>Cơ quan cấp</span>
+                        <strong>Sẽ bổ sung</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <small className="footer-license-note">
+                    Biểu tượng và thông tin giấy phép chính thức sẽ được cập nhật ngay sau
+                    khi cơ quan có thẩm quyền cấp phép.
                   </small>
                 </div>
               </div>
