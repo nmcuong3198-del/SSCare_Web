@@ -6,7 +6,7 @@ import {
   FaMapMarkerAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
-import socialNetworkLicense from "@/assets/brand/social-network-license-clean.png";
+import socialNetworkLicense from "@/assets/brand/social-network-license.png";
 import "./Footer.css";
 
 const productLinks = [

@@ -278,18 +278,16 @@
 .footer-license-badge-panel {
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 92px;
+  justify-content: flex-start;
   margin-bottom: 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(5, 21, 61, 0.42);
+  padding: 2px 0;
 }
 
 .footer-license-badge {
-  width: min(210px, 100%);
+  width: min(260px, 100%);
   height: auto;
   display: block;
+  object-fit: contain;
 }
 
 .footer-license-summary {
