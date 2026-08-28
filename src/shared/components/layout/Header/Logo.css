@@ -1,5 +1,5 @@
 .logo {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 10px;
     text-decoration: none;
@@ -9,18 +9,45 @@
 .logo-image {
     width: 42px;
     height: 42px;
+    flex-shrink: 0;
     object-fit: contain;
     border-radius: 8px;
 }
 
-.logo-text {
-    font-size: 30px;
-    font-weight: 700;
-    color: #163C92;
-    letter-spacing: 0.5px;
+.logo-copy {
+    display: inline-flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1;
 }
 
-.logo:hover .logo-text {
+.logo-text {
+    display: block;
+    color: #163C92;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+/* Theo tài liệu review: tên loại hình dịch vụ nằm ngay dưới tên trang,
+   cỡ chữ bằng 2/3 tên SSCare và đủ tương phản với nền. */
+.logo-service-type {
+    display: block;
+    margin-top: 4px;
+    color: #43557E;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.15px;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.logo:hover .logo-text,
+.logo:hover .logo-service-type {
     color: #1B4DB8;
 }
 
@@ -32,5 +59,29 @@
 
     .logo-text {
         font-size: 24px;
+    }
+
+    .logo-service-type {
+        margin-top: 3px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 380px) {
+    .logo {
+        gap: 8px;
+    }
+
+    .logo-image {
+        width: 34px;
+        height: 34px;
+    }
+
+    .logo-text {
+        font-size: 22px;
+    }
+
+    .logo-service-type {
+        font-size: 14.6667px;
     }
 }

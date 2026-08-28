@@ -6,6 +6,7 @@ import {
   FaMapMarkerAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
+import socialNetworkLicense from "@/assets/brand/social-network-license.png";
 import "./Footer.css";
 
 const productLinks = [
@@ -20,7 +21,7 @@ const supportLinks = [
   { label: "Điều khoản sử dụng", href: "#" },
   { label: "Chính sách bảo mật", href: "#" },
   { label: "Câu hỏi thường gặp", href: "#" },
-  { label: "Liên hệ", href: "mailto:admin@sscare.com" },
+  { label: "Liên hệ", href: "mailto:sscarevn@gmail.com" },
 ];
 
 export default function Footer() {
@@ -34,7 +35,6 @@ export default function Footer() {
         <div className="footer-container">
           <section className="footer-brand" aria-label="Giới thiệu SSCare">
             <Link to="/" className="footer-brand-link" aria-label="Về trang chủ SSCare">
-
               <span className="footer-brand-name">SSCare</span>
             </Link>
 
@@ -87,22 +87,71 @@ export default function Footer() {
               <span className="footer-contact-icon" aria-hidden="true">
                 <FaMapMarkerAlt />
               </span>
-                <span>Hà Nội, Việt Nam</span>
+                <span>Số 232, Dãy C13, Tổ 1, Phường Long Biên, Hà Nội</span>
               </div>
 
-              <a href="mailto:admin@sscare.com" className="footer-contact-item">
+              <a href="mailto:sscarevn@gmail.com" className="footer-contact-item">
               <span className="footer-contact-icon" aria-hidden="true">
                 <FaEnvelope />
               </span>
-                <span>admin@sscare.com</span>
+                <span>sscarevn@gmail.com</span>
               </a>
 
-              <a href="tel:0123456789" className="footer-contact-item">
+              <div className="footer-contact-item">
               <span className="footer-contact-icon" aria-hidden="true">
                 <FaPhoneAlt />
               </span>
-                <span>0123 456 789</span>
-              </a>
+                <span>Số điện thoại: Đang cập nhật</span>
+              </div>
+            </div>
+          </section>
+
+          <section className="footer-legal" aria-label="Thông tin pháp lý SSCare">
+            <h3>Thông tin doanh nghiệp</h3>
+
+            <div className="footer-legal-grid">
+              <div className="footer-legal-card">
+                <p className="footer-legal-company">Công ty Cổ phần Dịch vụ SSCare</p>
+                <p>
+                  <span>Mã số doanh nghiệp/MST:</span> 0111554606
+                </p>
+                <p>
+                  <span>Đăng ký lần đầu:</span> 01/07/2026
+                </p>
+                <p>
+                  <span>Cơ quan cấp:</span> Phòng Đăng ký kinh doanh và Tài chính doanh nghiệp
+                </p>
+              </div>
+
+              <div className="footer-legal-card">
+                <p>
+                  <span>Địa chỉ:</span> Số 232, Dãy C13, Tổ 1, Phường Long Biên, Hà Nội
+                </p>
+                <p>
+                  <span>Email:</span>{" "}
+                  <a href="mailto:sscarevn@gmail.com">sscarevn@gmail.com</a>
+                </p>
+                <p>
+                  <span>Số điện thoại:</span> Đang cập nhật
+                </p>
+              </div>
+
+              <div className="footer-legal-card">
+                <p>
+                  <span>Người chịu trách nhiệm quản lý nội dung:</span> Nguyễn Thị Hương
+                </p>
+                <div className="footer-license">
+                  <span className="footer-license-title">Giấy phép mạng xã hội</span>
+                  <img
+                      src={socialNetworkLicense}
+                      alt="Biểu tượng Đã cấp phép"
+                      className="footer-license-badge"
+                  />
+                  <small>
+                    Số giấy phép, ngày cấp và cơ quan cấp: Đang cập nhật sau khi được cấp.
+                  </small>
+                </div>
+              </div>
             </div>
           </section>
         </div>
