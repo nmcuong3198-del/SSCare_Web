@@ -6,7 +6,7 @@ import {
   FaMapMarkerAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
-import socialNetworkLicense from "@/assets/brand/social-network-license.png";
+import socialNetworkLicense from "@/assets/brand/social-network-license-clean.png";
 import "./Footer.css";
 
 const productLinks = [
@@ -137,45 +137,24 @@ export default function Footer() {
               </div>
 
               <div className="footer-legal-card">
-                <p>
+                <p className="footer-legal-owner">
                   <span>Người chịu trách nhiệm quản lý nội dung:</span> Nguyễn Thị Hương
                 </p>
 
                 <div className="footer-license">
-                  <div className="footer-license-header">
-                    <span className="footer-license-title">Thông tin cấp phép mạng xã hội</span>
-                    <span className="footer-license-status">Sẽ bổ sung khi được cấp</span>
+                  <span className="footer-license-title">Thông tin cấp phép mạng xã hội</span>
+
+                  <div className="footer-license-badge-panel">
+                    <img
+                        src={socialNetworkLicense}
+                        alt="Biểu tượng cấp phép mạng xã hội"
+                        className="footer-license-badge"
+                    />
                   </div>
 
-                  <div className="footer-license-body">
-                    <div className="footer-license-badge-wrap">
-                      <img
-                          src={socialNetworkLicense}
-                          alt="Biểu tượng Đã cấp phép"
-                          className="footer-license-badge"
-                      />
-                    </div>
-
-                    <div className="footer-license-info">
-                      <div className="footer-license-row">
-                        <span>Số giấy phép</span>
-                        <strong>Sẽ bổ sung</strong>
-                      </div>
-                      <div className="footer-license-row">
-                        <span>Ngày cấp</span>
-                        <strong>Sẽ bổ sung</strong>
-                      </div>
-                      <div className="footer-license-row">
-                        <span>Cơ quan cấp</span>
-                        <strong>Sẽ bổ sung</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  <small className="footer-license-note">
-                    Biểu tượng và thông tin giấy phép chính thức sẽ được cập nhật ngay sau
-                    khi cơ quan có thẩm quyền cấp phép.
-                  </small>
+                  <p className="footer-license-summary">
+                    <span>Số giấy phép, ngày cấp, cơ quan cấp:</span> Sẽ bổ sung sau khi được cấp.
+                  </p>
                 </div>
               </div>
             </div>
