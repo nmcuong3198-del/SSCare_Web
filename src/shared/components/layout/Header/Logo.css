@@ -7,8 +7,8 @@
 }
 
 .logo-image {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
     object-fit: contain;
     border-radius: 8px;
@@ -25,7 +25,7 @@
 .logo-text {
     display: block;
     color: #163C92;
-    font-size: 30px;
+    font-size: 34px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0.5px;
@@ -38,7 +38,7 @@
     display: block;
     margin-top: 4px;
     color: #43557E;
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 600;
     line-height: 1;
     letter-spacing: 0.15px;
@@ -53,17 +53,17 @@
 
 @media (max-width: 768px) {
     .logo-image {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
     }
 
     .logo-text {
-        font-size: 24px;
+        font-size: 27px;
     }
 
     .logo-service-type {
         margin-top: 3px;
-        font-size: 16px;
+        font-size: 17px;
     }
 }
 
@@ -73,15 +73,15 @@
     }
 
     .logo-image {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
     }
 
     .logo-text {
-        font-size: 22px;
+        font-size: 24px;
     }
 
     .logo-service-type {
-        font-size: 14.6667px;
+        font-size: 16px;
     }
 }
