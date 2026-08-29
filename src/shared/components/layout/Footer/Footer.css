@@ -2,11 +2,11 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  margin-top: 72px;
+  margin-top: 0;
   background:
-          radial-gradient(circle at 16% 14%, rgba(28, 103, 222, 0.28), transparent 28%),
-          radial-gradient(circle at 86% 22%, rgba(62, 91, 255, 0.22), transparent 30%),
-          linear-gradient(135deg, #031440 0%, #061d62 48%, #062b78 100%);
+          radial-gradient(circle at 15% 15%, rgba(20, 115, 210, 0.30), transparent 32%),
+          radial-gradient(circle at 88% 15%, rgba(55, 145, 255, 0.18), transparent 28%),
+          linear-gradient(135deg, #073b88 0%, #062f73 45%, #041e55 100%);
   color: #dce7ff;
 }
 
@@ -297,10 +297,6 @@
 }
 
 @media (max-width: 860px) {
-  .footer {
-    margin-top: 56px;
-  }
-
   .footer-container {
     width: min(100% - 36px, 1320px);
     padding-top: 38px;

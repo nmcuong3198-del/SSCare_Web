@@ -122,7 +122,7 @@ export default function Footer() {
                 </div>
 
                 <p className="footer-license-number">
-                  Giấy phép số: <span>[Đang cập nhật]</span>
+                  Thông tin về số giấy phép, ngày cấp, cơ quan cấp: <span>[Đang cập nhật]</span>
                 </p>
               </div>
             </section>
