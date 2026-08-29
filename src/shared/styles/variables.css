@@ -17,4 +17,10 @@
 
     --shadow:0 10px 30px rgba(0,0,0,.08);
 
+    /* Shared landing/download/footer palette so the last two blocks read as one visual section. */
+    --landing-blue-deep:#09265F;
+    --landing-blue-mid:#0B3DA8;
+    --landing-blue-bright:#1267E9;
+    --landing-blue-sky:#62BDF6;
+
 }

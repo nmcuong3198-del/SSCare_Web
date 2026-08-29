@@ -3,16 +3,16 @@
   overflow: hidden;
   padding: 92px 0 88px;
   background:
-    radial-gradient(circle at 75% 45%, rgba(74, 162, 255, 0.42), transparent 30%),
-    linear-gradient(118deg, #09265f 0%, #0b3da8 39%, #1267e9 72%, #62bdf6 100%);
+          radial-gradient(circle at 75% 45%, rgba(74, 162, 255, 0.42), transparent 30%),
+          linear-gradient(118deg, var(--landing-blue-deep) 0%, var(--landing-blue-mid) 39%, var(--landing-blue-bright) 72%, var(--landing-blue-sky) 100%);
 }
 
 .download-section::before {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+          linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 68px 68px;
   content: "";
   pointer-events: none;
