@@ -453,48 +453,11 @@
   background: #fff;
 }
 
-.download-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  pointer-events: none;
-}
-
-.download-glow-left {
-  top: -150px;
-  left: -190px;
-  width: 450px;
-  height: 450px;
-  background: rgba(28, 101, 255, 0.34);
-}
-
-.download-glow-right {
-  right: -210px;
-  bottom: -220px;
-  width: 560px;
-  height: 560px;
-  background: rgba(81, 204, 255, 0.44);
-}
-
+.download-glow,
 .download-dots {
-  position: absolute;
-  width: 120px;
-  height: 90px;
-  opacity: 0.28;
-  background-image: radial-gradient(circle, #fff 2px, transparent 2px);
-  background-size: 18px 18px;
-  pointer-events: none;
+  display: none;
 }
 
-.download-dots-top {
-  top: 23px;
-  right: 26px;
-}
-
-.download-dots-bottom {
-  bottom: 17px;
-  left: 27px;
-}
 
 @keyframes download-phone-float {
   0%, 100% { transform: translateY(0) rotate(4deg); }

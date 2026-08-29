@@ -1,20 +1,36 @@
 
 .download-footer-unified {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   background:
-    radial-gradient(circle at 78% 16%, rgba(74, 162, 255, 0.42), transparent 30%),
-    radial-gradient(circle at 18% 86%, rgba(16, 71, 170, 0.24), transparent 30%),
-    linear-gradient(118deg, var(--landing-blue-deep) 0%, var(--landing-blue-mid) 39%, var(--landing-blue-bright) 72%, var(--landing-blue-sky) 100%);
+          radial-gradient(circle at 82% 22%, rgba(96, 196, 255, 0.20), transparent 28%),
+          radial-gradient(circle at 12% 78%, rgba(32, 102, 226, 0.18), transparent 28%),
+          linear-gradient(90deg, #0a347f 0%, #0d54c8 55%, #46aef0 100%);
 }
 
 .download-footer-unified::before {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
   background-size: 68px 68px;
+  content: "";
+  pointer-events: none;
+}
+
+.download-footer-unified::after {
+  position: absolute;
+  z-index: 0;
+  right: -220px;
+  top: 18%;
+  width: 620px;
+  height: 620px;
+  border-radius: 50%;
+  background: rgba(88, 195, 255, 0.12);
+  filter: blur(120px);
   content: "";
   pointer-events: none;
 }
