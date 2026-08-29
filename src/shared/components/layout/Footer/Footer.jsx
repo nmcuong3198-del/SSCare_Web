@@ -24,6 +24,8 @@ export default function Footer() {
       <footer className="footer">
         <div className="footer-decoration footer-decoration-left" />
         <div className="footer-decoration footer-decoration-right" />
+        <div className="footer-dots footer-dots-left" />
+        <div className="footer-dots footer-dots-right" />
 
         <div className="footer-container">
           <div className="footer-main">
@@ -38,55 +40,37 @@ export default function Footer() {
 
               <div className="footer-company-info">
                 <div className="footer-info-row">
-                <span className="footer-info-icon" aria-hidden="true">
-                  <FaFileAlt />
-                </span>
+                  <span className="footer-info-icon" aria-hidden="true"><FaFileAlt /></span>
                   <span>
-                  Mã số doanh nghiệp/MST: <strong>0111554606</strong>
+                  Mã số doanh nghiệp/MST: <strong>0115546066</strong>
                   <span className="footer-info-separator"> – </span>
                   Đăng ký lần đầu: <strong>01/07/2026</strong>
                 </span>
                 </div>
 
                 <div className="footer-info-row">
-                <span className="footer-info-icon" aria-hidden="true">
-                  <FaShieldAlt />
-                </span>
-                  <span>
-                  Cơ quan cấp: Phòng Đăng ký kinh doanh và Tài chính doanh nghiệp
-                </span>
+                  <span className="footer-info-icon" aria-hidden="true"><FaShieldAlt /></span>
+                  <span>Cơ quan cấp: Phòng Đăng ký kinh doanh và Tài chính doanh nghiệp</span>
                 </div>
 
                 <div className="footer-info-row">
-                <span className="footer-info-icon" aria-hidden="true">
-                  <FaMapMarkerAlt />
-                </span>
+                  <span className="footer-info-icon" aria-hidden="true"><FaMapMarkerAlt /></span>
                   <span>Số 232, Dãy C13, Tổ 1, Phường Long Biên, Hà Nội</span>
                 </div>
 
                 <a href="mailto:sscarevn@gmail.com" className="footer-info-row footer-info-link">
-                <span className="footer-info-icon" aria-hidden="true">
-                  <FaEnvelope />
-                </span>
-                  <span>
-                  Email: <strong>sscarevn@gmail.com</strong>
-                </span>
+                  <span className="footer-info-icon" aria-hidden="true"><FaEnvelope /></span>
+                  <span>Email: <strong>sscarevn@gmail.com</strong></span>
                 </a>
 
                 <div className="footer-info-row">
-                <span className="footer-info-icon" aria-hidden="true">
-                  <FaPhoneAlt />
-                </span>
+                  <span className="footer-info-icon" aria-hidden="true"><FaPhoneAlt /></span>
                   <span>Số điện thoại: Đang cập nhật</span>
                 </div>
 
                 <div className="footer-info-row">
-                <span className="footer-info-icon" aria-hidden="true">
-                  <FaUser />
-                </span>
-                  <span>
-                  Người chịu trách nhiệm quản lý nội dung: <strong>Nguyễn Thị Hương</strong>
-                </span>
+                  <span className="footer-info-icon" aria-hidden="true"><FaUser /></span>
+                  <span>Người chịu trách nhiệm quản lý nội dung: <strong>Nguyễn Thị Hương</strong></span>
                 </div>
               </div>
             </section>
@@ -96,15 +80,10 @@ export default function Footer() {
                 {footerLinks.map((item, index) => (
                     <span className="footer-quick-link-wrap" key={item.label}>
                   {item.to ? (
-                      <Link to={item.to} className="footer-quick-link">
-                        {item.label}
-                      </Link>
+                      <Link to={item.to} className="footer-quick-link">{item.label}</Link>
                   ) : (
-                      <a href={item.href} className="footer-quick-link">
-                        {item.label}
-                      </a>
+                      <a href={item.href} className="footer-quick-link">{item.label}</a>
                   )}
-
                       {index < footerLinks.length - 1 && (
                           <span className="footer-link-dot" aria-hidden="true">•</span>
                       )}
@@ -122,23 +101,29 @@ export default function Footer() {
                 </div>
 
                 <p className="footer-license-number">
-                  Thông tin về số giấy phép, ngày cấp, cơ quan cấp: <span>[Đang cập nhật]</span>
+                  Thông tin về số giấy phép, ngày cấp,<br />
+                  cơ quan cấp: <span>[Đang cập nhật]</span>
                 </p>
               </div>
             </section>
           </div>
 
           <div className="footer-bottom">
-          <span>
-            © {currentYear} Công ty Cổ phần Dịch vụ SSCare. All rights reserved.
-          </span>
+            <span>© {currentYear} Công ty Cổ phần Dịch vụ SSCare. All rights reserved.</span>
           </div>
+        </div>
 
-          <p className="footer-testing-notice">
-            <strong>
-              Website đang trong quá trình kiểm thử. SSCare cam kết hoạt động đúng theo quy định của pháp luật!
-            </strong>
-          </p>
+        <div className="footer-testing-bar">
+          <div className="footer-testing-inner">
+            <span className="footer-testing-spark" aria-hidden="true">✦</span>
+            <span className="footer-testing-icon" aria-hidden="true"><FaShieldAlt /></span>
+            <p>
+              <strong>
+                Website đang trong quá trình kiểm thử. SSCare cam kết hoạt động đúng theo quy định của pháp luật!
+              </strong>
+            </p>
+            <span className="footer-testing-spark" aria-hidden="true">✦</span>
+          </div>
         </div>
       </footer>
   );
