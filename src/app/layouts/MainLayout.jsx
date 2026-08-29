@@ -1,18 +1,21 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import Header from "@/shared/components/layout/Header/Header";
 import Footer from "@/shared/components/layout/Footer/Footer";
 
 export default function MainLayout() {
-  return (
-    <>
-      <Header />
+    const location = useLocation();
+    const isHome = location.pathname === "/";
 
-      <main>
-        <Outlet />
-      </main>
+    return (
+        <>
+            <Header />
 
-      <Footer />
-    </>
-  );
+            <main>
+                <Outlet />
+            </main>
+
+            {!isHome && <Footer />}
+        </>
+    );
 }
