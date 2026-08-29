@@ -92,27 +92,6 @@ export default function Footer() {
             </section>
 
             <section className="footer-right" aria-label="Thông tin cấp phép và liên kết">
-              <div className="footer-license-card">
-                <div className="footer-license-heading">
-                <span className="footer-license-icon" aria-hidden="true">
-                  <FaShieldAlt />
-                </span>
-
-                  <div>
-                    <h3>THÔNG TIN CẤP PHÉP</h3>
-                    <p>Giấy phép số: [Đang cập nhật]</p>
-                  </div>
-                </div>
-
-                <div className="footer-license-badge-panel">
-                  <img
-                      src={socialNetworkLicense}
-                      alt="Biểu tượng Đã cấp phép mạng xã hội"
-                      className="footer-license-badge"
-                  />
-                </div>
-              </div>
-
               <nav className="footer-quick-links" aria-label="Liên kết chân trang">
                 {footerLinks.map((item, index) => (
                     <span className="footer-quick-link-wrap" key={item.label}>
@@ -132,6 +111,20 @@ export default function Footer() {
                 </span>
                 ))}
               </nav>
+
+              <div className="footer-license-card">
+                <div className="footer-license-badge-panel">
+                  <img
+                      src={socialNetworkLicense}
+                      alt="Biểu tượng Đã cấp phép mạng xã hội"
+                      className="footer-license-badge"
+                  />
+                </div>
+
+                <p className="footer-license-number">
+                  Giấy phép số: <span>[Đang cập nhật]</span>
+                </p>
+              </div>
             </section>
           </div>
 
