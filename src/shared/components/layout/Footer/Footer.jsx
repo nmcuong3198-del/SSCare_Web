@@ -29,7 +29,7 @@ export default function Footer() {
 
         <div className="footer-container">
           <div className="footer-main">
-            <section className="footer-company" aria-label="Thông tin Công ty SSCare">
+            <div className="footer-company" aria-label="Thông tin Công ty SSCare">
               <Link to="/" className="footer-brand-link" aria-label="Về trang chủ SSCare">
                 <span className="footer-brand-ss">SS</span>
                 <span className="footer-brand-care">Care</span>
@@ -73,9 +73,9 @@ export default function Footer() {
                   <span>Người chịu trách nhiệm quản lý nội dung: <strong>Nguyễn Thị Hương</strong></span>
                 </div>
               </div>
-            </section>
+            </div>
 
-            <section className="footer-right" aria-label="Thông tin cấp phép và liên kết">
+            <div className="footer-right" aria-label="Thông tin cấp phép và liên kết">
               <nav className="footer-quick-links" aria-label="Liên kết chân trang">
                 {footerLinks.map((item, index) => (
                     <span className="footer-quick-link-wrap" key={item.label}>
@@ -105,7 +105,7 @@ export default function Footer() {
                   cơ quan cấp: <span>[Đang cập nhật]</span>
                 </p>
               </div>
-            </section>
+            </div>
           </div>
 
           <div className="footer-bottom">
