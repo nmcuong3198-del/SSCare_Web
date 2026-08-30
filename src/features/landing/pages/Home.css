@@ -1,5 +1,5 @@
 
-.download-footer-unified {
+.download-section-background {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -9,7 +9,7 @@
           linear-gradient(90deg, #0a347f 0%, #0d54c8 55%, #46aef0 100%);
 }
 
-.download-footer-unified::before {
+.download-section-background::before {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -21,7 +21,7 @@
   pointer-events: none;
 }
 
-.download-footer-unified::after {
+.download-section-background::after {
   position: absolute;
   z-index: 0;
   right: -220px;
@@ -35,7 +35,7 @@
   pointer-events: none;
 }
 
-.download-footer-unified > * {
+.download-section-background > * {
   position: relative;
   z-index: 1;
 }
