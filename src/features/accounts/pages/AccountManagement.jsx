@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { FaSearch, FaShieldAlt, FaUsers } from "react-icons/fa";
+import { FaCheckCircle, FaSearch, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
 
+import AuthorProfileModal from "@/features/accounts/components/AuthorProfileModal";
 import accountAdminService from "@/features/accounts/services/accountAdminService";
 import Pagination from "@/shared/components/ui/Pagination/Pagination";
 
@@ -8,6 +9,26 @@ import "./AccountManagement.css";
 
 const PAGE_SIZE = 10;
 
+/**
+ * @typedef {Object} AuthorProfile
+ * @property {string|null} credentials
+ * @property {boolean} verified
+ */
+
+/**
+ * @typedef {Object} AdminAccount
+ * @property {string} id
+ * @property {string} displayName
+ * @property {string|null} email
+ * @property {string|null} phone
+ * @property {string[]} roles
+ * @property {boolean} canWriteArticles
+ * @property {boolean} canManageNotifications
+ * @property {string} status
+ * @property {AuthorProfile|null} authorProfile
+ */
+
+/** @param {string} role */
 const roleLabel = (role) => {
   const labels = {
     ADMIN: "Admin",
@@ -21,22 +42,21 @@ const roleLabel = (role) => {
 };
 
 export default function AccountManagement() {
-  const [accounts, setAccounts] = useState([]);
+  const [accounts, setAccounts] = useState(/** @type {AdminAccount[]} */ ([]));
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [keyword, setKeyword] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [loading, setLoading] = useState(true);
-  const [savingId, setSavingId] = useState(null);
+  const [savingId, setSavingId] = useState(/** @type {string|null} */ (null));
+  const [authorProfileAccount, setAuthorProfileAccount] = useState(/** @type {AdminAccount|null} */ (null));
+  const [savingAuthorProfile, setSavingAuthorProfile] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError("");
-
     accountAdminService
       .getAccounts({ keyword: searchKeyword, page, size: PAGE_SIZE })
       .then((response) => {
@@ -61,10 +81,30 @@ export default function AccountManagement() {
 
   const handleSearch = (event) => {
     event.preventDefault();
+    const nextKeyword = keyword.trim();
+
+    if (page === 0 && nextKeyword === searchKeyword) return;
+
+    setLoading(true);
+    setError("");
     setPage(0);
-    setSearchKeyword(keyword.trim());
+    setSearchKeyword(nextKeyword);
   };
 
+  /** @param {number} nextPage */
+  const handlePageChange = (nextPage) => {
+    if (nextPage === page) return;
+
+    setLoading(true);
+    setError("");
+    setPage(nextPage);
+  };
+
+  /**
+   * @param {AdminAccount} account
+   * @param {"canWriteArticles"|"canManageNotifications"} field
+   * @param {boolean} checked
+   */
   const updatePermission = async (account, field, checked) => {
     setSavingId(account.id);
     setError("");
@@ -89,6 +129,38 @@ export default function AccountManagement() {
       setError("Cập nhật quyền thất bại. Vui lòng thử lại.");
     } finally {
       setSavingId(null);
+    }
+  };
+
+
+  /**
+   * @param {{credentials: string|null, verified: boolean}} profile
+   */
+  const updateAuthorProfile = async (profile) => {
+    if (!authorProfileAccount) return;
+
+    setSavingAuthorProfile(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const updated = await accountAdminService.updateAuthorProfile(
+        authorProfileAccount.id,
+        profile,
+      );
+      setAccounts((current) =>
+        current.map((item) => (item.id === updated.id ? updated : item)),
+      );
+      setMessage(`Đã cập nhật hồ sơ tác giả cho ${updated.displayName}.`);
+      setAuthorProfileAccount(null);
+    } catch (requestError) {
+      setError(
+        requestError?.response?.data?.message ||
+          "Cập nhật hồ sơ tác giả thất bại. Vui lòng thử lại.",
+      );
+      throw requestError;
+    } finally {
+      setSavingAuthorProfile(false);
     }
   };
 
@@ -135,6 +207,7 @@ export default function AccountManagement() {
               <th>Tài khoản</th>
               <th>Liên hệ</th>
               <th>Vai trò hiện tại</th>
+              <th>Hồ sơ tác giả</th>
               <th>Viết bài</th>
               <th>Quản lý thông báo</th>
               <th>Trạng thái</th>
@@ -143,11 +216,11 @@ export default function AccountManagement() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" className="account-empty">Đang tải dữ liệu...</td>
+                <td colSpan="7" className="account-empty">Đang tải dữ liệu...</td>
               </tr>
             ) : accounts.length === 0 ? (
               <tr>
-                <td colSpan="6" className="account-empty">Không có tài khoản phù hợp.</td>
+                <td colSpan="7" className="account-empty">Không có tài khoản phù hợp.</td>
               </tr>
             ) : (
               accounts.map((account) => {
@@ -169,6 +242,31 @@ export default function AccountManagement() {
                         {(account.roles || []).map((role) => (
                           <span key={role} className="role-badge">{roleLabel(role)}</span>
                         ))}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="author-profile-cell">
+                        <button
+                          type="button"
+                          className={`author-profile-button ${
+                            account.authorProfile?.verified ? "verified" : ""
+                          }`}
+                          onClick={() => setAuthorProfileAccount(account)}
+                        >
+                          {account.authorProfile?.verified ? <FaCheckCircle /> : <FaUserEdit />}
+                          <span>
+                            <strong>
+                              {account.authorProfile?.credentials
+                                ? "Cập nhật"
+                                : "Thiết lập"}
+                            </strong>
+                            <small>
+                              {account.authorProfile?.verified
+                                ? "Đã xác minh"
+                                : account.authorProfile?.credentials || "Chưa có chuyên môn"}
+                            </small>
+                          </span>
+                        </button>
                       </div>
                     </td>
                     <td>
@@ -219,8 +317,19 @@ export default function AccountManagement() {
         totalPages={totalPages}
         totalElements={totalElements}
         pageSize={PAGE_SIZE}
-        onPageChange={setPage}
+        onPageChange={handlePageChange}
       />
+
+      {authorProfileAccount && (
+        <AuthorProfileModal
+          account={authorProfileAccount}
+          saving={savingAuthorProfile}
+          onClose={() => {
+            if (!savingAuthorProfile) setAuthorProfileAccount(null);
+          }}
+          onSave={updateAuthorProfile}
+        />
+      )}
     </div>
   );
 }
