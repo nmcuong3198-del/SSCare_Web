@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useRef, useState } from "react";
 
-import { resolveArticleImageUrl } from "@/features/posts/utils/articleImageUrl";
+import useArticleImagePreview from "@/features/posts/utils/useArticleImagePreview";
 
 import "./UploadCover.css";
 
@@ -14,19 +14,8 @@ export default function UploadCover({
                                     }) {
   const fileInputRef = useRef(null);
 
-  const previewUrl = useMemo(() => {
-    if (!imageFile) return null;
-    if (typeof imageFile === "string") return resolveArticleImageUrl(imageFile);
-    return URL.createObjectURL(imageFile);
-  }, [imageFile]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
+  const previewUrl = useArticleImagePreview(imageFile);
+  const [previewError, setPreviewError] = useState(false);
 
   const validateFile = (file) => {
     if (!file) return false;
@@ -46,6 +35,7 @@ export default function UploadCover({
 
   const processFile = (file) => {
     if (validateFile(file)) {
+      setPreviewError(false);
       setImageFile(file);
     }
   };
@@ -78,6 +68,7 @@ export default function UploadCover({
     event.stopPropagation();
     if (readOnly) return;
 
+    setPreviewError(false);
     setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -106,7 +97,19 @@ export default function UploadCover({
         >
           {imageFile && previewUrl ? (
               <div className="preview-container">
-                <img src={previewUrl} alt="Ảnh bìa" className="cover-preview" />
+                {!previewError ? (
+                    <img
+                        src={previewUrl}
+                        alt="Ảnh bìa"
+                        className="cover-preview"
+                        onLoad={() => setPreviewError(false)}
+                        onError={() => setPreviewError(true)}
+                    />
+                ) : (
+                    <div className="cover-preview-error">
+                      Không thể hiển thị ảnh này. Vui lòng chọn lại ảnh JPG hoặc PNG hợp lệ.
+                    </div>
+                )}
 
                 <div className="file-info">
                   {typeof imageFile === "string" ? (

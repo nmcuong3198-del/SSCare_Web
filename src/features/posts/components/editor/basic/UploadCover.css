@@ -136,3 +136,15 @@
     background: #163C92;
     color: white;
 }
+
+.cover-preview-error {
+    max-width: 420px;
+    padding: 16px 20px;
+    text-align: center;
+    color: #b42318;
+    background: #fff;
+    border: 1px solid #fecdca;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}

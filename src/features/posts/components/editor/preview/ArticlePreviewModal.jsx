@@ -6,7 +6,7 @@ import {
   buildContentBlocks,
   estimateReadMinutes,
 } from "@/features/posts/utils/articleBlocks";
-import { resolveArticleImageUrl } from "@/features/posts/utils/articleImageUrl";
+import useArticleImagePreview from "@/features/posts/utils/useArticleImagePreview";
 
 import "./ArticlePreviewModal.css";
 
@@ -68,18 +68,7 @@ export default function ArticlePreviewModal({
   article,
   imageFile,
 }) {
-  const coverUrl = useMemo(() => {
-    if (!imageFile) return null;
-    return typeof imageFile === "string"
-      ? resolveArticleImageUrl(imageFile)
-      : URL.createObjectURL(imageFile);
-  }, [imageFile]);
-
-  useEffect(() => {
-    return () => {
-      if (coverUrl?.startsWith("blob:")) URL.revokeObjectURL(coverUrl);
-    };
-  }, [coverUrl]);
+  const coverUrl = useArticleImagePreview(imageFile);
 
   useEffect(() => {
     if (!open) return undefined;
