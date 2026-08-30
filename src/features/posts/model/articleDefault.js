@@ -17,6 +17,7 @@ export function createEmptyArticle() {
     conclusion: "",
     qualityChecked: false,
     anonymousAuthor: false,
+    rejectionReason: null,
     authorName: "",
     createdBy: "",
   };

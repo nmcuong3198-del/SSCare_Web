@@ -1,0 +1,116 @@
+.reject-reason-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.reject-reason-modal {
+  width: min(520px, 100%);
+  padding: 28px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.22);
+}
+
+.reject-reason-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  color: #b42318;
+  background: #fee4e2;
+}
+
+.reject-reason-modal h2 {
+  margin: 0 0 8px;
+  color: #172554;
+  font-size: 22px;
+}
+
+.reject-reason-description {
+  margin: 0 0 22px;
+  color: #667085;
+  line-height: 1.55;
+}
+
+.reject-reason-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reject-reason-label span {
+  color: #d92d20;
+}
+
+.reject-reason-modal textarea {
+  width: 100%;
+  min-height: 122px;
+  resize: vertical;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  color: #101828;
+  font: inherit;
+  line-height: 1.5;
+  outline: none;
+}
+
+.reject-reason-modal textarea:focus {
+  border-color: #163c92;
+  box-shadow: 0 0 0 3px rgba(22, 60, 146, 0.1);
+}
+
+.reject-reason-counter {
+  margin-top: 6px;
+  color: #98a2b3;
+  font-size: 12px;
+  text-align: right;
+}
+
+.reject-reason-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.reject-reason-cancel,
+.reject-reason-confirm {
+  min-width: 126px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reject-reason-cancel {
+  color: #344054;
+  background: #fff;
+  border: 1px solid #d0d5dd;
+}
+
+.reject-reason-confirm {
+  color: #fff;
+  background: #d92d20;
+  border: 1px solid #d92d20;
+}
+
+.reject-reason-cancel:disabled,
+.reject-reason-confirm:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

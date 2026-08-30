@@ -34,6 +34,15 @@ export default function Sidebar({
         />
       </div>
 
+      {article.status === "rejected" && article.rejectionReason && (
+        <div className="sidebar-card rejection-reason-card">
+          <div className="sidebar-header">
+            <span>LÝ DO TỪ CHỐI</span>
+          </div>
+          <p>{article.rejectionReason}</p>
+        </div>
+      )}
+
       <QualityChecker
         key={qualityRevision}
         article={article}

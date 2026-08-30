@@ -7,7 +7,7 @@ import ContentEditor from "@/features/posts/components/editor/content/ContentEdi
 import BottomActionBar from "@/features/posts/components/editor/footer/BottomBar";
 import ApproveSuccessModal from "@/features/posts/components/editor/popup/ApproveSuccessModal";
 import ArticlePreviewModal from "@/features/posts/components/editor/preview/ArticlePreviewModal";
-import RejectSuccessModal from "@/features/posts/components/editor/popup/RejectSuccessModal";
+import RejectReasonModal from "@/features/posts/components/editor/popup/RejectReasonModal";
 import SubmitSuccessModal from "@/features/posts/components/editor/popup/SubmitSuccessModal";
 import Sidebar from "@/features/posts/components/editor/sidebar/Sidebar";
 import { createEmptyArticle } from "@/features/posts/model/articleDefault";
@@ -32,7 +32,7 @@ export default function PostEditor() {
   const [loading, setLoading] = useState(Boolean(code));
   const [qualityRevision, setQualityRevision] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showRejectReasonModal, setShowRejectReasonModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -239,17 +239,33 @@ export default function PostEditor() {
     }
   };
 
-  const handleReject = async () => {
+  const handleReject = () => {
+    setShowRejectReasonModal(true);
+  };
+
+  const handleConfirmReject = async (reason) => {
     try {
       setLoading(true);
-      await articleService.updateStatus({
+      const updated = await articleService.updateStatus({
         code: article.code,
         status: "rejected",
+        reason,
       });
-      setShowRejectModal(true);
+
+      const normalized = {
+        ...articleRef.current,
+        ...updated,
+        status: updated.status || "rejected",
+        rejectionReason: reason,
+      };
+
+      articleRef.current = normalized;
+      setArticle(normalized);
+      setShowRejectReasonModal(false);
+      toast.success("Đã từ chối bài viết và gửi thông báo cho người viết.");
     } catch (error) {
       console.error(error);
-      window.alert(error.response?.data?.detail || "Không thể từ chối bài viết.");
+      toast.error(error.response?.data?.detail || "Không thể từ chối bài viết.");
     } finally {
       setLoading(false);
     }
@@ -262,14 +278,37 @@ export default function PostEditor() {
 
     try {
       setLoading(true);
-      await articleService.updateStatus({
+      const updated = await articleService.updateStatus({
         code: article.code,
         status: "published",
       });
+
+      const normalized = {
+        ...articleRef.current,
+        ...updated,
+        status: updated.status || "published",
+        rejectionReason: null,
+      };
+      articleRef.current = normalized;
+      setArticle(normalized);
       setShowApproveModal(true);
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.detail || "Không thể duyệt bài viết.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRevoke = async () => {
+    try {
+      setLoading(true);
+      await articleService.revoke(article.code);
+      toast.success("Đã thu hồi và xóa vĩnh viễn bài viết.");
+      navigate("/posts");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.detail || "Không thể thu hồi bài viết.");
     } finally {
       setLoading(false);
     }
@@ -322,6 +361,7 @@ export default function PostEditor() {
         onSaveDraft={handleSaveDraft}
         onReject={handleReject}
         onApprove={handleApprove}
+        onRevoke={handleRevoke}
         onEdit={handleEdit}
         onSave={handleSave}
         onCancelEdit={handleCancelEdit}
@@ -342,9 +382,11 @@ export default function PostEditor() {
         open={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
       />
-      <RejectSuccessModal
-        open={showRejectModal}
-        onClose={() => setShowRejectModal(false)}
+      <RejectReasonModal
+        open={showRejectReasonModal}
+        loading={loading}
+        onCancel={() => setShowRejectReasonModal(false)}
+        onConfirm={handleConfirmReject}
       />
       <ApproveSuccessModal
         open={showApproveModal}

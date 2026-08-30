@@ -151,3 +151,28 @@
     opacity: .6;
     cursor: not-allowed;
 }
+
+.revoke-btn {
+    min-width: 176px;
+    height: 48px;
+    border: 1px solid #B42318;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #B42318;
+    background: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.revoke-btn:hover:not(:disabled) {
+    background: #FEF3F2;
+}
+
+.revoke-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}

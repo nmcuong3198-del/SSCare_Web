@@ -5,6 +5,7 @@ import {
   Pencil,
   SendHorizonal,
   Save,
+  Undo2,
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -50,6 +51,7 @@ export default function BottomActionBar({
   onSaveDraft,
   onApprove,
   onReject,
+  onRevoke,
   onEdit,
   onSave,
   onCancelEdit,
@@ -62,6 +64,7 @@ export default function BottomActionBar({
   const isDraft = articleStatus === "draft";
   const isRejected = articleStatus === "rejected";
   const isPending = articleStatus === "pending";
+  const isPublished = articleStatus === "published";
 
   // Đang chỉnh sửa: phải lưu lại trước, không cho gửi thẳng khi còn thay đổi chưa lưu.
   if (isEditing) {
@@ -145,6 +148,18 @@ export default function BottomActionBar({
               </button>
             </>
           )}
+
+          {isPublished && (
+            <button
+              type="button"
+              className="revoke-btn"
+              onClick={onRevoke}
+              disabled={loading}
+            >
+              <Undo2 size={18} />
+              <span>{loading ? "Đang thu hồi..." : "Thu hồi bài viết"}</span>
+            </button>
+          )}
         </div>
       </div>
     );
@@ -183,7 +198,7 @@ export default function BottomActionBar({
     );
   }
 
-  // Bài bị từ chối được phép chỉnh sửa lại, nhưng phải lưu thành nháp rồi mới gửi lại.
+  // Bài bị từ chối vẫn được chỉnh sửa hoặc gửi lại.
   if (isRejected) {
     return (
       <div className="bottom-bar">
@@ -201,7 +216,16 @@ export default function BottomActionBar({
               <span>Chỉnh sửa</span>
             </button>
           )}
-          <BackButton loading={loading} />
+
+          <button
+            type="button"
+            className="submit-btn"
+            onClick={onSubmit}
+            disabled={loading}
+          >
+            <SendHorizonal size={18} />
+            <span>{loading ? "Đang gửi..." : "Gửi lại bài viết"}</span>
+          </button>
         </div>
       </div>
     );

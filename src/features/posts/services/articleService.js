@@ -9,6 +9,7 @@ const articleService = {
   create(formData) { return axiosClient.post("/articles", formData); },
   update(code, formData) { return axiosClient.put(`/articles/${code}`, formData); },
   updateStatus(data) { return axiosClient.put("/articles/update-status", data); },
+  revoke(code) { return axiosClient.delete(`/articles/${code}/revoke`); },
   remove(code, { reason } = {}) { return axiosClient.delete(`/articles/${code}`, { params: { reason } }); },
   restore(code) { return axiosClient.put(`/articles/${code}/restore`); },
   recycleBin() { return axiosClient.get("/articles/recycle-bin"); },
