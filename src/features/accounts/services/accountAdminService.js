@@ -9,13 +9,12 @@ import axiosClient from "@/shared/services/http/axiosClient";
 /**
  * @typedef {Object} AdminAccount
  * @property {string} id
- * @property {string} displayName
+ * @property {string} fullName
  * @property {string|null} email
  * @property {string|null} phone
  * @property {string[]} roles
  * @property {boolean} canWriteArticles
  * @property {boolean} canManageNotifications
- * @property {string} status
  * @property {AuthorProfile|null} authorProfile
  */
 

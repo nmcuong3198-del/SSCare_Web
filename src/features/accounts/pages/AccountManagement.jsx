@@ -18,13 +18,12 @@ const PAGE_SIZE = 10;
 /**
  * @typedef {Object} AdminAccount
  * @property {string} id
- * @property {string} displayName
+ * @property {string} fullName
  * @property {string|null} email
  * @property {string|null} phone
  * @property {string[]} roles
  * @property {boolean} canWriteArticles
  * @property {boolean} canManageNotifications
- * @property {string} status
  * @property {AuthorProfile|null} authorProfile
  */
 
@@ -124,7 +123,7 @@ export default function AccountManagement() {
       setAccounts((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
-      setMessage(`Đã cập nhật quyền cho ${updated.displayName}.`);
+      setMessage(`Đã cập nhật quyền cho ${updated.fullName}.`);
     } catch {
       setError("Cập nhật quyền thất bại. Vui lòng thử lại.");
     } finally {
@@ -151,7 +150,7 @@ export default function AccountManagement() {
       setAccounts((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
-      setMessage(`Đã cập nhật hồ sơ tác giả cho ${updated.displayName}.`);
+      setMessage(`Đã cập nhật hồ sơ tác giả cho ${updated.fullName}.`);
       setAuthorProfileAccount(null);
     } catch (requestError) {
       setError(
@@ -182,7 +181,7 @@ export default function AccountManagement() {
           <FaShieldAlt />
           <div>
             <strong>{totalElements}</strong>
-            <span>Tổng tài khoản</span>
+            <span>Tài khoản hoạt động</span>
           </div>
         </div>
       </div>
@@ -192,7 +191,7 @@ export default function AccountManagement() {
         <input
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Tìm theo tên, email hoặc số điện thoại"
+          placeholder="Tìm theo họ tên đầy đủ, email hoặc số điện thoại"
         />
         <button type="submit">Tìm kiếm</button>
       </form>
@@ -210,17 +209,16 @@ export default function AccountManagement() {
               <th>Hồ sơ tác giả</th>
               <th>Viết bài</th>
               <th>Quản lý thông báo</th>
-              <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="7" className="account-empty">Đang tải dữ liệu...</td>
+                <td colSpan="6" className="account-empty">Đang tải dữ liệu...</td>
               </tr>
             ) : accounts.length === 0 ? (
               <tr>
-                <td colSpan="7" className="account-empty">Không có tài khoản phù hợp.</td>
+                <td colSpan="6" className="account-empty">Không có tài khoản phù hợp.</td>
               </tr>
             ) : (
               accounts.map((account) => {
@@ -230,8 +228,7 @@ export default function AccountManagement() {
                 return (
                   <tr key={account.id}>
                     <td>
-                      <div className="account-name">{account.displayName}</div>
-                      <div className="account-id">{account.id}</div>
+                      <div className="account-name">{account.fullName || "-"}</div>
                     </td>
                     <td>
                       <div>{account.email || "-"}</div>
@@ -298,11 +295,6 @@ export default function AccountManagement() {
                         />
                         <span />
                       </label>
-                    </td>
-                    <td>
-                      <span className={`account-status ${account.status?.toLowerCase()}`}>
-                        {account.status === "ACTIVE" ? "Hoạt động" : account.status}
-                      </span>
                     </td>
                   </tr>
                 );

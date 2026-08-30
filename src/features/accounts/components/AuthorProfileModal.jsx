@@ -73,7 +73,7 @@ export default function AuthorProfileModal({ account, saving, onClose, onSave })
         <div className="author-profile-account-card">
           <div>
             <span>Tài khoản</span>
-            <strong>{account.displayName || "-"}</strong>
+            <strong>{account.fullName || "-"}</strong>
           </div>
           <div>
             <span>Email</span>
