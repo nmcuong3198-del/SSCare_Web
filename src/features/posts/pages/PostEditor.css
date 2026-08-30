@@ -61,3 +61,30 @@
     min-height:800px;
 
 }
+
+.editor-rejection-banner {
+  margin: 0 0 18px;
+  padding: 15px 18px;
+  border: 1px solid #f5a49b;
+  border-left: 4px solid #d92d20;
+  border-radius: 12px;
+  background: #fff7f6;
+  box-shadow: 0 6px 20px rgba(180, 35, 24, 0.06);
+}
+
+.editor-rejection-banner__title {
+  margin-bottom: 6px;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.editor-rejection-banner__content {
+  color: #7a271a;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

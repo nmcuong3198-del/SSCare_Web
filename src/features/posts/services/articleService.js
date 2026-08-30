@@ -3,7 +3,18 @@ import axiosClient from "@/shared/services/http/axiosClient";
 const articleService = {
   getCategories: () => axiosClient.get("/articles/categories"),
   getStats: () => axiosClient.get("/articles/stats"),
-  getList(page, size) { return axiosClient.get("/articles", { params: { page, size } }); },
+  getAuthors: () => axiosClient.get("/articles/authors"),
+  getList(page, size, filters = {}) {
+    return axiosClient.get("/articles", {
+      params: {
+        page,
+        size,
+        ...(filters.title ? { title: filters.title } : {}),
+        ...(filters.status ? { status: filters.status } : {}),
+        ...(filters.author ? { author: filters.author } : {}),
+      },
+    });
+  },
   getDetail(code) { return axiosClient.get(`/articles/${code}`); },
   // Do not set multipart Content-Type manually: the browser must append the boundary.
   create(formData) { return axiosClient.post("/articles", formData); },

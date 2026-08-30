@@ -125,3 +125,9 @@
     height: 14px;
     flex: 0 0 auto;
 }
+
+.article-empty-cell {
+  padding: 34px 18px !important;
+  color: #7b8799;
+  text-align: center !important;
+}

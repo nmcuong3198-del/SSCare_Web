@@ -22,6 +22,11 @@ export default function StatusBadge({ status }) {
       text: "Bị từ chối",
       className: "rejected",
     },
+
+    archived: {
+      text: "Lưu trữ",
+      className: "archived",
+    },
   };
 
   const current = config[status] || {

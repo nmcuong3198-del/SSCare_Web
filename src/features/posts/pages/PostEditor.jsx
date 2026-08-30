@@ -316,6 +316,15 @@ export default function PostEditor() {
 
   return (
     <div className="editor-page">
+      {article.status === "rejected" && article.rejectionReason && (
+        <div className="editor-rejection-banner" role="alert">
+          <div className="editor-rejection-banner__title">Lý do từ chối</div>
+          <div className="editor-rejection-banner__content">
+            {article.rejectionReason}
+          </div>
+        </div>
+      )}
+
       <div className="editor-header">
         <h1>
           {code

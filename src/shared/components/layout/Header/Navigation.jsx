@@ -1,34 +1,72 @@
-import { NavLink } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { FaChevronDown } from "react-icons/fa";
+import { NavLink, useLocation } from "react-router-dom";
+
 import authService from "@/features/auth/services/authService";
 
-const menus = [
-  { title: "Trang chủ", path: "/", public: true },
-  { title: "Về chúng tôi", path: "/about", public: true },
-  { title: "Tải ứng dụng", path: "/download", public: true },
-  { title: "Viết bài", path: "/posts", roles: ["ADMIN", "CONTENT_EDITOR"] },
-  { title: "Báo cáo", path: "/report", roles: ["ADMIN"] },
-  { title: "Quản lý thông báo", path: "/notifications", roles: ["ADMIN", "NOTIFICATION_MANAGER"] },
-  { title: "Quản lý tài khoản", path: "/accounts", roles: ["ADMIN"] },
+const publicMenus = [
+  { title: "Trang chủ", path: "/" },
+  { title: "Về chúng tôi", path: "/about" },
+  { title: "Tải ứng dụng", path: "/download" },
+];
+
+const adminMenus = [
+  { title: "Bài viết", path: "/posts" },
+  { title: "Báo cáo", path: "/report" },
+  { title: "Thông báo", path: "/notifications" },
+  { title: "Tài khoản", path: "/accounts" },
+];
+
+const roleMenus = [
+  { title: "Viết bài", path: "/posts", roles: ["CONTENT_EDITOR"] },
+  { title: "Quản lý thông báo", path: "/notifications", roles: ["NOTIFICATION_MANAGER"] },
 ];
 
 export default function Navigation({ onNavigate }) {
+  const location = useLocation();
   const user = authService.getCurrentUser();
   const roles = user?.roles || [];
+  const isAdmin = roles.includes("ADMIN");
+  const [adminOpen, setAdminOpen] = useState(false);
+  const adminMenuRef = useRef(null);
 
-  const visibleMenus = menus.filter((menu) => {
-    if (menu.public) return true;
-    if (!user) return false;
-    return menu.roles?.some((role) => roles.includes(role));
-  });
+  useEffect(() => {
+    const handleOutside = (event) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target)) {
+        setAdminOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
+
+  useEffect(() => {
+    setAdminOpen(false);
+  }, [location.pathname]);
+
+  const handleNavigate = () => {
+    setAdminOpen(false);
+    onNavigate?.();
+  };
+
+  const visibleRoleMenus = roleMenus.filter((menu) =>
+    menu.roles.some((role) => roles.includes(role)),
+  );
+
+  const isAdminSectionActive = adminMenus.some(
+    (menu) => location.pathname === menu.path || location.pathname.startsWith(`${menu.path}/`),
+  );
 
   return (
     <nav className="navigation" aria-label="Điều hướng chính">
       <ul className="nav-menu">
-        {visibleMenus.map((menu) => (
+        {publicMenus.map((menu) => (
           <li key={menu.path}>
             <NavLink
               to={menu.path}
-              onClick={onNavigate}
+              end={menu.path === "/"}
+              onClick={handleNavigate}
               className={({ isActive }) =>
                 isActive ? "nav-link active" : "nav-link"
               }
@@ -37,6 +75,55 @@ export default function Navigation({ onNavigate }) {
             </NavLink>
           </li>
         ))}
+
+        {!isAdmin &&
+          visibleRoleMenus.map((menu) => (
+            <li key={menu.path}>
+              <NavLink
+                to={menu.path}
+                onClick={handleNavigate}
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                {menu.title}
+              </NavLink>
+            </li>
+          ))}
+
+        {isAdmin && (
+          <li className="admin-nav" ref={adminMenuRef}>
+            <button
+              type="button"
+              className={`nav-link admin-nav-trigger ${isAdminSectionActive ? "active" : ""}`}
+              aria-expanded={adminOpen}
+              onClick={() => setAdminOpen((current) => !current)}
+            >
+              <span>Quản trị</span>
+              <FaChevronDown
+                className={adminOpen ? "admin-nav-chevron is-open" : "admin-nav-chevron"}
+                size={11}
+              />
+            </button>
+
+            {adminOpen && (
+              <div className="admin-nav-dropdown">
+                {adminMenus.map((menu) => (
+                  <NavLink
+                    key={menu.path}
+                    to={menu.path}
+                    onClick={handleNavigate}
+                    className={({ isActive }) =>
+                      isActive ? "admin-nav-item active" : "admin-nav-item"
+                    }
+                  >
+                    {menu.title}
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </li>
+        )}
       </ul>
     </nav>
   );

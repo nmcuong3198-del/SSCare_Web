@@ -48,6 +48,12 @@
     color: #c83939;
 }
 
+.status.archived {
+    border-color: #d8d1eb;
+    background: #f5f2fb;
+    color: #68558f;
+}
+
 .status.unknown {
     border-color: #dce1e8;
     background: #f7f8fa;

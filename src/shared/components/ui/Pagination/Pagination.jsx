@@ -10,8 +10,14 @@ export default function Pagination({
   if (totalPages === 0) return null;
 
   const start = currentPage * pageSize + 1;
-
   const end = Math.min((currentPage + 1) * pageSize, totalElements);
+
+  const changePage = (nextPage) => {
+    if (nextPage === currentPage || nextPage < 0 || nextPage >= totalPages) {
+      return;
+    }
+    onPageChange(nextPage);
+  };
 
   return (
     <div className="pagination">
@@ -21,25 +27,35 @@ export default function Pagination({
 
       <div className="page-group">
         <button
+          type="button"
           disabled={currentPage === 0}
-          onClick={() => onPageChange(currentPage - 1)}
+          onClick={() => changePage(currentPage - 1)}
+          aria-label="Trang trước"
         >
           {"<"}
         </button>
 
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            className={index === currentPage ? "active" : ""}
-            onClick={() => onPageChange(index)}
-          >
-            {index + 1}
-          </button>
-        ))}
+        {Array.from({ length: totalPages }, (_, index) => {
+          const isCurrent = index === currentPage;
+          return (
+            <button
+              type="button"
+              key={index}
+              className={isCurrent ? "active" : ""}
+              disabled={isCurrent}
+              aria-current={isCurrent ? "page" : undefined}
+              onClick={() => changePage(index)}
+            >
+              {index + 1}
+            </button>
+          );
+        })}
 
         <button
+          type="button"
           disabled={currentPage === totalPages - 1}
-          onClick={() => onPageChange(currentPage + 1)}
+          onClick={() => changePage(currentPage + 1)}
+          aria-label="Trang sau"
         >
           {">"}
         </button>

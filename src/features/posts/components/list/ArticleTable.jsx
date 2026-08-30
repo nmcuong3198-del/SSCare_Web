@@ -30,7 +30,13 @@ export default function ArticleTable({ articles }) {
           </thead>
 
           <tbody>
-          {articles.map((article) => (
+          {articles.length === 0 ? (
+            <tr>
+              <td colSpan="5" className="article-empty-cell">
+                Không có bài viết phù hợp.
+              </td>
+            </tr>
+          ) : articles.map((article) => (
               <tr key={article.code}>
                 <td className="code-cell" data-label="Mã bài">
                   #{article.code}
