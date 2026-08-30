@@ -27,13 +27,20 @@ import axiosClient from "@/shared/services/http/axiosClient";
 
 const accountAdminService = {
   /**
-   * @param {{keyword?: string, page?: number, size?: number}} [options]
+   * @param {{fullName?: string, email?: string, phone?: string, role?: string, page?: number, size?: number}} [options]
    * @returns {Promise<AdminAccountPage>}
    */
-  getAccounts({ keyword = "", page = 0, size = 10 } = {}) {
+  getAccounts({
+    fullName = "",
+    email = "",
+    phone = "",
+    role = "",
+    page = 0,
+    size = 10,
+  } = {}) {
     return /** @type {Promise<AdminAccountPage>} */ (
       axiosClient.get("/admin/accounts", {
-        params: { keyword, page, size },
+        params: { fullName, email, phone, role, page, size },
       })
     );
   },

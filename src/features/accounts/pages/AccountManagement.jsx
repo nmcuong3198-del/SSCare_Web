@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCheckCircle, FaSearch, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
+import { FaCheckCircle, FaFilter, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
 
 import AuthorProfileModal from "@/features/accounts/components/AuthorProfileModal";
 import accountAdminService from "@/features/accounts/services/accountAdminService";
@@ -8,6 +8,16 @@ import Pagination from "@/shared/components/ui/Pagination/Pagination";
 import "./AccountManagement.css";
 
 const PAGE_SIZE = 10;
+
+const ROLE_OPTIONS = [
+  { value: "", label: "Tất cả vai trò" },
+  { value: "ADMIN", label: "Admin" },
+  { value: "PARENT", label: "Tài khoản app" },
+  { value: "CONTENT_EDITOR", label: "Viết bài" },
+  { value: "NOTIFICATION_MANAGER", label: "Quản lý thông báo" },
+  { value: "SUPPORT", label: "Hỗ trợ" },
+  { value: "EXPERT", label: "Chuyên gia" },
+];
 
 /**
  * @typedef {Object} AuthorProfile
@@ -45,8 +55,18 @@ export default function AccountManagement() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const [keyword, setKeyword] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
+
+  // Giá trị đang nhập trên UI.
+  const [fullNameInput, setFullNameInput] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [phoneInput, setPhoneInput] = useState("");
+
+  // Giá trị thực sự dùng để gọi API. Text chỉ được áp dụng khi onBlur.
+  const [fullNameFilter, setFullNameFilter] = useState("");
+  const [emailFilter, setEmailFilter] = useState("");
+  const [phoneFilter, setPhoneFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState(/** @type {string|null} */ (null));
   const [authorProfileAccount, setAuthorProfileAccount] = useState(/** @type {AdminAccount|null} */ (null));
@@ -56,8 +76,16 @@ export default function AccountManagement() {
 
   useEffect(() => {
     let cancelled = false;
+
     accountAdminService
-      .getAccounts({ keyword: searchKeyword, page, size: PAGE_SIZE })
+      .getAccounts({
+        fullName: fullNameFilter,
+        email: emailFilter,
+        phone: phoneFilter,
+        role: roleFilter,
+        page,
+        size: PAGE_SIZE,
+      })
       .then((response) => {
         if (cancelled) return;
         setAccounts(response.content || []);
@@ -76,18 +104,46 @@ export default function AccountManagement() {
     return () => {
       cancelled = true;
     };
-  }, [page, searchKeyword]);
+  }, [page, fullNameFilter, emailFilter, phoneFilter, roleFilter]);
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    const nextKeyword = keyword.trim();
+  /**
+   * Áp dụng một điều kiện text khi người dùng rời khỏi ô nhập.
+   * @param {"fullName"|"email"|"phone"} field
+   * @param {string} value
+   */
+  const applyTextFilter = (field, value) => {
+    const normalized = value.trim();
+    const currentValue =
+      field === "fullName"
+        ? fullNameFilter
+        : field === "email"
+          ? emailFilter
+          : phoneFilter;
 
-    if (page === 0 && nextKeyword === searchKeyword) return;
+    if (normalized === currentValue) return;
 
     setLoading(true);
     setError("");
     setPage(0);
-    setSearchKeyword(nextKeyword);
+
+    if (field === "fullName") {
+      setFullNameFilter(normalized);
+    } else if (field === "email") {
+      setEmailFilter(normalized);
+    } else {
+      setPhoneFilter(normalized);
+    }
+  };
+
+  /** @param {import("react").ChangeEvent<HTMLSelectElement>} event */
+  const handleRoleChange = (event) => {
+    const nextRole = event.target.value;
+    if (nextRole === roleFilter) return;
+
+    setLoading(true);
+    setError("");
+    setPage(0);
+    setRoleFilter(nextRole);
   };
 
   /** @param {number} nextPage */
@@ -130,7 +186,6 @@ export default function AccountManagement() {
       setSavingId(null);
     }
   };
-
 
   /**
    * @param {{credentials: string|null, verified: boolean}} profile
@@ -186,15 +241,59 @@ export default function AccountManagement() {
         </div>
       </div>
 
-      <form className="account-search" onSubmit={handleSearch}>
-        <FaSearch />
-        <input
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="Tìm theo họ tên đầy đủ, email hoặc số điện thoại"
-        />
-        <button type="submit">Tìm kiếm</button>
-      </form>
+      <section className="account-filter-panel" aria-label="Bộ lọc tài khoản">
+        <div className="account-filter-heading">
+          <FaFilter />
+          <div>
+            <strong>Tìm kiếm tài khoản</strong>
+            <span>Ô nhập sẽ tự tìm khi bạn click ra ngoài.</span>
+          </div>
+        </div>
+
+        <div className="account-filter-grid">
+          <label className="account-filter-field">
+            <span>Họ và Tên</span>
+            <input
+              value={fullNameInput}
+              onChange={(event) => setFullNameInput(event.target.value)}
+              onBlur={(event) => applyTextFilter("fullName", event.target.value)}
+              placeholder="Nhập họ và tên..."
+            />
+          </label>
+
+          <label className="account-filter-field">
+            <span>Email</span>
+            <input
+              type="email"
+              value={emailInput}
+              onChange={(event) => setEmailInput(event.target.value)}
+              onBlur={(event) => applyTextFilter("email", event.target.value)}
+              placeholder="Nhập email..."
+            />
+          </label>
+
+          <label className="account-filter-field">
+            <span>Số điện thoại</span>
+            <input
+              value={phoneInput}
+              onChange={(event) => setPhoneInput(event.target.value)}
+              onBlur={(event) => applyTextFilter("phone", event.target.value)}
+              placeholder="Nhập số điện thoại..."
+            />
+          </label>
+
+          <label className="account-filter-field">
+            <span>Vai trò</span>
+            <select value={roleFilter} onChange={handleRoleChange}>
+              {ROLE_OPTIONS.map((option) => (
+                <option key={option.value || "ALL"} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </section>
 
       {message && <div className="account-alert success">{message}</div>}
       {error && <div className="account-alert error">{error}</div>}
@@ -203,7 +302,7 @@ export default function AccountManagement() {
         <table className="account-table">
           <thead>
             <tr>
-              <th>Tài khoản</th>
+              <th>Họ và Tên</th>
               <th>Liên hệ</th>
               <th>Vai trò hiện tại</th>
               <th>Hồ sơ tác giả</th>
