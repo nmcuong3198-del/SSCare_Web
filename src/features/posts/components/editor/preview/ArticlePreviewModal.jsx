@@ -11,9 +11,10 @@ import useArticleImagePreview from "@/features/posts/utils/useArticleImagePrevie
 import "./ArticlePreviewModal.css";
 
 const CATEGORY_LABELS = {
-  mental: "Sức khỏe tinh thần",
-  physical: "Sức khỏe thể chất",
-  skills: "Kỹ năng sống",
+  mental: "Nuôi dưỡng tinh thần",
+  physical: "Phát triển thể chất",
+  skills: "Bồi đắp kỹ năng",
+  // Giữ label cho dữ liệu cũ; thư mục này không còn xuất hiện trong form tạo/sửa.
   alerts: "Dấu hiệu cảnh báo",
 };
 
@@ -27,7 +28,7 @@ function MarkdownPreview({ markdown = "" }) {
         if (text.startsWith("## ")) {
           return <h2 key={`h-${index}`}>{text.slice(3)}</h2>;
         }
-        if (/^!\[[^\]]*\]\([^)]*\)$/.test(text)) {
+        if (/^!\[[^\]]*]\([^)]*\)$/.test(text)) {
           return (
             <p key={`img-${index}`} className="article-preview__dropped-image">
               Ảnh trong nội dung sẽ không hiển thị trên ứng dụng

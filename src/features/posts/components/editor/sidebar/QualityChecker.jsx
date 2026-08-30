@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { CheckCircle2, EyeOff, XCircle } from "lucide-react";
 
-import { isArticleReadyForQualityCheck } from "@/features/posts/utils/articleValidator";
+import {
+  findForbiddenWords,
+  isArticleReadyForQualityCheck,
+} from "@/features/posts/utils/articleValidator";
 
 import "./QualityChecker.css";
-
-const FORBIDDEN_WORDS = ["đánh", "giết", "chửi", "ngu", "khùng"];
 
 export default function QualityChecker({
   article,
@@ -14,7 +15,6 @@ export default function QualityChecker({
   setArticle,
 }) {
   const [scanResult, setScanResult] = useState(null);
-  const sections = Array.isArray(article.content) ? article.content : [];
   const canCheck = isArticleReadyForQualityCheck(article, imageFile);
 
   const checked = Boolean(article.qualityChecked) || scanResult !== null;
@@ -24,20 +24,7 @@ export default function QualityChecker({
   const handleCheck = () => {
     if (!canCheck) return;
 
-    const content = [
-      article.title,
-      article.summary,
-      article.conclusion,
-      ...sections.map((section) => section.title),
-      ...sections.map((section) => section.content),
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    const foundWords = FORBIDDEN_WORDS.filter((word) =>
-      content.includes(word),
-    );
+    const foundWords = findForbiddenWords(article);
 
     setScanResult(foundWords);
     setArticle((previousArticle) => ({
@@ -115,8 +102,13 @@ export default function QualityChecker({
         <div className="anonymous-author-option__icon">
           <EyeOff size={18} />
         </div>
-        <label htmlFor="anonymous-author-checkbox" className="anonymous-author-option__content">
-          <span className="anonymous-author-option__title">Ẩn danh người viết bài</span>
+        <label
+          htmlFor="anonymous-author-checkbox"
+          className="anonymous-author-option__content"
+        >
+          <span className="anonymous-author-option__title">
+            Ẩn danh người viết bài
+          </span>
           <span className="anonymous-author-option__desc">
             Khi bật, tên người viết sẽ được che khi hiển thị bài viết.
           </span>

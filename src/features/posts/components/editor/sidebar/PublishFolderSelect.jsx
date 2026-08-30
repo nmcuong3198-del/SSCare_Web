@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { FolderOpen } from "lucide-react";
+
 import articleService from "@/features/posts/services/articleService";
+
 import "./PublishFolderSelect.css";
 
-// The keys come from the server because they are the vocabulary the mobile app uses to build
-// its library tabs; a folder the app does not know about would be unreachable content.
+const PUBLISH_CATEGORIES = [
+  { key: "mental", label: "Nuôi dưỡng tinh thần" },
+  { key: "physical", label: "Phát triển thể chất" },
+  { key: "skills", label: "Bồi đắp kỹ năng" },
+];
+
 export default function PublishFolderSelect({
   article,
   setArticle,
@@ -22,14 +28,28 @@ export default function PublishFolderSelect({
       .then((data) => {
         if (cancelled) return;
 
-        const list = Array.isArray(data) ? data : [];
+        const serverCategories = Array.isArray(data) ? data : [];
+        const serverByKey = new Map(
+          serverCategories.map((category) => [category.key, category]),
+        );
+
+        // CMS chỉ cho phép đúng 3 thư mục nghiệp vụ này.
+        const list = PUBLISH_CATEGORIES.filter((category) =>
+          serverByKey.has(category.key),
+        ).map((category) => ({
+          ...serverByKey.get(category.key),
+          key: category.key,
+          label: category.label,
+        }));
+
         setCategories(list);
 
-        setArticle((previousArticle) =>
-          previousArticle.cateName || list.length === 0
-            ? previousArticle
-            : { ...previousArticle, cateName: list[0].key },
-        );
+        setArticle((previousArticle) => {
+          if (previousArticle.cateName || list.length === 0) {
+            return previousArticle;
+          }
+          return { ...previousArticle, cateName: list[0].key };
+        });
       })
       .catch((error) => {
         if (!cancelled) {

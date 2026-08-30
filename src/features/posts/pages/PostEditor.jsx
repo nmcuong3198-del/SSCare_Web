@@ -17,6 +17,7 @@ import { canEditArticle } from "@/features/posts/utils/articlePermissions";
 import {
   getQualityTextSignature,
   validateArticle,
+  validateNoForbiddenWords,
 } from "@/features/posts/utils/articleValidator";
 
 import "./PostEditor.css";
@@ -39,10 +40,19 @@ export default function PostEditor() {
   const requestInFlightRef = useRef(false);
   const loadedRef = useRef(null);
   const articleRef = useRef(article);
+  const returnToListTimerRef = useRef(null);
 
   useEffect(() => {
     articleRef.current = article;
   }, [article]);
+
+  useEffect(() => {
+    return () => {
+      if (returnToListTimerRef.current) {
+        window.clearTimeout(returnToListTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -137,7 +147,7 @@ export default function PostEditor() {
     setIsEditing(false);
   };
 
-  const persistArticle = async (status, { requireQuality, successMessage } = {}) => {
+  const persistArticle = async (status, { requireQuality = false } = {}) => {
     if (
       !validateArticle(article, imageFile, { requireQuality }) ||
       requestInFlightRef.current
@@ -161,16 +171,14 @@ export default function PostEditor() {
           article: normalized,
           imageFile: updated.imageUrl ?? imageFile,
         };
+        articleRef.current = normalized;
         setArticle(normalized);
         setImageFile(updated.imageUrl ?? imageFile);
         setIsEditing(false);
-        if (successMessage) toast.success(successMessage);
         return normalized;
       }
 
-      const created = await articleService.create(formData);
-      if (successMessage) toast.success(successMessage);
-      return created;
+      return await articleService.create(formData);
     } catch (error) {
       toast.error(
         error.response?.data?.detail ||
@@ -184,26 +192,44 @@ export default function PostEditor() {
     }
   };
 
+  const showSavedMessageAndReturn = () => {
+    toast.success("Đã lưu bài viết.", { duration: 3000 });
+
+    if (returnToListTimerRef.current) {
+      window.clearTimeout(returnToListTimerRef.current);
+    }
+    returnToListTimerRef.current = window.setTimeout(() => {
+      navigate("/posts");
+    }, 3000);
+  };
+
   const handleSaveDraft = async () => {
     const saved = await persistArticle("draft", {
       requireQuality: false,
-      successMessage: "Đã lưu bài viết ở trạng thái bản nháp.",
     });
 
-    if (saved && !isExisting) {
-      navigate(`/posts/${saved.code}`);
+    if (saved) {
+      showSavedMessageAndReturn();
     }
   };
 
   const handleSave = async () => {
-    const status = article.status === "rejected" ? "draft" : article.status;
-    await persistArticle(status || "draft", {
-      requireQuality: status === "pending",
-      successMessage: "Đã lưu thay đổi.",
+    // Màn chỉnh sửa chỉ áp dụng cho draft/rejected. Sau khi lưu luôn trở về draft.
+    const saved = await persistArticle("draft", {
+      requireQuality: false,
     });
+
+    if (saved) {
+      showSavedMessageAndReturn();
+    }
   };
 
   const handleSubmit = async () => {
+    if (!isExisting) {
+      toast.error("Vui lòng lưu bài viết trước khi gửi duyệt.");
+      return;
+    }
+
     const saved = await persistArticle("pending", {
       requireQuality: true,
     });
@@ -230,6 +256,10 @@ export default function PostEditor() {
   };
 
   const handleApprove = async () => {
+    if (!validateNoForbiddenWords(article, "duyệt")) {
+      return;
+    }
+
     try {
       setLoading(true);
       await articleService.updateStatus({
@@ -239,7 +269,7 @@ export default function PostEditor() {
       setShowApproveModal(true);
     } catch (error) {
       console.error(error);
-      window.alert(error.response?.data?.detail || "Không thể duyệt bài viết.");
+      toast.error(error.response?.data?.detail || "Không thể duyệt bài viết.");
     } finally {
       setLoading(false);
     }
@@ -298,7 +328,6 @@ export default function PostEditor() {
         canEdit={canEdit}
         isEditing={isEditing}
         isExisting={isExisting}
-        readOnly={readOnly}
         articleStatus={article.status}
       />
 

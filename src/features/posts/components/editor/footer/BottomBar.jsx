@@ -1,9 +1,47 @@
-import { ArrowLeft, Check, Eye, Pencil, SendHorizonal, Save, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Eye,
+  Pencil,
+  SendHorizonal,
+  Save,
+  X,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
 
 import "./BottomBar.css";
+
+function PreviewButton({ loading, onPreview }) {
+  return (
+    <button
+      type="button"
+      className="preview-btn"
+      onClick={onPreview}
+      disabled={loading}
+    >
+      <Eye size={18} />
+      <span>Xem trước (Preview)</span>
+    </button>
+  );
+}
+
+function BackButton({ loading }) {
+  const navigate = useNavigate();
+
+  return (
+    <button
+      type="button"
+      className="preview-btn"
+      onClick={() => navigate("/posts")}
+      disabled={loading}
+    >
+      <ArrowLeft size={18} />
+      <span>Trở về</span>
+    </button>
+  );
+}
 
 export default function BottomActionBar({
   loading = false,
@@ -18,49 +56,18 @@ export default function BottomActionBar({
   canEdit = false,
   isEditing = false,
   isExisting = false,
-  readOnly,
   articleStatus,
 }) {
-  const navigate = useNavigate();
-  const isAdmin = authService.isAdmin() && isExisting;
-  const canReview = isAdmin && articleStatus === "pending";
+  const isAdmin = authService.isAdmin();
+  const isDraft = articleStatus === "draft";
+  const isRejected = articleStatus === "rejected";
+  const isPending = articleStatus === "pending";
 
-  const writerActions = (
-    <div className="writer-actions">
-      <button
-        type="button"
-        className="save-draft-btn"
-        onClick={onSaveDraft}
-        disabled={loading}
-      >
-        <Save size={18} />
-        <span>{loading ? "Đang lưu..." : "Lưu bài viết"}</span>
-      </button>
-
-      <button
-        type="button"
-        className="submit-btn"
-        onClick={onSubmit}
-        disabled={loading}
-      >
-        <SendHorizonal size={18} />
-        <span>{loading ? "Đang gửi..." : "Gửi bài viết"}</span>
-      </button>
-    </div>
-  );
-
+  // Đang chỉnh sửa: phải lưu lại trước, không cho gửi thẳng khi còn thay đổi chưa lưu.
   if (isEditing) {
     return (
       <div className="bottom-bar">
-        <button
-          type="button"
-          className="preview-btn"
-          onClick={onPreview}
-          disabled={loading}
-        >
-          <Eye size={18} />
-          <span>Xem trước (Preview)</span>
-        </button>
+        <PreviewButton loading={loading} onPreview={onPreview} />
 
         <div className="admin-actions">
           <button
@@ -73,59 +80,49 @@ export default function BottomActionBar({
             <span>Huỷ</span>
           </button>
 
-          {authService.isAdmin() ? (
-            <button
-              type="button"
-              className="approve-btn"
-              onClick={onSave}
-              disabled={loading}
-            >
-              <Save size={18} />
-              <span>{loading ? "Đang lưu..." : "Lưu thay đổi"}</span>
-            </button>
-          ) : writerActions}
+          <button
+            type="button"
+            className="approve-btn"
+            onClick={onSave}
+            disabled={loading}
+          >
+            <Save size={18} />
+            <span>{loading ? "Đang lưu..." : "Lưu thay đổi"}</span>
+          </button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="bottom-bar">
-      <button
-        type="button"
-        className="preview-btn"
-        onClick={onPreview}
-        disabled={loading}
-      >
-        <Eye size={18} />
-        <span>Xem trước (Preview)</span>
-      </button>
+  // Tạo mới: chỉ được lưu trước. Sau khi đã có mã bài mới xuất hiện nút gửi.
+  if (!isExisting) {
+    return (
+      <div className="bottom-bar">
+        <PreviewButton loading={loading} onPreview={onPreview} />
 
-      {canEdit && (
         <button
           type="button"
-          className="preview-btn"
-          onClick={onEdit}
+          className="save-draft-btn"
+          onClick={onSaveDraft}
           disabled={loading}
         >
-          <Pencil size={18} />
-          <span>Chỉnh sửa</span>
+          <Save size={18} />
+          <span>{loading ? "Đang lưu..." : "Lưu bài viết"}</span>
         </button>
-      )}
+      </div>
+    );
+  }
 
-      {isAdmin ? (
+  // Admin chỉ review bài đã gửi, không chỉnh sửa nội dung bài pending.
+  if (isAdmin) {
+    return (
+      <div className="bottom-bar">
+        <PreviewButton loading={loading} onPreview={onPreview} />
+
         <div className="admin-actions">
-          <button
-            type="button"
-            className="preview-btn"
-            onClick={() => navigate("/posts")}
-            disabled={loading}
-          >
-            <ArrowLeft size={18} />
-            <span>Trở về</span>
-          </button>
+          <BackButton loading={loading} />
 
-          {canReview && (
+          {isPending && (
             <>
               <button
                 type="button"
@@ -149,17 +146,72 @@ export default function BottomActionBar({
             </>
           )}
         </div>
-      ) : readOnly ? (
-        <button
-          type="button"
-          className="submit-btn"
-          onClick={() => navigate("/posts")}
-          disabled={loading}
-        >
-          <ArrowLeft size={18} />
-          <span>Trở về</span>
-        </button>
-      ) : writerActions}
+      </div>
+    );
+  }
+
+  // Người viết mở bài nháp: Preview + Chỉnh sửa + Gửi bài viết.
+  if (isDraft) {
+    return (
+      <div className="bottom-bar">
+        <PreviewButton loading={loading} onPreview={onPreview} />
+
+        <div className="writer-actions">
+          {canEdit && (
+            <button
+              type="button"
+              className="preview-btn"
+              onClick={onEdit}
+              disabled={loading}
+            >
+              <Pencil size={18} />
+              <span>Chỉnh sửa</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="submit-btn"
+            onClick={onSubmit}
+            disabled={loading}
+          >
+            <SendHorizonal size={18} />
+            <span>{loading ? "Đang gửi..." : "Gửi bài viết"}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Bài bị từ chối được phép chỉnh sửa lại, nhưng phải lưu thành nháp rồi mới gửi lại.
+  if (isRejected) {
+    return (
+      <div className="bottom-bar">
+        <PreviewButton loading={loading} onPreview={onPreview} />
+
+        <div className="writer-actions">
+          {canEdit && (
+            <button
+              type="button"
+              className="preview-btn"
+              onClick={onEdit}
+              disabled={loading}
+            >
+              <Pencil size={18} />
+              <span>Chỉnh sửa</span>
+            </button>
+          )}
+          <BackButton loading={loading} />
+        </div>
+      </div>
+    );
+  }
+
+  // Pending/published/archived: người viết chỉ được xem trước và trở về.
+  return (
+    <div className="bottom-bar">
+      <PreviewButton loading={loading} onPreview={onPreview} />
+      <BackButton loading={loading} />
     </div>
   );
 }
