@@ -121,12 +121,14 @@ export default function PostList() {
     setPage(nextPage);
   };
 
-  const handleSearchTitle = (event) => {
-    event.preventDefault();
+  const handleTitleBlur = () => {
+    const nextTitle = titleInput.trim();
+    if (nextTitle === filters.title) return;
+
     setPage(0);
     setFilters((current) => ({
       ...current,
-      title: titleInput.trim(),
+      title: nextTitle,
     }));
   };
 
@@ -197,7 +199,7 @@ export default function PostList() {
       </div>
 
       <div className="article-search-panel">
-        <form className="article-title-search" onSubmit={handleSearchTitle}>
+        <div className="article-title-search">
           <label htmlFor="article-title-search">Tên bài viết</label>
           <div className="article-search-input-wrap">
             <FiSearch aria-hidden="true" />
@@ -205,13 +207,11 @@ export default function PostList() {
               id="article-title-search"
               value={titleInput}
               onChange={(event) => setTitleInput(event.target.value)}
+              onBlur={handleTitleBlur}
               placeholder="Nhập tên bài viết cần tìm..."
             />
           </div>
-          <button type="submit" className="article-search-btn" disabled={loading}>
-            Tìm kiếm
-          </button>
-        </form>
+        </div>
 
         <div className="article-filter-field">
           <label htmlFor="article-status-filter">Trạng thái</label>
