@@ -26,7 +26,7 @@ export default function ContentEditor({
 
                     <SectionCard
 
-                        key={index}
+                        key={section.id}
 
                         index={index}
 

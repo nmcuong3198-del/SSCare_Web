@@ -11,6 +11,11 @@ export default function HashTagInput({ article, readOnly, setArticle }) {
 
     if (!tag) return;
 
+    if (tag.length > 50) {
+      alert("Mỗi hashtag tối đa 50 ký tự");
+      return;
+    }
+
     if (article.hashtags.includes(tag)) return;
 
     if (article.hashtags.length >= 10) {
@@ -56,6 +61,7 @@ export default function HashTagInput({ article, readOnly, setArticle }) {
           <input
             value={value}
             placeholder="Thêm hashtag..."
+            maxLength={50}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {

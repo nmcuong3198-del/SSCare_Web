@@ -1,29 +1,22 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { resolveArticleImageUrl } from "@/features/posts/utils/articleImageUrl";
+
 import "./UploadCover.css";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const VALID_TYPES = ["image/jpeg", "image/jpg", "image/png"];
-const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "/api")
-  .replace(/\/api\/?$/, "")
-  .replace(/\/$/, "");
-
-const resolveStoredImageUrl = (imageUrl) => {
-  if (/^(https?:|blob:|data:)/.test(imageUrl)) return imageUrl;
-  return `${API_ORIGIN}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
-};
-
 export default function UploadCover({
-  imageFile,
-  setImageFile,
-  readOnly,
-  loading = false,
-}) {
+                                      imageFile,
+                                      setImageFile,
+                                      readOnly,
+                                      loading = false,
+                                    }) {
   const fileInputRef = useRef(null);
 
   const previewUrl = useMemo(() => {
     if (!imageFile) return null;
-    if (typeof imageFile === "string") return resolveStoredImageUrl(imageFile);
+    if (typeof imageFile === "string") return resolveArticleImageUrl(imageFile);
     return URL.createObjectURL(imageFile);
   }, [imageFile]);
 
@@ -95,56 +88,56 @@ export default function UploadCover({
   };
 
   return (
-    <>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".jpg,.jpeg,.png"
-        onChange={handleFileChange}
-        disabled={loading || readOnly}
-        hidden
-      />
+      <>
+        <input
+            ref={fileInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png"
+            onChange={handleFileChange}
+            disabled={loading || readOnly}
+            hidden
+        />
 
-      <div
-        className="upload-box"
-        onClick={loading || readOnly ? undefined : handleChooseImage}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
-        {imageFile && previewUrl ? (
-          <div className="preview-container">
-            <img src={previewUrl} alt="Ảnh bìa" className="cover-preview" />
+        <div
+            className="upload-box"
+            onClick={loading || readOnly ? undefined : handleChooseImage}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+        >
+          {imageFile && previewUrl ? (
+              <div className="preview-container">
+                <img src={previewUrl} alt="Ảnh bìa" className="cover-preview" />
 
-            <div className="file-info">
-              {typeof imageFile === "string" ? (
-                <strong>Ảnh hiện tại</strong>
-              ) : (
-                <>
-                  <strong>{imageFile.name}</strong>
-                  <p>{(imageFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                </>
-              )}
-            </div>
+                <div className="file-info">
+                  {typeof imageFile === "string" ? (
+                      <strong>Ảnh hiện tại</strong>
+                  ) : (
+                      <>
+                        <strong>{imageFile.name}</strong>
+                        <p>{(imageFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                      </>
+                  )}
+                </div>
 
-            {!readOnly && (
-              <div className="preview-actions">
-                <button type="button" onClick={handleChangeImage}>
-                  Đổi ảnh
-                </button>
-                <button type="button" onClick={handleRemoveImage}>
-                  Xóa ảnh
-                </button>
+                {!readOnly && (
+                    <div className="preview-actions">
+                      <button type="button" onClick={handleChangeImage}>
+                        Đổi ảnh
+                      </button>
+                      <button type="button" onClick={handleRemoveImage}>
+                        Xóa ảnh
+                      </button>
+                    </div>
+                )}
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="upload-content">
-            <div className="upload-icon">📷</div>
-            <h3>Nhấn hoặc kéo ảnh vào đây</h3>
-            <p>JPG, PNG - Tối đa 5MB</p>
-          </div>
-        )}
-      </div>
-    </>
+          ) : (
+              <div className="upload-content">
+                <div className="upload-icon">📷</div>
+                <h3>Nhấn hoặc kéo ảnh vào đây</h3>
+                <p>JPG, PNG - Tối đa 5MB</p>
+              </div>
+          )}
+        </div>
+      </>
   );
 }

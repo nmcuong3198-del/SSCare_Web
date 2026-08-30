@@ -1,43 +1,55 @@
-.status{
-
-    padding:7px 18px;
-
-    border-radius:30px;
-
-    font-size:13px;
-
-    font-weight:600;
-
+.status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 108px;
+    min-height: 32px;
+    padding: 6px 11px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
-.published{
-
-    background:#DDF9E7;
-
-    color:#148A4B;
-
+.status::before {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
 }
 
-.pending{
-
-    background:#FFEFD8;
-
-    color:#E46B00;
-
+.status.published {
+    border-color: #bdeed0;
+    background: #ecfbf2;
+    color: #16834b;
 }
 
-.draft{
-
-    background:#EEEEEE;
-
-    color:#666;
-
+.status.pending {
+    border-color: #f8d9a8;
+    background: #fff8e8;
+    color: #c86a09;
 }
 
-.rejected{
+.status.draft {
+    border-color: #dce1e8;
+    background: #f5f7f9;
+    color: #667085;
+}
 
-    background:#FEE2E2;
+.status.rejected {
+    border-color: #f5c2c2;
+    background: #fff1f1;
+    color: #c83939;
+}
 
-    color:#DC2626;
-
+.status.unknown {
+    border-color: #dce1e8;
+    background: #f7f8fa;
+    color: #667085;
 }

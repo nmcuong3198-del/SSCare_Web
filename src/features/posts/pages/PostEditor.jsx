@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import authService from "@/features/auth/services/authService";
 import ArticleBasicInfo from "@/features/posts/components/editor/basic/ArticleBasicInfo";
 import ContentEditor from "@/features/posts/components/editor/content/ContentEditor";
 import BottomActionBar from "@/features/posts/components/editor/footer/BottomBar";
@@ -140,7 +139,6 @@ export default function PostEditor() {
 
       const formData = createArticleFormData(article, imageFile, {
         status: article.status,
-        createdBy: article.createdBy,
       });
 
       const updated = await articleService.update(code, formData);
@@ -172,10 +170,8 @@ export default function PostEditor() {
       requestInFlightRef.current = true;
       setLoading(true);
 
-      const currentUsername = authService.getCurrentUser()?.username ?? "";
       const formData = createArticleFormData(article, imageFile, {
         status: "pending",
-        createdBy: currentUsername,
       });
 
       await articleService.create(formData);
