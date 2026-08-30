@@ -11,6 +11,7 @@ export function createArticleFormData(article, imageFile, { status } = {}) {
     })),
     conclusion: article.conclusion?.trim() ?? "",
     qualityChecked: article.qualityChecked === true,
+    anonymousAuthor: article.anonymousAuthor === true,
     status: status ?? article.status ?? "draft",
   };
 

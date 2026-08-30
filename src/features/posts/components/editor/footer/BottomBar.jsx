@@ -9,6 +9,7 @@ export default function BottomActionBar({
   loading = false,
   onPreview,
   onSubmit,
+  onSaveDraft,
   onApprove,
   onReject,
   onEdit,
@@ -18,11 +19,35 @@ export default function BottomActionBar({
   isEditing = false,
   isExisting = false,
   readOnly,
+  articleStatus,
 }) {
   const navigate = useNavigate();
-  // Approving only makes sense for an article that exists; on the create form the author
-  // still needs the submit button, whatever their role.
   const isAdmin = authService.isAdmin() && isExisting;
+  const canReview = isAdmin && articleStatus === "pending";
+
+  const writerActions = (
+    <div className="writer-actions">
+      <button
+        type="button"
+        className="save-draft-btn"
+        onClick={onSaveDraft}
+        disabled={loading}
+      >
+        <Save size={18} />
+        <span>{loading ? "Đang lưu..." : "Lưu bài viết"}</span>
+      </button>
+
+      <button
+        type="button"
+        className="submit-btn"
+        onClick={onSubmit}
+        disabled={loading}
+      >
+        <SendHorizonal size={18} />
+        <span>{loading ? "Đang gửi..." : "Gửi bài viết"}</span>
+      </button>
+    </div>
+  );
 
   if (isEditing) {
     return (
@@ -48,15 +73,17 @@ export default function BottomActionBar({
             <span>Huỷ</span>
           </button>
 
-          <button
-            type="button"
-            className="approve-btn"
-            onClick={onSave}
-            disabled={loading}
-          >
-            <Save size={18} />
-            <span>{loading ? "Đang lưu..." : "Lưu thay đổi"}</span>
-          </button>
+          {authService.isAdmin() ? (
+            <button
+              type="button"
+              className="approve-btn"
+              onClick={onSave}
+              disabled={loading}
+            >
+              <Save size={18} />
+              <span>{loading ? "Đang lưu..." : "Lưu thay đổi"}</span>
+            </button>
+          ) : writerActions}
         </div>
       </div>
     );
@@ -98,25 +125,29 @@ export default function BottomActionBar({
             <span>Trở về</span>
           </button>
 
-          <button
-            type="button"
-            className="reject-btn"
-            onClick={onReject}
-            disabled={loading}
-          >
-            <X size={18} />
-            <span>Từ chối</span>
-          </button>
+          {canReview && (
+            <>
+              <button
+                type="button"
+                className="reject-btn"
+                onClick={onReject}
+                disabled={loading}
+              >
+                <X size={18} />
+                <span>Từ chối</span>
+              </button>
 
-          <button
-            type="button"
-            className="approve-btn"
-            onClick={onApprove}
-            disabled={loading}
-          >
-            <Check size={18} />
-            <span>Duyệt bài</span>
-          </button>
+              <button
+                type="button"
+                className="approve-btn"
+                onClick={onApprove}
+                disabled={loading}
+              >
+                <Check size={18} />
+                <span>Duyệt bài</span>
+              </button>
+            </>
+          )}
         </div>
       ) : readOnly ? (
         <button
@@ -128,17 +159,7 @@ export default function BottomActionBar({
           <ArrowLeft size={18} />
           <span>Trở về</span>
         </button>
-      ) : (
-        <button
-          type="button"
-          className="submit-btn"
-          onClick={onSubmit}
-          disabled={loading}
-        >
-          <SendHorizonal size={18} />
-          <span>{loading ? "Đang gửi..." : "Gửi bài viết"}</span>
-        </button>
-      )}
+      ) : writerActions}
     </div>
   );
 }

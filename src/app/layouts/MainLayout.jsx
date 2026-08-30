@@ -5,7 +5,7 @@ import Footer from "@/shared/components/layout/Footer/Footer";
 
 export default function MainLayout() {
     const location = useLocation();
-    const isUnifiedFooterPage = location.pathname === "/" || location.pathname === "/download";
+    const showFooter = location.pathname === "/about";
 
     return (
         <>
@@ -15,7 +15,7 @@ export default function MainLayout() {
                 <Outlet />
             </main>
 
-            {!isUnifiedFooterPage && <Footer />}
+            {showFooter && <Footer />}
         </>
     );
 }

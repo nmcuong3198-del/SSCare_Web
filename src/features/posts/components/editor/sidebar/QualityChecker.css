@@ -126,3 +126,55 @@
   background: #f4f6f9;
   color: #9aa3b2;
 }
+
+.anonymous-author-option {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e7f1;
+}
+
+.anonymous-author-option__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: #19398b;
+  background: #eef3ff;
+  border-radius: 9px;
+}
+
+.anonymous-author-option__content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.anonymous-author-option__title {
+  color: #25324a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.anonymous-author-option__desc {
+  color: #8f96a3;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.anonymous-author-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #19398b;
+  cursor: pointer;
+}
+
+.anonymous-author-option input[type="checkbox"]:disabled,
+.anonymous-author-option input[type="checkbox"]:disabled + * {
+  cursor: default;
+}

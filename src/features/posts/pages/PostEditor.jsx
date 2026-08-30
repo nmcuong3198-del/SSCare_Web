@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import ArticleBasicInfo from "@/features/posts/components/editor/basic/ArticleBasicInfo";
@@ -14,18 +14,22 @@ import { createEmptyArticle } from "@/features/posts/model/articleDefault";
 import articleService from "@/features/posts/services/articleService";
 import { createArticleFormData } from "@/features/posts/utils/articlePayload";
 import { canEditArticle } from "@/features/posts/utils/articlePermissions";
-import { validateArticle } from "@/features/posts/utils/articleValidator";
+import {
+  getQualityTextSignature,
+  validateArticle,
+} from "@/features/posts/utils/articleValidator";
 
 import "./PostEditor.css";
 
 export default function PostEditor() {
   const { code } = useParams();
+  const navigate = useNavigate();
   const isExisting = Boolean(code);
 
   const [article, setArticle] = useState(createEmptyArticle);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(Boolean(code));
-  const [revision, setRevision] = useState(0);
+  const [qualityRevision, setQualityRevision] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
@@ -33,8 +37,12 @@ export default function PostEditor() {
   const [showPreview, setShowPreview] = useState(false);
 
   const requestInFlightRef = useRef(false);
-  const submittedRef = useRef(false);
   const loadedRef = useRef(null);
+  const articleRef = useRef(article);
+
+  useEffect(() => {
+    articleRef.current = article;
+  }, [article]);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -46,13 +54,21 @@ export default function PostEditor() {
       .then((data) => {
         if (cancelled) return;
 
-        loadedRef.current = { article: data, imageFile: data.imageUrl ?? null };
-        setArticle(data);
+        const normalized = {
+          ...data,
+          anonymousAuthor: data.anonymousAuthor === true,
+        };
+        loadedRef.current = {
+          article: normalized,
+          imageFile: data.imageUrl ?? null,
+        };
+        setArticle(normalized);
         setImageFile(data.imageUrl ?? null);
       })
       .catch((error) => {
         if (!cancelled) {
           console.error("Không thể tải chi tiết bài viết:", error);
+          toast.error(error.response?.data?.detail || "Không thể tải bài viết.");
         }
       })
       .finally(() => {
@@ -64,42 +80,45 @@ export default function PostEditor() {
     };
   }, [code]);
 
-  const markAsChanged = useCallback(() => {
-    setRevision((currentRevision) => currentRevision + 1);
-  }, []);
-
   const canEdit = isExisting && canEditArticle(article.status);
   const readOnly = isExisting && !isEditing;
 
-  const handleArticleChange = useCallback(
-    (updater) => {
-      setArticle((previousArticle) => {
-        const nextArticle =
-          typeof updater === "function" ? updater(previousArticle) : updater;
+  const handleArticleChange = useCallback((updater) => {
+    const previousArticle = articleRef.current;
+    const nextArticle =
+      typeof updater === "function" ? updater(previousArticle) : updater;
 
-        return {
-          ...nextArticle,
-          qualityChecked: false,
-        };
-      });
-      markAsChanged();
-    },
-    [markAsChanged],
-  );
+    const textChanged =
+      getQualityTextSignature(previousArticle) !==
+      getQualityTextSignature(nextArticle);
 
-  const handleImageChange = useCallback(
-    (updater) => {
-      setImageFile((previousImage) =>
-        typeof updater === "function" ? updater(previousImage) : updater,
-      );
-      setArticle((previousArticle) => ({
-        ...previousArticle,
-        qualityChecked: false,
-      }));
-      markAsChanged();
-    },
-    [markAsChanged],
-  );
+    const normalized = {
+      ...nextArticle,
+      qualityChecked: textChanged
+        ? false
+        : Boolean(nextArticle.qualityChecked),
+    };
+
+    articleRef.current = normalized;
+    setArticle(normalized);
+    if (textChanged) {
+      setQualityRevision((current) => current + 1);
+    }
+  }, []);
+
+  const handleQualityStateChange = useCallback((updater) => {
+    const previousArticle = articleRef.current;
+    const nextArticle =
+      typeof updater === "function" ? updater(previousArticle) : updater;
+    articleRef.current = nextArticle;
+    setArticle(nextArticle);
+  }, []);
+
+  const handleImageChange = useCallback((updater) => {
+    setImageFile((previousImage) =>
+      typeof updater === "function" ? updater(previousImage) : updater,
+    );
+  }, []);
 
   const handlePreview = () => {
     setShowPreview(true);
@@ -113,77 +132,84 @@ export default function PostEditor() {
     if (loadedRef.current) {
       setArticle(loadedRef.current.article);
       setImageFile(loadedRef.current.imageFile);
+      setQualityRevision((current) => current + 1);
     }
     setIsEditing(false);
   };
 
-  const handleSave = async () => {
-    if (!validateArticle(article, imageFile) || requestInFlightRef.current) {
-      return;
-    }
-
-    // Readers keep their place by contentVersion, which the server bumps when published
-    // content changes, so this is not a silent edit.
+  const persistArticle = async (status, { requireQuality, successMessage } = {}) => {
     if (
-      article.status === "published" &&
-      !window.confirm(
-        "Bài viết đang hiển thị trên ứng dụng. Lưu thay đổi sẽ đặt lại tiến độ đọc của người dùng. Tiếp tục?",
-      )
+      !validateArticle(article, imageFile, { requireQuality }) ||
+      requestInFlightRef.current
     ) {
-      return;
+      return null;
     }
 
     try {
       requestInFlightRef.current = true;
       setLoading(true);
 
-      const formData = createArticleFormData(article, imageFile, {
-        status: article.status,
-      });
+      const formData = createArticleFormData(article, imageFile, { status });
 
-      const updated = await articleService.update(code, formData);
+      if (isExisting) {
+        const updated = await articleService.update(code, formData);
+        const normalized = {
+          ...updated,
+          anonymousAuthor: updated.anonymousAuthor === true,
+        };
+        loadedRef.current = {
+          article: normalized,
+          imageFile: updated.imageUrl ?? imageFile,
+        };
+        setArticle(normalized);
+        setImageFile(updated.imageUrl ?? imageFile);
+        setIsEditing(false);
+        if (successMessage) toast.success(successMessage);
+        return normalized;
+      }
 
-      loadedRef.current = {
-        article: updated,
-        imageFile: updated.imageUrl ?? null,
-      };
-      setArticle(updated);
-      setImageFile(updated.imageUrl ?? null);
-      setIsEditing(false);
-      toast.success("Đã lưu thay đổi.");
+      const created = await articleService.create(formData);
+      if (successMessage) toast.success(successMessage);
+      return created;
     } catch (error) {
       toast.error(
-        error.response?.data?.detail || "Không thể lưu thay đổi bài viết.",
+        error.response?.data?.detail ||
+          error.response?.data?.message ||
+          "Không thể lưu bài viết.",
       );
+      return null;
     } finally {
       requestInFlightRef.current = false;
       setLoading(false);
     }
   };
 
-  const handleSubmit = async () => {
-    if (!validateArticle(article, imageFile) || requestInFlightRef.current) {
-      return;
+  const handleSaveDraft = async () => {
+    const saved = await persistArticle("draft", {
+      requireQuality: false,
+      successMessage: "Đã lưu bài viết ở trạng thái bản nháp.",
+    });
+
+    if (saved && !isExisting) {
+      navigate(`/posts/${saved.code}`);
     }
+  };
 
-    try {
-      requestInFlightRef.current = true;
-      setLoading(true);
+  const handleSave = async () => {
+    const status = article.status === "rejected" ? "draft" : article.status;
+    await persistArticle(status || "draft", {
+      requireQuality: status === "pending",
+      successMessage: "Đã lưu thay đổi.",
+    });
+  };
 
-      const formData = createArticleFormData(article, imageFile, {
-        status: "pending",
-      });
+  const handleSubmit = async () => {
+    const saved = await persistArticle("pending", {
+      requireQuality: true,
+    });
 
-      await articleService.create(formData);
-      submittedRef.current = true;
+    if (saved) {
       setShowSubmitModal(true);
-    } catch (error) {
-      const message =
-        error.response?.data?.message || "Không thể tạo bài viết.";
-      window.alert(message);
-    } finally {
-      requestInFlightRef.current = false;
-      setLoading(false);
     }
   };
 
@@ -197,7 +223,7 @@ export default function PostEditor() {
       setShowRejectModal(true);
     } catch (error) {
       console.error(error);
-      window.alert(error.response?.data?.message || "Không thể từ chối bài viết.");
+      window.alert(error.response?.data?.detail || "Không thể từ chối bài viết.");
     } finally {
       setLoading(false);
     }
@@ -213,7 +239,7 @@ export default function PostEditor() {
       setShowApproveModal(true);
     } catch (error) {
       console.error(error);
-      window.alert(error.response?.data?.message || "Không thể duyệt bài viết.");
+      window.alert(error.response?.data?.detail || "Không thể duyệt bài viết.");
     } finally {
       setLoading(false);
     }
@@ -251,9 +277,9 @@ export default function PostEditor() {
           <Sidebar
             article={article}
             imageFile={imageFile}
-            revision={revision}
+            qualityRevision={qualityRevision}
             setArticle={handleArticleChange}
-            setQualityChecked={setArticle}
+            setQualityChecked={handleQualityStateChange}
             readOnly={readOnly}
           />
         </div>
@@ -263,6 +289,7 @@ export default function PostEditor() {
         loading={loading}
         onPreview={handlePreview}
         onSubmit={handleSubmit}
+        onSaveDraft={handleSaveDraft}
         onReject={handleReject}
         onApprove={handleApprove}
         onEdit={handleEdit}
@@ -272,6 +299,7 @@ export default function PostEditor() {
         isEditing={isEditing}
         isExisting={isExisting}
         readOnly={readOnly}
+        articleStatus={article.status}
       />
 
       <ArticlePreviewModal

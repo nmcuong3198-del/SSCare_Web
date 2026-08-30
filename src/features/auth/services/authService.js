@@ -12,7 +12,7 @@ const normalizeSessionUser = (authResponse) => {
 
   return {
     ...account,
-    fullName: account.displayName,
+    fullName: account.fullName || account.displayName,
     username: account.email || account.phone,
     accessToken: authResponse?.accessToken,
     accessTokenExpiresAt: authResponse?.accessTokenExpiresAt,

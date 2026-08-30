@@ -6,7 +6,7 @@ import TestimonialSection from "@/features/landing/components/Testimonial/Testim
 import DownloadSection from "@/features/landing/components/Download/Download";
 import Footer from "@/shared/components/layout/Footer/Footer";
 
-export default function Home() {
+export default function Home({ showFooter = true }) {
     return (
         <>
             <HeroSection />
@@ -15,7 +15,7 @@ export default function Home() {
 
             <div className="download-footer-unified">
                 <DownloadSection />
-                <Footer />
+                {showFooter && <Footer />}
             </div>
         </>
     );

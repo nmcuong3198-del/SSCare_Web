@@ -16,6 +16,8 @@ export function createEmptyArticle() {
     content: [createEmptySection()],
     conclusion: "",
     qualityChecked: false,
+    anonymousAuthor: false,
+    authorName: "",
     createdBy: "",
   };
 }

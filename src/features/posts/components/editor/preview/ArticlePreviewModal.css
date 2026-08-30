@@ -213,3 +213,15 @@
   background: #f3f3f9;
   border-radius: 999px;
 }
+
+.article-preview__author {
+  margin: -2px 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #5f6672;
+}
+
+.article-preview__author strong {
+  color: #25324a;
+  font-weight: 700;
+}

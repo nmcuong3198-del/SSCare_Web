@@ -17,7 +17,7 @@ export default function DownloadPage() {
 
   return (
     <>
-      <Home />
+      <Home showFooter={false} />
       <AppDownloadModal onClose={closeModal} />
     </>
   );

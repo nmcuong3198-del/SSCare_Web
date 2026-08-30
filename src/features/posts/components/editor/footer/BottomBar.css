@@ -116,3 +116,38 @@
 .approve-btn:hover{
     background:#0D2F75;
 }
+
+.writer-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.save-draft-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 156px;
+    height: 48px;
+    padding: 0 20px;
+    color: #163C92;
+    background: #fff;
+    border: 1px solid #163C92;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.save-draft-btn:hover:not(:disabled) {
+    background: #eef3ff;
+}
+
+.save-draft-btn:disabled,
+.submit-btn:disabled,
+.preview-btn:disabled,
+.reject-btn:disabled,
+.approve-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}

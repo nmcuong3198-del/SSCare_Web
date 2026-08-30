@@ -10,7 +10,7 @@ export default function Sidebar({
   article,
   imageFile,
   readOnly,
-  revision,
+  qualityRevision,
   setArticle,
   setQualityChecked,
 }) {
@@ -24,7 +24,6 @@ export default function Sidebar({
       <div className="sidebar-card">
         <div className="sidebar-header">
           <Shapes size={15} />
-
           <span>PHÂN LOẠI & GẮN THẺ</span>
         </div>
 
@@ -36,7 +35,7 @@ export default function Sidebar({
       </div>
 
       <QualityChecker
-        key={revision}
+        key={qualityRevision}
         article={article}
         imageFile={imageFile}
         setArticle={setQualityChecked}

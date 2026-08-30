@@ -5,6 +5,21 @@ const MAX_TAG_LENGTH = 50;
 const MAX_SECTIONS = 10;
 const hasText = (value) => typeof value === "string" && value.trim().length > 0;
 
+export function getQualityTextSignature(article) {
+  const sections = Array.isArray(article?.content) ? article.content : [];
+
+  return JSON.stringify({
+    title: article?.title ?? "",
+    summary: article?.summary ?? "",
+    conclusion: article?.conclusion ?? "",
+    sections: sections.map((section) => ({
+      id: section?.id ?? "",
+      title: section?.title ?? "",
+      content: section?.content ?? "",
+    })),
+  });
+}
+
 export function isArticleReadyForQualityCheck(article, imageFile) {
   const sections = Array.isArray(article.content) ? article.content : [];
   return Boolean(hasText(article.title) && imageFile && hasText(article.summary) &&
@@ -14,7 +29,7 @@ export function isArticleReadyForQualityCheck(article, imageFile) {
     sections.every((s) => hasText(s.title) && hasText(s.content)) && hasText(article.conclusion));
 }
 
-export function validateArticle(article, imageFile) {
+export function validateArticle(article, imageFile, { requireQuality = true } = {}) {
   if (!hasText(article.title)) return toast.error("Vui lòng nhập tiêu đề bài viết."), false;
   if (article.title.trim().length > 100) return toast.error("Tiêu đề tối đa 100 ký tự."), false;
   if (!imageFile) return toast.error("Vui lòng chọn ảnh bìa."), false;
@@ -37,6 +52,8 @@ export function validateArticle(article, imageFile) {
     if (!hasText(section.content)) return toast.error("Nội dung chi tiết không được để trống."), false;
   }
   if (!hasText(article.conclusion)) return toast.error("Vui lòng nhập lời kết."), false;
-  if (article.qualityChecked !== true) return toast.error("Vui lòng kiểm tra từ cấm trước khi gửi/lưu bài viết."), false;
+  if (requireQuality && article.qualityChecked !== true) {
+    return toast.error("Vui lòng kiểm tra từ cấm trước khi gửi bài viết."), false;
+  }
   return true;
 }

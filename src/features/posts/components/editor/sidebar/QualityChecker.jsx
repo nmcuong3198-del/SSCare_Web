@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, EyeOff, XCircle } from "lucide-react";
 
 import { isArticleReadyForQualityCheck } from "@/features/posts/utils/articleValidator";
 
@@ -17,12 +17,8 @@ export default function QualityChecker({
   const sections = Array.isArray(article.content) ? article.content : [];
   const canCheck = isArticleReadyForQualityCheck(article, imageFile);
 
-  const checked = readOnly
-    ? Boolean(article.qualityChecked)
-    : scanResult !== null;
-  const passed = readOnly
-    ? Boolean(article.qualityChecked)
-    : scanResult?.length === 0;
+  const checked = Boolean(article.qualityChecked) || scanResult !== null;
+  const passed = Boolean(article.qualityChecked) || scanResult?.length === 0;
   const badWords = scanResult || [];
 
   const handleCheck = () => {
@@ -47,6 +43,14 @@ export default function QualityChecker({
     setArticle((previousArticle) => ({
       ...previousArticle,
       qualityChecked: foundWords.length === 0,
+    }));
+  };
+
+  const handleAnonymousChange = (event) => {
+    const checkedValue = event.target.checked;
+    setArticle((previousArticle) => ({
+      ...previousArticle,
+      anonymousAuthor: checkedValue,
     }));
   };
 
@@ -106,6 +110,26 @@ export default function QualityChecker({
           </ul>
         </div>
       )}
+
+      <div className="anonymous-author-option">
+        <div className="anonymous-author-option__icon">
+          <EyeOff size={18} />
+        </div>
+        <label htmlFor="anonymous-author-checkbox" className="anonymous-author-option__content">
+          <span className="anonymous-author-option__title">Ẩn danh người viết bài</span>
+          <span className="anonymous-author-option__desc">
+            Khi bật, tên người viết sẽ được che khi hiển thị bài viết.
+          </span>
+        </label>
+        <input
+          id="anonymous-author-checkbox"
+          type="checkbox"
+          checked={article.anonymousAuthor === true}
+          onChange={handleAnonymousChange}
+          disabled={readOnly}
+          aria-label="Ẩn danh người viết bài"
+        />
+      </div>
     </div>
   );
 }
