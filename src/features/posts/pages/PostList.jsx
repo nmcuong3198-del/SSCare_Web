@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlusCircle, FaRegFileAlt } from "react-icons/fa";
-import { FiClock, FiEdit3, FiSearch } from "react-icons/fi";
+import { FiCheck, FiChevronDown, FiClock, FiEdit3, FiSearch } from "react-icons/fi";
 
 import authService from "@/features/auth/services/authService";
 import ArticleTable from "@/features/posts/components/list/ArticleTable";
@@ -21,6 +21,91 @@ const STATUS_OPTIONS = [
   { value: "rejected", label: "Bị từ chối" },
   { value: "archived", label: "Lưu trữ" },
 ];
+
+
+function ArticleFilterSelect({ id, value, options, onChange, disabled = false, ariaLabel }) {
+  const rootRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const selected = options.find((option) => option.value === value) ?? options[0];
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handleOutsideClick = (event) => {
+      if (!rootRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        rootRef.current?.querySelector("button")?.focus();
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (disabled) setOpen(false);
+  }, [disabled]);
+
+  const selectOption = (option) => {
+    if (disabled || option.disabled) return;
+    onChange(option.value);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      ref={rootRef}
+      className={`article-filter-select ${open ? "is-open" : ""} ${disabled ? "is-disabled" : ""}`.trim()}
+    >
+      <button
+        id={id}
+        type="button"
+        className="article-filter-select__trigger"
+        aria-label={ariaLabel}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        disabled={disabled}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span>{selected?.label}</span>
+        <FiChevronDown aria-hidden="true" />
+      </button>
+
+      {open && (
+        <div className="article-filter-select__menu" role="listbox" aria-labelledby={id}>
+          {options.map((option) => {
+            const isSelected = option.value === value;
+            return (
+              <button
+                key={`${option.value || "all"}-${option.label}`}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                className={`article-filter-select__option ${isSelected ? "is-selected" : ""}`.trim()}
+                disabled={option.disabled}
+                onClick={() => selectOption(option)}
+              >
+                <span>{option.label}</span>
+                {isSelected && <FiCheck aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function PostList() {
   const navigate = useNavigate();
@@ -132,14 +217,12 @@ export default function PostList() {
     }));
   };
 
-  const handleStatusChange = (event) => {
-    const value = event.target.value;
+  const handleStatusChange = (value) => {
     setPage(0);
     setFilters((current) => ({ ...current, status: value }));
   };
 
-  const handleAuthorChange = (event) => {
-    const value = event.target.value;
+  const handleAuthorChange = (value) => {
     setPage(0);
     setFilters((current) => ({ ...current, author: value }));
   };
@@ -215,36 +298,30 @@ export default function PostList() {
 
         <div className="article-filter-field">
           <label htmlFor="article-status-filter">Trạng thái</label>
-          <select
+          <ArticleFilterSelect
             id="article-status-filter"
             value={filters.status}
+            options={STATUS_OPTIONS}
             onChange={handleStatusChange}
             disabled={loading}
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.value || "all"} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            ariaLabel="Lọc theo trạng thái bài viết"
+          />
         </div>
 
         {isAdmin && (
           <div className="article-filter-field">
             <label htmlFor="article-author-filter">Người viết</label>
-            <select
+            <ArticleFilterSelect
               id="article-author-filter"
               value={filters.author}
+              options={[
+                { value: "", label: "Tất cả người viết" },
+                ...authors.map((author) => ({ value: author, label: author })),
+              ]}
               onChange={handleAuthorChange}
               disabled={loading}
-            >
-              <option value="">Tất cả người viết</option>
-              {authors.map((author) => (
-                <option key={author} value={author}>
-                  {author}
-                </option>
-              ))}
-            </select>
+              ariaLabel="Lọc theo người viết"
+            />
           </div>
         )}
 
