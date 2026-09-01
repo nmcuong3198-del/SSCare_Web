@@ -4,6 +4,7 @@ import { FaCheckCircle, FaFilter, FaShieldAlt, FaUserEdit, FaUsers } from "react
 import AuthorProfileModal from "@/features/accounts/components/AuthorProfileModal";
 import accountAdminService from "@/features/accounts/services/accountAdminService";
 import Pagination from "@/shared/components/ui/Pagination/Pagination";
+import Select from "@/shared/components/ui/Select/Select";
 
 import "./AccountManagement.css";
 
@@ -135,9 +136,8 @@ export default function AccountManagement() {
     }
   };
 
-  /** @param {import("react").ChangeEvent<HTMLSelectElement>} event */
-  const handleRoleChange = (event) => {
-    const nextRole = event.target.value;
+  /** @param {string} nextRole */
+  const handleRoleChange = (nextRole) => {
     if (nextRole === roleFilter) return;
 
     setLoading(true);
@@ -282,16 +282,16 @@ export default function AccountManagement() {
             />
           </label>
 
-          <label className="account-filter-field">
+          <div className="account-filter-field">
             <span>Vai trò</span>
-            <select value={roleFilter} onChange={handleRoleChange}>
-              {ROLE_OPTIONS.map((option) => (
-                <option key={option.value || "ALL"} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <Select
+              id="account-role-filter"
+              value={roleFilter}
+              options={ROLE_OPTIONS}
+              onChange={handleRoleChange}
+              ariaLabel="Lọc theo vai trò"
+            />
+          </div>
         </div>
       </section>
 

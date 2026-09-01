@@ -107,8 +107,7 @@
   font-weight: 700;
 }
 
-.account-filter-field input,
-.account-filter-field select {
+.account-filter-field input {
   width: 100%;
   min-width: 0;
   height: 42px;
@@ -123,14 +122,17 @@
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.account-filter-field input:focus,
-.account-filter-field select:focus {
+.account-filter-field input:focus {
   border-color: #8eade4;
   box-shadow: 0 0 0 3px rgba(38, 84, 166, 0.08);
 }
 
 .account-filter-field input::placeholder {
   color: #a0a9b8;
+}
+
+.account-filter-field .ss-select__trigger {
+  height: 42px;
 }
 
 .account-alert {

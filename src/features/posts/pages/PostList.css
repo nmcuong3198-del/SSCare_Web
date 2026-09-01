@@ -129,23 +129,11 @@
   gap: 8px;
 }
 
-.article-filter-field select {
-  width: 100%;
+.article-filter-field .ss-select__trigger {
   height: 42px;
-  padding: 0 34px 0 12px;
-  border: 1px solid #d8e1ee;
-  border-radius: 9px;
-  outline: 0;
-  background: #fff;
-  color: #31415e;
   font-size: 14px;
-  cursor: pointer;
 }
 
-.article-filter-field select:focus {
-  border-color: #7fa3e9;
-  box-shadow: 0 0 0 3px rgba(30, 77, 169, 0.09);
-}
 
 .article-clear-filter {
   padding: 0 14px;
