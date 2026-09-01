@@ -89,11 +89,48 @@ export default function RichTextMarkdownEditor({
   const handlePaste = (event) => {
     if (readOnly || disabled) return;
 
-    // Paste only plain text. This prevents Word/website styles from breaking SSCare's
-    // fixed design system; formatting can then be applied with the toolbar.
+    // Chỉ lấy text thuần để nội dung copy từ Word/web không mang theo CSS lạ.
+    // Với trường có maxLength (ví dụ Lời kết), chỉ chèn phần còn vừa giới hạn
+    // thay vì chèn xong rồi khôi phục toàn bộ nội dung cũ.
     event.preventDefault();
-    const text = event.clipboardData?.getData("text/plain") ?? "";
-    execute("insertText", text);
+
+    const text = (event.clipboardData?.getData("text/plain") ?? "").replace(/\r\n?/g, "\n");
+    if (!text) return;
+
+    let textToInsert = text;
+
+    if (typeof maxLength === "number") {
+      const selection = typeof window !== "undefined" ? window.getSelection?.() : null;
+      const editor = editorRef.current;
+      let selectedLength = 0;
+
+      if (selection && selection.rangeCount > 0 && editor) {
+        const range = selection.getRangeAt(0);
+        const startInside = editor.contains(range.startContainer);
+        const endInside = editor.contains(range.endContainer);
+
+        if (startInside && endInside) {
+          selectedLength = selection.toString().length;
+        }
+      }
+
+      const currentLength = markdownPlainTextLength(value);
+      const remaining = Math.max(0, maxLength - currentLength + selectedLength);
+
+      if (remaining === 0) {
+        setLimitReached(true);
+        return;
+      }
+
+      if (textToInsert.length > remaining) {
+        textToInsert = textToInsert.slice(0, remaining);
+        setLimitReached(true);
+      } else {
+        setLimitReached(false);
+      }
+    }
+
+    execute("insertText", textToInsert);
     emitMarkdown();
   };
 
