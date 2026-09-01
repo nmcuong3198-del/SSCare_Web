@@ -217,16 +217,11 @@ export default function RichTextMarkdownEditor({
         />
       </div>
 
-      {!readOnly && (
+      {!readOnly && typeof maxLength === "number" && (
         <div className="rich-markdown-editor__footer">
-          <span>
-            Chọn nội dung rồi dùng thanh công cụ, không cần nhập **, &gt;, - hay 1.
+          <span className={limitReached ? "rich-markdown-editor__counter--error" : ""}>
+            {visibleLength}/{maxLength}
           </span>
-          {typeof maxLength === "number" && (
-            <span className={limitReached ? "rich-markdown-editor__counter--error" : ""}>
-              {visibleLength}/{maxLength}
-            </span>
-          )}
         </div>
       )}
     </div>
