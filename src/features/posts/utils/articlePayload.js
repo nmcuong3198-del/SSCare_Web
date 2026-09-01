@@ -20,3 +20,17 @@ export function createArticleFormData(article, imageFile, { status } = {}) {
   formData.append("article", new Blob([JSON.stringify(articlePayload)], { type: "application/json" }));
   return formData;
 }
+
+export function createForbiddenWordCheckPayload(article) {
+  return {
+    title: article?.title ?? "",
+    summary: article?.summary ?? "",
+    hashtags: Array.isArray(article?.hashtags) ? article.hashtags : [],
+    content: (article?.content ?? []).map((section, index) => ({
+      id: section?.id || `sec-${index}`,
+      title: section?.title ?? "",
+      content: section?.content ?? "",
+    })),
+    conclusion: article?.conclusion ?? "",
+  };
+}

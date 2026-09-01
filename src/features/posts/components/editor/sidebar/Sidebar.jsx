@@ -8,7 +8,6 @@ import PublishFolderSelect from "@/features/posts/components/editor/sidebar/Publ
 
 export default function Sidebar({
   article,
-  imageFile,
   readOnly,
   qualityRevision,
   setArticle,
@@ -38,7 +37,6 @@ export default function Sidebar({
       <QualityChecker
         key={qualityRevision}
         article={article}
-        imageFile={imageFile}
         setArticle={setQualityChecked}
         readOnly={readOnly}
       />

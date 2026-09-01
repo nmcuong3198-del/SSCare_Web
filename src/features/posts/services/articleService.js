@@ -4,6 +4,7 @@ const articleService = {
   getCategories: () => axiosClient.get("/articles/categories"),
   getStats: () => axiosClient.get("/articles/stats"),
   getAuthors: () => axiosClient.get("/articles/authors"),
+  checkForbiddenWords(payload) { return axiosClient.post("/articles/forbidden-words/check", payload); },
   getList(page, size, filters = {}) {
     return axiosClient.get("/articles", {
       params: {

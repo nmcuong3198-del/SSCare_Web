@@ -5,38 +5,6 @@ const MAX_TAG_LENGTH = 50;
 const MAX_SECTIONS = 10;
 const hasText = (value) => typeof value === "string" && value.trim().length > 0;
 
-export const FORBIDDEN_WORDS = ["đánh", "giết", "chửi", "ngu", "khùng"];
-
-function normalizeQualityText(value) {
-  return String(value ?? "").toLocaleLowerCase("vi-VN");
-}
-
-export function findForbiddenWords(article) {
-  const sections = Array.isArray(article?.content) ? article.content : [];
-  const text = normalizeQualityText(
-    [
-      article?.title,
-      article?.summary,
-      article?.conclusion,
-      ...sections.flatMap((section) => [section?.title, section?.content]),
-    ]
-      .filter(Boolean)
-      .join(" "),
-  );
-
-  return FORBIDDEN_WORDS.filter((word) => text.includes(normalizeQualityText(word)));
-}
-
-export function validateNoForbiddenWords(article, actionLabel = "lưu") {
-  const foundWords = findForbiddenWords(article);
-  if (foundWords.length === 0) return true;
-
-  toast.error(
-    `Bài viết có từ cấm (${foundWords.join(", ")}), không thể ${actionLabel} bài viết.`,
-  );
-  return false;
-}
-
 export function getQualityTextSignature(article) {
   const sections = Array.isArray(article?.content) ? article.content : [];
 
@@ -44,6 +12,7 @@ export function getQualityTextSignature(article) {
     title: article?.title ?? "",
     summary: article?.summary ?? "",
     conclusion: article?.conclusion ?? "",
+    hashtags: Array.isArray(article?.hashtags) ? article.hashtags : [],
     sections: sections.map((section) => ({
       id: section?.id ?? "",
       title: section?.title ?? "",
@@ -52,24 +21,15 @@ export function getQualityTextSignature(article) {
   });
 }
 
-export function isArticleReadyForQualityCheck(article, imageFile) {
-  const sections = Array.isArray(article.content) ? article.content : [];
-  return Boolean(
-    hasText(article.title) &&
-      imageFile &&
-      hasText(article.summary) &&
-      hasText(article.cateName) &&
-      Array.isArray(article.hashtags) &&
-      article.hashtags.length > 0 &&
-      article.hashtags.length <= MAX_TAGS &&
-      article.hashtags.every(
-        (tag) => hasText(tag) && tag.trim().length <= MAX_TAG_LENGTH,
-      ) &&
-      sections.length > 0 &&
-      sections.length <= MAX_SECTIONS &&
-      sections.every((section) => hasText(section.title) && hasText(section.content)) &&
-      hasText(article.conclusion)
-  );
+export function isArticleReadyForQualityCheck(article) {
+  const sections = Array.isArray(article?.content) ? article.content : [];
+  return [
+    article?.title,
+    article?.summary,
+    article?.conclusion,
+    ...(article?.hashtags ?? []),
+    ...sections.flatMap((section) => [section?.title, section?.content]),
+  ].some(hasText);
 }
 
 export function validateArticle(article, imageFile, { requireQuality = true } = {}) {
@@ -148,11 +108,6 @@ export function validateArticle(article, imageFile, { requireQuality = true } = 
 
   if (!hasText(article.conclusion)) {
     toast.error("Vui lòng nhập lời kết.");
-    return false;
-  }
-
-  // Từ cấm luôn được kiểm tra khi lưu/gửi, không phụ thuộc trạng thái qualityChecked.
-  if (!validateNoForbiddenWords(article, requireQuality ? "gửi" : "lưu")) {
     return false;
   }
 

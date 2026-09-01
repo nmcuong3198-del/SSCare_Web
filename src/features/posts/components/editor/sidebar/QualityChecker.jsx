@@ -1,36 +1,54 @@
 import { useState } from "react";
-import { CheckCircle2, EyeOff, XCircle } from "lucide-react";
+import toast from "react-hot-toast";
+import { CheckCircle2, EyeOff, Loader2, XCircle } from "lucide-react";
 
-import {
-  findForbiddenWords,
-  isArticleReadyForQualityCheck,
-} from "@/features/posts/utils/articleValidator";
+import ForbiddenWordResultModal from "@/features/posts/components/editor/popup/ForbiddenWordResultModal";
+import articleService from "@/features/posts/services/articleService";
+import { createForbiddenWordCheckPayload } from "@/features/posts/utils/articlePayload";
+import { isArticleReadyForQualityCheck } from "@/features/posts/utils/articleValidator";
 
 import "./QualityChecker.css";
 
 export default function QualityChecker({
   article,
-  imageFile,
   readOnly,
   setArticle,
 }) {
   const [scanResult, setScanResult] = useState(null);
-  const canCheck = isArticleReadyForQualityCheck(article, imageFile);
+  const [checking, setChecking] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const canCheck = isArticleReadyForQualityCheck(article);
 
-  const checked = Boolean(article.qualityChecked) || scanResult !== null;
-  const passed = Boolean(article.qualityChecked) || scanResult?.length === 0;
-  const badWords = scanResult || [];
+  const checked = scanResult !== null || Boolean(article.qualityChecked);
+  const passed = scanResult !== null
+    ? scanResult.clean === true
+    : Boolean(article.qualityChecked);
 
-  const handleCheck = () => {
-    if (!canCheck) return;
+  const handleCheck = async () => {
+    if (!canCheck || checking) return;
 
-    const foundWords = findForbiddenWords(article);
+    try {
+      setChecking(true);
+      const result = await articleService.checkForbiddenWords(
+        createForbiddenWordCheckPayload(article),
+      );
 
-    setScanResult(foundWords);
-    setArticle((previousArticle) => ({
-      ...previousArticle,
-      qualityChecked: foundWords.length === 0,
-    }));
+      setScanResult(result);
+      setArticle((previousArticle) => ({
+        ...previousArticle,
+        qualityChecked: result.clean === true,
+      }));
+      setShowResult(true);
+    } catch (error) {
+      console.error("Không thể kiểm tra từ cấm:", error);
+      toast.error(
+        error.response?.data?.detail ||
+          error.response?.data?.message ||
+          "Không thể kiểm tra từ cấm. Vui lòng thử lại.",
+      );
+    } finally {
+      setChecking(false);
+    }
   };
 
   const handleAnonymousChange = (event) => {
@@ -42,86 +60,106 @@ export default function QualityChecker({
   };
 
   return (
-    <div className="quality-card">
-      <div className="quality-title">
-        📝 <span>KIỂM TRA CHẤT LƯỢNG</span>
-      </div>
+    <>
+      {checking && (
+        <div className="quality-loading-overlay" role="status" aria-live="polite">
+          <div className="quality-loading-box">
+            <Loader2 size={34} className="quality-loading-spinner" />
+            <strong>Đang kiểm tra từ cấm...</strong>
+            <span>Hệ thống đang đối chiếu nội dung với danh sách trong cơ sở dữ liệu.</span>
+          </div>
+        </div>
+      )}
 
-      <div className="quality-result">
-        <span>
-          {checked
-            ? passed
-              ? "Ngôn ngữ phù hợp"
-              : "Ngôn ngữ chưa phù hợp"
-            : "Chưa kiểm tra"}
-        </span>
+      <div className="quality-card">
+        <div className="quality-title">
+          📝 <span>KIỂM TRA CHẤT LƯỢNG</span>
+        </div>
 
-        {checked &&
-          (passed ? (
-            <CheckCircle2 size={22} className="quality-success" />
-          ) : (
-            <XCircle size={22} className="quality-error" />
-          ))}
-      </div>
+        <div className="quality-result">
+          <span>
+            {checked
+              ? passed
+                ? "Ngôn ngữ phù hợp"
+                : "Ngôn ngữ chưa phù hợp"
+              : "Chưa kiểm tra"}
+          </span>
 
-      {!readOnly && (
-        <>
+          {checked &&
+            (passed ? (
+              <CheckCircle2 size={22} className="quality-success" />
+            ) : (
+              <XCircle size={22} className="quality-error" />
+            ))}
+        </div>
+
+        {!readOnly && (
+          <>
+            <button
+              type="button"
+              className="quality-button"
+              onClick={handleCheck}
+              disabled={!canCheck || checking}
+              title={canCheck ? "Kiểm tra từ cấm" : "Vui lòng nhập nội dung bài viết trước"}
+            >
+              {checking ? (
+                <>
+                  <Loader2 size={18} className="quality-button-spinner" />
+                  Đang kiểm tra...
+                </>
+              ) : (
+                <>🛡 Kiểm tra từ cấm</>
+              )}
+            </button>
+            <p className="quality-desc">
+              {canCheck
+                ? "Hệ thống đối chiếu nội dung với danh sách từ cấm đang hoạt động trong cơ sở dữ liệu."
+                : "Nhập nội dung bài viết để sử dụng chức năng kiểm tra từ cấm."}
+            </p>
+          </>
+        )}
+
+        {!readOnly && scanResult && !scanResult.clean && (
           <button
             type="button"
-            className="quality-button"
-            onClick={handleCheck}
-            disabled={!canCheck}
-            title={
-              canCheck
-                ? "Kiểm tra từ cấm"
-                : "Vui lòng nhập đầy đủ các trường bắt buộc trước"
-            }
+            className="quality-detail-button"
+            onClick={() => setShowResult(true)}
           >
-            🛡 Kiểm tra từ cấm
+            Xem {scanResult.totalMatches || scanResult.matches?.length || 0} vị trí cần chỉnh sửa
           </button>
-          <p className="quality-desc">
-            {canCheck
-              ? "Hệ thống sẽ quét toàn bộ bài viết để tìm các từ ngữ không phù hợp với trẻ em."
-              : "Nhập đầy đủ các trường bắt buộc để sử dụng chức năng kiểm tra từ cấm."}
-          </p>
-        </>
-      )}
+        )}
 
-      {!readOnly && checked && !passed && (
-        <div className="bad-word-list">
-          <strong>Đã phát hiện:</strong>
-          <ul>
-            {badWords.map((word) => (
-              <li key={word}>{word}</li>
-            ))}
-          </ul>
+        <div className="anonymous-author-option">
+          <div className="anonymous-author-option__icon">
+            <EyeOff size={18} />
+          </div>
+          <label
+            htmlFor="anonymous-author-checkbox"
+            className="anonymous-author-option__content"
+          >
+            <span className="anonymous-author-option__title">
+              Ẩn danh người viết bài
+            </span>
+            <span className="anonymous-author-option__desc">
+              Khi bật, tên người viết sẽ được che khi hiển thị bài viết.
+            </span>
+          </label>
+          <input
+            id="anonymous-author-checkbox"
+            type="checkbox"
+            checked={article.anonymousAuthor === true}
+            onChange={handleAnonymousChange}
+            disabled={readOnly}
+            aria-label="Ẩn danh người viết bài"
+          />
         </div>
-      )}
-
-      <div className="anonymous-author-option">
-        <div className="anonymous-author-option__icon">
-          <EyeOff size={18} />
-        </div>
-        <label
-          htmlFor="anonymous-author-checkbox"
-          className="anonymous-author-option__content"
-        >
-          <span className="anonymous-author-option__title">
-            Ẩn danh người viết bài
-          </span>
-          <span className="anonymous-author-option__desc">
-            Khi bật, tên người viết sẽ được che khi hiển thị bài viết.
-          </span>
-        </label>
-        <input
-          id="anonymous-author-checkbox"
-          type="checkbox"
-          checked={article.anonymousAuthor === true}
-          onChange={handleAnonymousChange}
-          disabled={readOnly}
-          aria-label="Ẩn danh người viết bài"
-        />
       </div>
-    </div>
+
+      <ForbiddenWordResultModal
+        open={showResult}
+        result={scanResult}
+        onClose={() => setShowResult(false)}
+      />
+    </>
   );
 }

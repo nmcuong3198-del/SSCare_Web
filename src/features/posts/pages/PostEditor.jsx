@@ -17,7 +17,6 @@ import { canEditArticle } from "@/features/posts/utils/articlePermissions";
 import {
   getQualityTextSignature,
   validateArticle,
-  validateNoForbiddenWords,
 } from "@/features/posts/utils/articleValidator";
 
 import "./PostEditor.css";
@@ -272,10 +271,6 @@ export default function PostEditor() {
   };
 
   const handleApprove = async () => {
-    if (!validateNoForbiddenWords(article, "duyệt")) {
-      return;
-    }
-
     try {
       setLoading(true);
       const updated = await articleService.updateStatus({
@@ -354,7 +349,6 @@ export default function PostEditor() {
         <div className="editor-right">
           <Sidebar
             article={article}
-            imageFile={imageFile}
             qualityRevision={qualityRevision}
             setArticle={handleArticleChange}
             setQualityChecked={handleQualityStateChange}
