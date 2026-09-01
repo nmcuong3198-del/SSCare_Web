@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 
 import ArticleBasicInfo from "@/features/posts/components/editor/basic/ArticleBasicInfo";
 import ContentEditor from "@/features/posts/components/editor/content/ContentEditor";
+import ArticleCommentsPanel from "@/features/posts/components/comments/ArticleCommentsPanel";
 import BottomActionBar from "@/features/posts/components/editor/footer/BottomBar";
 import ApproveSuccessModal from "@/features/posts/components/editor/popup/ApproveSuccessModal";
 import ArticlePreviewModal from "@/features/posts/components/editor/preview/ArticlePreviewModal";
@@ -35,6 +36,8 @@ export default function PostEditor() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
 
   const requestInFlightRef = useRef(false);
   const loadedRef = useRef(null);
@@ -43,6 +46,27 @@ export default function PostEditor() {
   useEffect(() => {
     articleRef.current = article;
   }, [article]);
+
+  const loadComments = useCallback(async () => {
+    if (!code) {
+      setComments([]);
+      return;
+    }
+    try {
+      setCommentsLoading(true);
+      const data = await articleService.getComments(code);
+      setComments(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Không thể tải bình luận bài viết:", error);
+      setComments([]);
+    } finally {
+      setCommentsLoading(false);
+    }
+  }, [code]);
+
+  useEffect(() => {
+    void loadComments();
+  }, [loadComments]);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -362,6 +386,14 @@ export default function PostEditor() {
           />
         </div>
       </div>
+
+      {isExisting && (
+        <ArticleCommentsPanel
+          comments={comments}
+          loading={commentsLoading}
+          onRefresh={loadComments}
+        />
+      )}
 
       <BottomActionBar
         loading={loading}

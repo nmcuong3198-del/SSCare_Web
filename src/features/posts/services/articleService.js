@@ -17,6 +17,7 @@ const articleService = {
     });
   },
   getDetail(code) { return axiosClient.get(`/articles/${code}`); },
+  getComments(code) { return axiosClient.get(`/articles/${code}/comments`); },
   // Do not set multipart Content-Type manually: the browser must append the boundary.
   create(formData) { return axiosClient.post("/articles", formData); },
   update(code, formData) { return axiosClient.put(`/articles/${code}`, formData); },
