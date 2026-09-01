@@ -111,11 +111,11 @@ export default function QualityChecker({
                 <>🛡 Kiểm tra từ cấm</>
               )}
             </button>
-            <p className="quality-desc">
-              {canCheck
-                ? "Hệ thống đối chiếu nội dung với danh sách từ cấm đang hoạt động trong cơ sở dữ liệu."
-                : "Nhập nội dung bài viết để sử dụng chức năng kiểm tra từ cấm."}
-            </p>
+            {!canCheck && (
+              <p className="quality-desc">
+                Nhập nội dung bài viết để sử dụng chức năng kiểm tra từ cấm.
+              </p>
+            )}
           </>
         )}
 

@@ -116,6 +116,40 @@ export default function BottomActionBar({
     );
   }
 
+  // Bài nháp của người có quyền viết (CONTENT_EDITOR/ADMIN): Preview + Chỉnh sửa + Gửi bài viết.
+  if (isDraft) {
+    return (
+      <div className="bottom-bar">
+        <PreviewButton loading={loading} onPreview={onPreview} />
+
+        <div className="writer-actions">
+          {canEdit && (
+            <button
+              type="button"
+              className="preview-btn"
+              onClick={onEdit}
+              disabled={loading}
+            >
+              <Pencil size={18} />
+              <span>Chỉnh sửa</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="submit-btn"
+            onClick={onSubmit}
+            disabled={loading}
+          >
+            <SendHorizonal size={18} />
+            <span>{loading ? "Đang gửi..." : "Gửi bài viết"}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+
   // Admin chỉ review bài đã gửi, không chỉnh sửa nội dung bài pending.
   if (isAdmin) {
     return (
@@ -160,39 +194,6 @@ export default function BottomActionBar({
               <span>{loading ? "Đang thu hồi..." : "Thu hồi bài viết"}</span>
             </button>
           )}
-        </div>
-      </div>
-    );
-  }
-
-  // Người viết mở bài nháp: Preview + Chỉnh sửa + Gửi bài viết.
-  if (isDraft) {
-    return (
-      <div className="bottom-bar">
-        <PreviewButton loading={loading} onPreview={onPreview} />
-
-        <div className="writer-actions">
-          {canEdit && (
-            <button
-              type="button"
-              className="preview-btn"
-              onClick={onEdit}
-              disabled={loading}
-            >
-              <Pencil size={18} />
-              <span>Chỉnh sửa</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            className="submit-btn"
-            onClick={onSubmit}
-            disabled={loading}
-          >
-            <SendHorizonal size={18} />
-            <span>{loading ? "Đang gửi..." : "Gửi bài viết"}</span>
-          </button>
         </div>
       </div>
     );

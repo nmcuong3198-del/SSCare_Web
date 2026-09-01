@@ -39,19 +39,10 @@ export default function PostEditor() {
   const requestInFlightRef = useRef(false);
   const loadedRef = useRef(null);
   const articleRef = useRef(article);
-  const returnToListTimerRef = useRef(null);
 
   useEffect(() => {
     articleRef.current = article;
   }, [article]);
-
-  useEffect(() => {
-    return () => {
-      if (returnToListTimerRef.current) {
-        window.clearTimeout(returnToListTimerRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -177,7 +168,29 @@ export default function PostEditor() {
         return normalized;
       }
 
-      return await articleService.create(formData);
+      const created = await articleService.create(formData);
+      const normalized = {
+        ...created,
+        anonymousAuthor: created.anonymousAuthor === true,
+      };
+
+      loadedRef.current = {
+        article: normalized,
+        imageFile: created.imageUrl ?? imageFile,
+      };
+      articleRef.current = normalized;
+      setArticle(normalized);
+      setImageFile(created.imageUrl ?? imageFile);
+      setIsEditing(false);
+
+      // Giữ người dùng ở màn hình bài viết sau khi tạo thành công.
+      // Chuyển URL sang route chi tiết để lần lưu/gửi tiếp theo dùng update,
+      // tránh tạo trùng một bài mới.
+      if (normalized.code) {
+        navigate(`/posts/${normalized.code}`, { replace: true });
+      }
+
+      return normalized;
     } catch (error) {
       toast.error(
         error.response?.data?.detail ||
@@ -191,15 +204,8 @@ export default function PostEditor() {
     }
   };
 
-  const showSavedMessageAndReturn = () => {
-    toast.success("Đã lưu bài viết.", { duration: 3000 });
-
-    if (returnToListTimerRef.current) {
-      window.clearTimeout(returnToListTimerRef.current);
-    }
-    returnToListTimerRef.current = window.setTimeout(() => {
-      navigate("/posts");
-    }, 3000);
+  const showSavedMessage = () => {
+    toast.success("Đã lưu bài viết.");
   };
 
   const handleSaveDraft = async () => {
@@ -208,7 +214,7 @@ export default function PostEditor() {
     });
 
     if (saved) {
-      showSavedMessageAndReturn();
+      showSavedMessage();
     }
   };
 
@@ -219,7 +225,7 @@ export default function PostEditor() {
     });
 
     if (saved) {
-      showSavedMessageAndReturn();
+      showSavedMessage();
     }
   };
 
