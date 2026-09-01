@@ -1,0 +1,187 @@
+.rich-markdown-editor {
+  width: 100%;
+  margin-top: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #d9e0eb;
+  border-radius: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rich-markdown-editor--focused {
+  border-color: #163c92;
+  box-shadow: 0 0 0 3px rgba(22, 60, 146, 0.08);
+}
+
+.rich-markdown-editor--readonly {
+  background: #f9fafc;
+}
+
+.rich-markdown-editor--disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.rich-markdown-editor__toolbar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #f8faff;
+  border-bottom: 1px solid #e5eaf3;
+}
+
+.rich-markdown-editor__toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 32px;
+  padding: 0;
+  color: #344054;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+
+.rich-markdown-editor__toolbar button:hover:not(:disabled) {
+  color: #163c92;
+  background: #eaf0ff;
+  border-color: #d5e0ff;
+}
+
+.rich-markdown-editor__toolbar button:focus-visible {
+  outline: 2px solid #163c92;
+  outline-offset: 1px;
+}
+
+.rich-markdown-editor__toolbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rich-markdown-editor__divider {
+  width: 1px;
+  height: 22px;
+  margin: 0 3px;
+  background: #d9e0eb;
+}
+
+.rich-markdown-editor__surface {
+  position: relative;
+}
+
+.rich-markdown-editor__placeholder {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 0;
+  color: #98a2b3;
+  pointer-events: none;
+}
+
+.rich-markdown-editor__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 14px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #191c20;
+  outline: none;
+  white-space: normal;
+}
+
+.rich-markdown-editor__content:empty {
+  min-height: inherit;
+}
+
+.rich-markdown-editor__content p {
+  margin: 0 0 10px;
+}
+
+.rich-markdown-editor__content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-markdown-editor__content strong,
+.rich-markdown-editor__content b {
+  font-weight: 700;
+}
+
+.rich-markdown-editor__content em,
+.rich-markdown-editor__content i {
+  font-style: italic;
+}
+
+.rich-markdown-editor__content blockquote {
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-style: italic;
+  color: #4b5565;
+  background: #f3f5fa;
+  border-left: 3px solid #164f83;
+}
+
+.rich-markdown-editor__content ul,
+.rich-markdown-editor__content ol {
+  padding-left: 26px;
+  margin: 8px 0 12px;
+}
+
+.rich-markdown-editor__content ul {
+  list-style: disc outside;
+}
+
+.rich-markdown-editor__content ol {
+  list-style: decimal outside;
+}
+
+.rich-markdown-editor__content li {
+  padding-left: 3px;
+  margin: 5px 0;
+}
+
+.rich-markdown-editor__content li::marker {
+  font-weight: 700;
+  color: #164f83;
+}
+
+.rich-markdown-editor__content h1,
+.rich-markdown-editor__content h2,
+.rich-markdown-editor__content h3 {
+  margin: 8px 0 10px;
+  color: #164f83;
+}
+
+.rich-markdown-editor__content h1,
+.rich-markdown-editor__content h2 {
+  font-size: 18px;
+}
+
+.rich-markdown-editor__content h3 {
+  font-size: 16px;
+}
+
+.rich-markdown-editor__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #7a8799;
+  background: #fbfcfe;
+  border-top: 1px solid #eef1f6;
+}
+
+.rich-markdown-editor__footer span:last-child {
+  flex: 0 0 auto;
+}
+
+.rich-markdown-editor__counter--error {
+  font-weight: 700;
+  color: #b42318;
+}

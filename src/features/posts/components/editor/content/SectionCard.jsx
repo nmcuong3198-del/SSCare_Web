@@ -1,4 +1,7 @@
 import { Trash2 } from "lucide-react";
+
+import RichTextMarkdownEditor from "@/features/posts/components/editor/content/RichTextMarkdownEditor";
+
 import "./SectionCard.css";
 
 export default function SectionCard({
@@ -11,7 +14,6 @@ export default function SectionCard({
   const updateSection = (field, value) => {
     setArticle((prev) => ({
       ...prev,
-
       content: prev.content.map((item) =>
         item.id === section.id
           ? {
@@ -24,18 +26,15 @@ export default function SectionCard({
   };
 
   const removeSection = () => {
-
     if (readOnly) return;
-    
+
     if (article.content.length === 1) {
       alert("Bài viết phải có ít nhất một mục.");
-
       return;
     }
 
     setArticle((prev) => ({
       ...prev,
-
       content: prev.content.filter((item) => item.id !== section.id),
     }));
   };
@@ -46,7 +45,7 @@ export default function SectionCard({
         <span>NỘI DUNG {index + 1}</span>
 
         {!readOnly && (
-          <button type="button" onClick={removeSection}>
+          <button type="button" onClick={removeSection} aria-label={`Xóa nội dung ${index + 1}`}>
             <Trash2 size={17} />
           </button>
         )}
@@ -59,12 +58,13 @@ export default function SectionCard({
         readOnly={readOnly}
       />
 
-      <textarea
-        rows={6}
-        value={section.content}
-        placeholder="Nhập nội dung..."
-        onChange={(e) => updateSection("content", e.target.value)}
+      <RichTextMarkdownEditor
+        value={section.content ?? ""}
+        onChange={(value) => updateSection("content", value)}
         readOnly={readOnly}
+        placeholder="Nhập nội dung..."
+        minHeight={140}
+        ariaLabel={`Nội dung chi tiết ${index + 1}`}
       />
     </div>
   );

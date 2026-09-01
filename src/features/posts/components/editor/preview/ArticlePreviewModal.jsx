@@ -7,6 +7,7 @@ import {
   estimateReadMinutes,
 } from "@/features/posts/utils/articleBlocks";
 import useArticleImagePreview from "@/features/posts/utils/useArticleImagePreview";
+import { markdownToHtml } from "@/features/posts/utils/markdownEditor";
 
 import "./ArticlePreviewModal.css";
 
@@ -19,25 +20,17 @@ const CATEGORY_LABELS = {
 };
 
 function MarkdownPreview({ markdown = "" }) {
-  const lines = markdown.split(/\r?\n/);
+  const withoutImages = String(markdown ?? "").replace(
+    /^!\[[^\]]*]\([^)]*\)\s*$/gm,
+    "Ảnh trong nội dung sẽ không hiển thị trên ứng dụng",
+  );
+
   return (
-    <>
-      {lines.map((line, index) => {
-        const text = line.trim();
-        if (!text) return <br key={`br-${index}`} />;
-        if (text.startsWith("## ")) {
-          return <h2 key={`h-${index}`}>{text.slice(3)}</h2>;
-        }
-        if (/^!\[[^\]]*]\([^)]*\)$/.test(text)) {
-          return (
-            <p key={`img-${index}`} className="article-preview__dropped-image">
-              Ảnh trong nội dung sẽ không hiển thị trên ứng dụng
-            </p>
-          );
-        }
-        return <p key={`p-${index}`}>{line}</p>;
-      })}
-    </>
+    <div
+      className="article-preview__markdown"
+      // markdownToHtml escapes raw HTML first and only emits SSCare-supported tags.
+      dangerouslySetInnerHTML={{ __html: markdownToHtml(withoutImages) }}
+    />
   );
 }
 
