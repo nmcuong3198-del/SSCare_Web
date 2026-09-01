@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FolderOpen } from "lucide-react";
 
 import articleService from "@/features/posts/services/articleService";
+import Select from "@/shared/components/ui/Select/Select";
 
 import "./PublishFolderSelect.css";
 
@@ -65,9 +66,12 @@ export default function PublishFolderSelect({
     };
   }, [setArticle]);
 
-  const handleChange = (event) => {
-    const { value } = event.target;
+  const folderOptions = categories.map((category) => ({
+    value: category.key,
+    label: category.label,
+  }));
 
+  const handleChange = (value) => {
     setArticle((previousArticle) => ({
       ...previousArticle,
       cateName: value,
@@ -84,22 +88,15 @@ export default function PublishFolderSelect({
       <div className="publish-folder-card__field">
         <label htmlFor="publish-folder-select">Chọn thư mục</label>
 
-        <select
+        <Select
           id="publish-folder-select"
           value={article?.cateName ?? ""}
+          options={folderOptions}
           onChange={handleChange}
+          placeholder={loadingCategories ? "Đang tải thư mục..." : "Chọn thư mục"}
           disabled={loading || readOnly || loadingCategories}
-        >
-          <option value="" disabled>
-            {loadingCategories ? "Đang tải thư mục..." : "Chọn thư mục"}
-          </option>
-
-          {categories.map((category) => (
-            <option key={category.key} value={category.key}>
-              {category.label}
-            </option>
-          ))}
-        </select>
+          ariaLabel="Chọn thư mục đăng tải bài viết"
+        />
       </div>
     </section>
   );
