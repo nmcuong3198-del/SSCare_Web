@@ -9,6 +9,8 @@ import AccountManagement from "@/features/accounts/pages/AccountManagement";
 import Home from "@/features/landing/pages/Home";
 import About from "@/features/landing/pages/About/About";
 import DownloadPage from "@/features/landing/pages/Download/DownloadPage";
+import PrivacyPolicy from "@/features/legal/pages/PrivacyPolicy";
+import TermsOfUse from "@/features/legal/pages/TermsOfUse";
 import NotificationEditor from "@/features/notifications/pages/NotificationEditor";
 import NotificationList from "@/features/notifications/pages/NotificationList";
 import PostEditor from "@/features/posts/pages/PostEditor";
@@ -25,6 +27,8 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/download" element={<DownloadPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-use" element={<TermsOfUse />} />
 
         <Route element={<ProtectedRoute roles={["ADMIN", "CONTENT_EDITOR"]} />}>
           <Route path="/posts" element={<PostList />} />

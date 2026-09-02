@@ -13,7 +13,7 @@ import {
   FaUser,
   FaUserFriends,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
@@ -75,6 +75,7 @@ export default function Register() {
   const [otp, setOtp] = useState("");
   const [now, setNow] = useState(Date.now());
   const [success, setSuccess] = useState(false);
+  const [acceptedPolicies, setAcceptedPolicies] = useState(false);
 
   const fieldErrors = useMemo(() => {
     const errors = {};
@@ -186,7 +187,7 @@ export default function Register() {
     setSubmitted(true);
     setErrorMessage("");
 
-    if (Object.keys(fieldErrors).length > 0) return;
+    if (!acceptedPolicies || Object.keys(fieldErrors).length > 0) return;
 
     setLoading(true);
     try {
@@ -506,9 +507,51 @@ export default function Register() {
                 </label>
               </div>
 
+              <div className="register-policy-block">
+                <label className="register-policy-consent">
+                  <input
+                    type="checkbox"
+                    checked={acceptedPolicies}
+                    onChange={(event) => {
+                      setAcceptedPolicies(event.target.checked);
+                      if (errorMessage) setErrorMessage("");
+                    }}
+                  />
+                  <span className="register-policy-check" aria-hidden="true" />
+                  <span className="register-policy-text">
+                    Bạn đồng ý với Chính sách bảo mật và Điều khoản và điều kiện của chúng tôi.
+                  </span>
+                </label>
+
+                <div className="register-policy-links" aria-label="Tài liệu chính sách và điều khoản">
+                  <Link
+                    to="/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="register-policy-link"
+                  >
+                    Chính sách bảo mật
+                  </Link>
+                  <span className="register-policy-separator" aria-hidden="true">•</span>
+                  <Link
+                    to="/terms-of-use"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="register-policy-link"
+                  >
+                    Điều khoản và điều kiện
+                  </Link>
+                </div>
+              </div>
+
               {errorMessage && <div className="register-error-box">{errorMessage}</div>}
 
-              <button type="submit" className="register-primary-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="register-primary-btn"
+                disabled={loading || !acceptedPolicies}
+                title={!acceptedPolicies ? "Vui lòng đồng ý với Chính sách bảo mật và Điều khoản và điều kiện" : undefined}
+              >
                 {loading ? "Đang gửi OTP..." : "Gửi mã OTP"}
               </button>
             </form>

@@ -5,8 +5,8 @@ import "./Footer.css";
 
 const footerLinks = [
   { label: "Về chúng tôi", to: "/about" },
-  { label: "Chính sách bảo mật", href: "#" },
-  { label: "Điều khoản sử dụng", href: "#" },
+  { label: "Chính sách bảo mật", to: "/privacy-policy" },
+  { label: "Điều khoản sử dụng", to: "/terms-of-use" },
 ];
 
 export default function Footer() {
