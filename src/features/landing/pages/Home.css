@@ -2,36 +2,12 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background:
-          radial-gradient(circle at 83% 17%, rgba(96, 201, 255, 0.24), transparent 28%),
-          radial-gradient(circle at 8% 72%, rgba(22, 95, 218, 0.20), transparent 30%),
-          linear-gradient(105deg, #0a3788 0%, #0c58cb 54%, #42b2ef 100%);
+  background: #ffffff;
 }
 
-.download-footer-unified::before {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image:
-          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-  background-size: 72px 72px;
-  content: "";
-  pointer-events: none;
-}
-
+.download-footer-unified::before,
 .download-footer-unified::after {
-  position: absolute;
-  z-index: 0;
-  right: -210px;
-  top: 11%;
-  width: 660px;
-  height: 660px;
-  border-radius: 50%;
-  background: rgba(104, 205, 255, 0.12);
-  filter: blur(120px);
-  content: "";
-  pointer-events: none;
+  display: none;
 }
 
 .download-footer-unified > * {
