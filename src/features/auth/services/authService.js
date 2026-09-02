@@ -21,6 +21,44 @@ const normalizeSessionUser = (authResponse) => {
 };
 
 const authService = {
+  register(form) {
+    return axiosClient.post("/v1/auth/register", {
+      displayName: form.displayName?.trim(),
+      fullName: form.fullName?.trim(),
+      parentRelationCode: form.parentRelationCode,
+      dateOfBirth: form.dateOfBirth,
+      email: form.email?.trim(),
+      phone: form.phone?.trim(),
+      password: form.password,
+    });
+  },
+
+  resendRegistrationOtp(challengeId) {
+    return axiosClient.post("/v1/auth/resend-otp", { challengeId });
+  },
+
+  async verifyRegistration({ challengeId, otp }) {
+    const authResponse = await axiosClient.post("/v1/auth/verify-registration", {
+      challengeId,
+      otp,
+      deviceLabel: "SSCare Web Registration",
+    });
+
+    // Giống luồng App: xác thực OTP chỉ tạo tài khoản, không tự đăng nhập.
+    // Backend hiện trả về một refresh session mới nên thu hồi ngay session này.
+    if (authResponse?.refreshToken) {
+      try {
+        await axiosClient.post("/v1/auth/logout", {
+          refreshToken: authResponse.refreshToken,
+        });
+      } catch {
+        // Best effort: web không lưu access/refresh token của phiên đăng ký.
+      }
+    }
+
+    return authResponse;
+  },
+
   login(form) {
     return axiosClient.post("/v1/auth/login", {
       identity: form.username?.trim(),

@@ -64,6 +64,31 @@
   flex-shrink: 0;
 }
 
+.guest-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guest-register-btn {
+  width: 118px;
+  height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid #173d8f;
+  border-radius: 30px;
+  background: #fff;
+  color: #173d8f;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.guest-register-btn:hover {
+  background: #eef4ff;
+  transform: translateY(-2px);
+}
+
 .header-account .primary-btn {
   width: 140px;
   height: 48px;
@@ -234,6 +259,13 @@
     border-top: 1px solid #edf1f7;
   }
 
+  .header-account .guest-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .header-account .guest-register-btn,
   .header-account .primary-btn {
     width: 100%;
   }

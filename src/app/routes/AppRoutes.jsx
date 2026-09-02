@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import MainLayout from "@/app/layouts/MainLayout";
 import ProtectedRoute from "@/features/auth/components/ProtectedRoute/ProtectedRoute";
 import Login from "@/features/auth/pages/Login/Login";
+import Register from "@/features/auth/pages/Register/Register";
 import AccountManagement from "@/features/accounts/pages/AccountManagement";
 import Home from "@/features/landing/pages/Home";
 import About from "@/features/landing/pages/About/About";
@@ -16,6 +17,7 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
