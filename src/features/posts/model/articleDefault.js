@@ -16,6 +16,7 @@ export function createEmptyArticle() {
     content: [createEmptySection()],
     conclusion: "",
     qualityChecked: false,
+    ignoredForbiddenWords: [],
     anonymousAuthor: false,
     rejectionReason: null,
     authorName: "",

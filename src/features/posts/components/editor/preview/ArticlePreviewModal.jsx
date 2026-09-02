@@ -104,9 +104,6 @@ export default function ArticlePreviewModal({
         <header className="article-preview__bar">
           <div>
             <strong>Xem trước</strong>
-            <span className="article-preview__hint">
-              Hiển thị gần đúng như trên ứng dụng
-            </span>
           </div>
 
           <button

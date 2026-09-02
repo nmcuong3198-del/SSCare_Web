@@ -9,6 +9,10 @@ import { isArticleReadyForQualityCheck } from "@/features/posts/utils/articleVal
 
 import "./QualityChecker.css";
 
+function normalizeWord(value) {
+  return String(value ?? "").trim().replace(/\s+/g, " ").toLocaleLowerCase("vi-VN");
+}
+
 export default function QualityChecker({
   article,
   readOnly,
@@ -49,6 +53,41 @@ export default function QualityChecker({
     } finally {
       setChecking(false);
     }
+  };
+
+  const handleIgnoreWord = (word) => {
+    const normalized = normalizeWord(word);
+    if (!normalized) return;
+
+    const previousMatches = Array.isArray(scanResult?.matches)
+      ? scanResult.matches
+      : [];
+    const remainingMatches = previousMatches.filter(
+      (match) => normalizeWord(match.word) !== normalized,
+    );
+    const nextResult = {
+      ...(scanResult ?? {}),
+      matches: remainingMatches,
+      totalMatches: remainingMatches.length,
+      clean: remainingMatches.length === 0,
+    };
+
+    setScanResult(nextResult);
+    setArticle((previousArticle) => {
+      const previousIgnored = Array.isArray(previousArticle.ignoredForbiddenWords)
+        ? previousArticle.ignoredForbiddenWords
+        : [];
+      const alreadyIgnored = previousIgnored.some(
+        (item) => normalizeWord(item) === normalized,
+      );
+      return {
+        ...previousArticle,
+        ignoredForbiddenWords: alreadyIgnored
+          ? previousIgnored
+          : [...previousIgnored, String(word).trim()],
+        qualityChecked: nextResult.clean,
+      };
+    });
   };
 
   const handleAnonymousChange = (event) => {
@@ -158,6 +197,7 @@ export default function QualityChecker({
       <ForbiddenWordResultModal
         open={showResult}
         result={scanResult}
+        onIgnoreWord={readOnly ? undefined : handleIgnoreWord}
         onClose={() => setShowResult(false)}
       />
     </>

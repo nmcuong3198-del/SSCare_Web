@@ -137,6 +137,65 @@ export function markdownToHtml(markdown = "") {
   return html.join("");
 }
 
+/**
+ * Sanitize rich HTML from the clipboard to the small formatting subset SSCare supports.
+ * This keeps semantic formatting (bold/italic/headings/quotes/lists) while dropping
+ * Word/Google Docs classes, colors, fonts and other inline CSS that should not leak into the CMS.
+ */
+export function clipboardHtmlToEditorHtml(html = "") {
+  if (typeof DOMParser === "undefined" || !String(html).trim()) return "";
+
+  const documentNode = new DOMParser().parseFromString(String(html), "text/html");
+
+  const renderChildren = (node) =>
+    Array.from(node?.childNodes ?? []).map(renderNode).join("");
+
+  const renderNode = (node) => {
+    if (!node) return "";
+    if (node.nodeType === 3) return escapeHtml(node.nodeValue ?? "");
+    if (node.nodeType !== 1) return "";
+
+    const tag = node.tagName?.toUpperCase();
+    const children = renderChildren(node);
+
+    if (tag === "BR") return "<br>";
+    if (tag === "B" || tag === "STRONG") return `<strong>${children}</strong>`;
+    if (tag === "I" || tag === "EM") return `<em>${children}</em>`;
+
+    if (tag === "SPAN") {
+      const style = node.style;
+      const weight = String(style?.fontWeight ?? "").toLowerCase();
+      const numericWeight = Number.parseInt(weight, 10);
+      const isBold = weight === "bold" || weight === "bolder" ||
+        (Number.isFinite(numericWeight) && numericWeight >= 600);
+      const fontStyle = String(style?.fontStyle ?? "").toLowerCase();
+      const isItalic = fontStyle === "italic" || fontStyle === "oblique";
+      let result = children;
+      if (isItalic) result = `<em>${result}</em>`;
+      if (isBold) result = `<strong>${result}</strong>`;
+      return result;
+    }
+
+    if (tag === "P") return `<p>${children}</p>`;
+    // Keep DIV as a block instead of wrapping it in P. Clipboard HTML from
+    // Word/Google Docs often nests paragraphs in DIVs; converting those DIVs
+    // to P would create invalid <p><p>...</p></p> markup and lose formatting.
+    if (tag === "DIV") return `<div>${children}</div>`;
+    if (tag === "BLOCKQUOTE") return `<blockquote>${children}</blockquote>`;
+    if (tag === "UL") return `<ul>${children}</ul>`;
+    if (tag === "OL") return `<ol>${children}</ol>`;
+    if (tag === "LI") return `<li>${children}</li>`;
+    if (tag === "H1" || tag === "H2" || tag === "H3") {
+      return `<${tag.toLowerCase()}>${children}</${tag.toLowerCase()}>`;
+    }
+
+    // Unsupported wrappers (links, font tags, Office-specific elements...) keep only content.
+    return children;
+  };
+
+  return renderChildren(documentNode.body);
+}
+
 function normalizeInlineText(value) {
   return value.replace(/\u00a0/g, " ");
 }

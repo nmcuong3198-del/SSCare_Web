@@ -142,3 +142,36 @@
     font-size: 11.5px;
   }
 }
+
+.article-comment-item__meta-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.article-comment-item__delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #9b4c55;
+  cursor: pointer;
+}
+
+.article-comment-item__delete:hover {
+  background: #fff0f1;
+  color: #c62828;
+}
+
+.article-comment-item__delete:disabled {
+  cursor: wait;
+  opacity: 0.45;
+}

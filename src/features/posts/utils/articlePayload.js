@@ -11,6 +11,9 @@ export function createArticleFormData(article, imageFile, { status } = {}) {
     })),
     conclusion: article.conclusion?.trim() ?? "",
     qualityChecked: article.qualityChecked === true,
+    ignoredForbiddenWords: Array.isArray(article.ignoredForbiddenWords)
+      ? article.ignoredForbiddenWords.map((word) => String(word).trim()).filter(Boolean)
+      : [],
     anonymousAuthor: article.anonymousAuthor === true,
     status: status ?? article.status ?? "draft",
   };
@@ -32,5 +35,8 @@ export function createForbiddenWordCheckPayload(article) {
       content: section?.content ?? "",
     })),
     conclusion: article?.conclusion ?? "",
+    ignoredForbiddenWords: Array.isArray(article?.ignoredForbiddenWords)
+      ? article.ignoredForbiddenWords
+      : [],
   };
 }

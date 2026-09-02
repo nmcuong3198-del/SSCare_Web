@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import ArticleBasicInfo from "@/features/posts/components/editor/basic/ArticleBasicInfo";
 import ContentEditor from "@/features/posts/components/editor/content/ContentEditor";
 import ArticleCommentsPanel from "@/features/posts/components/comments/ArticleCommentsPanel";
+import authService from "@/features/auth/services/authService";
 import BottomActionBar from "@/features/posts/components/editor/footer/BottomBar";
 import ApproveSuccessModal from "@/features/posts/components/editor/popup/ApproveSuccessModal";
 import ArticlePreviewModal from "@/features/posts/components/editor/preview/ArticlePreviewModal";
@@ -37,7 +38,8 @@ export default function PostEditor() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [comments, setComments] = useState([]);
-  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(Boolean(code));
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   const requestInFlightRef = useRef(false);
   const loadedRef = useRef(null);
@@ -47,26 +49,50 @@ export default function PostEditor() {
     articleRef.current = article;
   }, [article]);
 
+  const fetchComments = useCallback(async () => {
+    if (!code) return [];
+    const data = await articleService.getComments(code);
+    return Array.isArray(data) ? data : [];
+  }, [code]);
+
   const loadComments = useCallback(async () => {
-    if (!code) {
-      setComments([]);
-      return;
-    }
+    if (!code) return;
+
     try {
       setCommentsLoading(true);
-      const data = await articleService.getComments(code);
-      setComments(Array.isArray(data) ? data : []);
+      const data = await fetchComments();
+      setComments(data);
     } catch (error) {
       console.error("Không thể tải bình luận bài viết:", error);
       setComments([]);
     } finally {
       setCommentsLoading(false);
     }
-  }, [code]);
+  }, [code, fetchComments]);
 
   useEffect(() => {
-    void loadComments();
-  }, [loadComments]);
+    if (!code) return undefined;
+
+    let cancelled = false;
+
+    fetchComments()
+        .then((data) => {
+          if (!cancelled) setComments(data);
+        })
+        .catch((error) => {
+          if (!cancelled) {
+            console.error("Không thể tải bình luận bài viết:", error);
+            setComments([]);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setCommentsLoading(false);
+        });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [code, fetchComments]);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -74,30 +100,30 @@ export default function PostEditor() {
     let cancelled = false;
 
     articleService
-      .getDetail(code)
-      .then((data) => {
-        if (cancelled) return;
+        .getDetail(code)
+        .then((data) => {
+          if (cancelled) return;
 
-        const normalized = {
-          ...data,
-          anonymousAuthor: data.anonymousAuthor === true,
-        };
-        loadedRef.current = {
-          article: normalized,
-          imageFile: data.imageUrl ?? null,
-        };
-        setArticle(normalized);
-        setImageFile(data.imageUrl ?? null);
-      })
-      .catch((error) => {
-        if (!cancelled) {
-          console.error("Không thể tải chi tiết bài viết:", error);
-          toast.error(error.response?.data?.detail || "Không thể tải bài viết.");
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+          const normalized = {
+            ...data,
+            anonymousAuthor: data.anonymousAuthor === true,
+          };
+          loadedRef.current = {
+            article: normalized,
+            imageFile: data.imageUrl ?? null,
+          };
+          setArticle(normalized);
+          setImageFile(data.imageUrl ?? null);
+        })
+        .catch((error) => {
+          if (!cancelled) {
+            console.error("Không thể tải chi tiết bài viết:", error);
+            toast.error(error.response?.data?.detail || "Không thể tải bài viết.");
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
 
     return () => {
       cancelled = true;
@@ -110,17 +136,17 @@ export default function PostEditor() {
   const handleArticleChange = useCallback((updater) => {
     const previousArticle = articleRef.current;
     const nextArticle =
-      typeof updater === "function" ? updater(previousArticle) : updater;
+        typeof updater === "function" ? updater(previousArticle) : updater;
 
     const textChanged =
-      getQualityTextSignature(previousArticle) !==
-      getQualityTextSignature(nextArticle);
+        getQualityTextSignature(previousArticle) !==
+        getQualityTextSignature(nextArticle);
 
     const normalized = {
       ...nextArticle,
       qualityChecked: textChanged
-        ? false
-        : Boolean(nextArticle.qualityChecked),
+          ? false
+          : Boolean(nextArticle.qualityChecked),
     };
 
     articleRef.current = normalized;
@@ -133,14 +159,14 @@ export default function PostEditor() {
   const handleQualityStateChange = useCallback((updater) => {
     const previousArticle = articleRef.current;
     const nextArticle =
-      typeof updater === "function" ? updater(previousArticle) : updater;
+        typeof updater === "function" ? updater(previousArticle) : updater;
     articleRef.current = nextArticle;
     setArticle(nextArticle);
   }, []);
 
   const handleImageChange = useCallback((updater) => {
     setImageFile((previousImage) =>
-      typeof updater === "function" ? updater(previousImage) : updater,
+        typeof updater === "function" ? updater(previousImage) : updater,
     );
   }, []);
 
@@ -163,8 +189,8 @@ export default function PostEditor() {
 
   const persistArticle = async (status, { requireQuality = false } = {}) => {
     if (
-      !validateArticle(article, imageFile, { requireQuality }) ||
-      requestInFlightRef.current
+        !validateArticle(article, imageFile, { requireQuality }) ||
+        requestInFlightRef.current
     ) {
       return null;
     }
@@ -193,23 +219,40 @@ export default function PostEditor() {
       }
 
       const created = await articleService.create(formData);
+
+      // API create historically returns only a compact response. Merge it with
+      // the form state immediately, then fetch the canonical detail so the page
+      // is usable right after Save without requiring an F5.
+      let canonical = null;
+      if (created?.code) {
+        try {
+          canonical = await articleService.getDetail(created.code);
+        } catch (reloadError) {
+          console.warn("Đã lưu bài nhưng chưa tải lại được chi tiết:", reloadError);
+        }
+      }
+      const canonicalIgnoredForbiddenWords = canonical?.ignoredForbiddenWords;
       const normalized = {
+        ...articleRef.current,
         ...created,
-        anonymousAuthor: created.anonymousAuthor === true,
+        ...(canonical ?? {}),
+        status: canonical?.status || created?.status || "draft",
+        ignoredForbiddenWords: Array.isArray(canonicalIgnoredForbiddenWords)
+            ? canonicalIgnoredForbiddenWords
+            : (articleRef.current.ignoredForbiddenWords ?? []),
+        anonymousAuthor:
+            (canonical?.anonymousAuthor ?? articleRef.current.anonymousAuthor) === true,
       };
 
       loadedRef.current = {
         article: normalized,
-        imageFile: created.imageUrl ?? imageFile,
+        imageFile: canonical?.imageUrl ?? created?.imageUrl ?? imageFile,
       };
       articleRef.current = normalized;
       setArticle(normalized);
-      setImageFile(created.imageUrl ?? imageFile);
+      setImageFile(canonical?.imageUrl ?? created?.imageUrl ?? imageFile);
       setIsEditing(false);
 
-      // Giữ người dùng ở màn hình bài viết sau khi tạo thành công.
-      // Chuyển URL sang route chi tiết để lần lưu/gửi tiếp theo dùng update,
-      // tránh tạo trùng một bài mới.
       if (normalized.code) {
         navigate(`/posts/${normalized.code}`, { replace: true });
       }
@@ -217,7 +260,7 @@ export default function PostEditor() {
       return normalized;
     } catch (error) {
       toast.error(
-        error.response?.data?.detail ||
+          error.response?.data?.detail ||
           error.response?.data?.message ||
           "Không thể lưu bài viết.",
       );
@@ -325,6 +368,28 @@ export default function PostEditor() {
     }
   };
 
+  const handleDeleteComment = async (comment) => {
+    if (!code || !comment?.id || !authService.isAdmin() || deletingCommentId) return;
+    const confirmed = window.confirm(
+        `Xóa bình luận của ${comment.authorName || "người dùng"}?`,
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeletingCommentId(comment.id);
+      await articleService.deleteComment(code, comment.id);
+      setComments((current) => current.filter(
+          (item) => item.id !== comment.id && item.parentId !== comment.id,
+      ));
+      toast.success("Đã xóa bình luận.");
+    } catch (error) {
+      console.error("Không thể xóa bình luận:", error);
+      toast.error(error.response?.data?.detail || "Không thể xóa bình luận.");
+    } finally {
+      setDeletingCommentId(null);
+    }
+  };
+
   const handleRevoke = async () => {
     try {
       setLoading(true);
@@ -340,99 +405,102 @@ export default function PostEditor() {
   };
 
   return (
-    <div className="editor-page">
-      {article.status === "rejected" && article.rejectionReason && (
-        <div className="editor-rejection-banner" role="alert">
-          <div className="editor-rejection-banner__title">Lý do từ chối</div>
-          <div className="editor-rejection-banner__content">
-            {article.rejectionReason}
+      <div className="editor-page">
+        {article.status === "rejected" && article.rejectionReason && (
+            <div className="editor-rejection-banner" role="alert">
+              <div className="editor-rejection-banner__title">Lý do từ chối</div>
+              <div className="editor-rejection-banner__content">
+                {article.rejectionReason}
+              </div>
+            </div>
+        )}
+
+        <div className="editor-header">
+          <h1>
+            {code
+                ? `${isEditing ? "Chỉnh sửa" : "Chi tiết"} bài viết ${code}`
+                : "Tạo bài viết mới"}
+          </h1>
+        </div>
+
+        <div className="editor-layout">
+          <div className="editor-left">
+            <ArticleBasicInfo
+                article={article}
+                setArticle={handleArticleChange}
+                imageFile={imageFile}
+                setImageFile={handleImageChange}
+                readOnly={readOnly}
+                loading={loading}
+            />
+
+            <ContentEditor
+                article={article}
+                setArticle={handleArticleChange}
+                readOnly={readOnly}
+            />
+          </div>
+
+          <div className="editor-right">
+            <Sidebar
+                article={article}
+                qualityRevision={qualityRevision}
+                setArticle={handleArticleChange}
+                setQualityChecked={handleQualityStateChange}
+                readOnly={readOnly}
+            />
           </div>
         </div>
-      )}
 
-      <div className="editor-header">
-        <h1>
-          {code
-            ? `${isEditing ? "Chỉnh sửa" : "Chi tiết"} bài viết ${code}`
-            : "Tạo bài viết mới"}
-        </h1>
-      </div>
+        {isExisting && (
+            <ArticleCommentsPanel
+                comments={comments}
+                loading={commentsLoading}
+                onRefresh={loadComments}
+                canDelete={authService.isAdmin()}
+                deletingCommentId={deletingCommentId}
+                onDeleteComment={handleDeleteComment}
+            />
+        )}
 
-      <div className="editor-layout">
-        <div className="editor-left">
-          <ArticleBasicInfo
-            article={article}
-            setArticle={handleArticleChange}
-            imageFile={imageFile}
-            setImageFile={handleImageChange}
-            readOnly={readOnly}
+        <BottomActionBar
             loading={loading}
-          />
-
-          <ContentEditor
-            article={article}
-            setArticle={handleArticleChange}
-            readOnly={readOnly}
-          />
-        </div>
-
-        <div className="editor-right">
-          <Sidebar
-            article={article}
-            qualityRevision={qualityRevision}
-            setArticle={handleArticleChange}
-            setQualityChecked={handleQualityStateChange}
-            readOnly={readOnly}
-          />
-        </div>
-      </div>
-
-      {isExisting && (
-        <ArticleCommentsPanel
-          comments={comments}
-          loading={commentsLoading}
-          onRefresh={loadComments}
+            onPreview={handlePreview}
+            onSubmit={handleSubmit}
+            onSaveDraft={handleSaveDraft}
+            onReject={handleReject}
+            onApprove={handleApprove}
+            onRevoke={handleRevoke}
+            onEdit={handleEdit}
+            onSave={handleSave}
+            onCancelEdit={handleCancelEdit}
+            canEdit={canEdit}
+            isEditing={isEditing}
+            isExisting={isExisting}
+            articleStatus={article.status}
         />
-      )}
 
-      <BottomActionBar
-        loading={loading}
-        onPreview={handlePreview}
-        onSubmit={handleSubmit}
-        onSaveDraft={handleSaveDraft}
-        onReject={handleReject}
-        onApprove={handleApprove}
-        onRevoke={handleRevoke}
-        onEdit={handleEdit}
-        onSave={handleSave}
-        onCancelEdit={handleCancelEdit}
-        canEdit={canEdit}
-        isEditing={isEditing}
-        isExisting={isExisting}
-        articleStatus={article.status}
-      />
+        <ArticlePreviewModal
+            open={showPreview}
+            onClose={() => setShowPreview(false)}
+            article={article}
+            imageFile={imageFile}
+        />
 
-      <ArticlePreviewModal
-        open={showPreview}
-        onClose={() => setShowPreview(false)}
-        article={article}
-        imageFile={imageFile}
-      />
-
-      <SubmitSuccessModal
-        open={showSubmitModal}
-        onClose={() => setShowSubmitModal(false)}
-      />
-      <RejectReasonModal
-        open={showRejectReasonModal}
-        loading={loading}
-        onCancel={() => setShowRejectReasonModal(false)}
-        onConfirm={handleConfirmReject}
-      />
-      <ApproveSuccessModal
-        open={showApproveModal}
-        onClose={() => setShowApproveModal(false)}
-      />
-    </div>
+        <SubmitSuccessModal
+            open={showSubmitModal}
+            onClose={() => setShowSubmitModal(false)}
+        />
+        <RejectReasonModal
+            open={showRejectReasonModal}
+            loading={loading}
+            onCancel={() => setShowRejectReasonModal(false)}
+            onConfirm={handleConfirmReject}
+        />
+        <ApproveSuccessModal
+            open={showApproveModal}
+            onClose={() => setShowApproveModal(false)}
+        />
+      </div>
   );
 }

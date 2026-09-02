@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import {
+  clipboardHtmlToEditorHtml,
   closestEditableBlock,
   editorElementToMarkdown,
   markdownPlainTextLength,
@@ -89,48 +90,47 @@ export default function RichTextMarkdownEditor({
   const handlePaste = (event) => {
     if (readOnly || disabled) return;
 
-    // Chỉ lấy text thuần để nội dung copy từ Word/web không mang theo CSS lạ.
-    // Với trường có maxLength (ví dụ Lời kết), chỉ chèn phần còn vừa giới hạn
-    // thay vì chèn xong rồi khôi phục toàn bộ nội dung cũ.
     event.preventDefault();
 
-    const text = (event.clipboardData?.getData("text/plain") ?? "").replace(/\r\n?/g, "\n");
-    if (!text) return;
+    const clipboard = event.clipboardData;
+    const plainText = (clipboard?.getData("text/plain") ?? "").replace(/\r\n?/g, "\n");
+    const richHtml = clipboardHtmlToEditorHtml(clipboard?.getData("text/html") ?? "");
+    if (!plainText && !richHtml) return;
 
-    let textToInsert = text;
-
+    let selectedLength = 0;
     if (typeof maxLength === "number") {
       const selection = typeof window !== "undefined" ? window.getSelection?.() : null;
       const editor = editorRef.current;
-      let selectedLength = 0;
-
       if (selection && selection.rangeCount > 0 && editor) {
         const range = selection.getRangeAt(0);
-        const startInside = editor.contains(range.startContainer);
-        const endInside = editor.contains(range.endContainer);
-
-        if (startInside && endInside) {
+        if (editor.contains(range.startContainer) && editor.contains(range.endContainer)) {
           selectedLength = selection.toString().length;
         }
       }
 
       const currentLength = markdownPlainTextLength(value);
       const remaining = Math.max(0, maxLength - currentLength + selectedLength);
-
       if (remaining === 0) {
         setLimitReached(true);
         return;
       }
 
-      if (textToInsert.length > remaining) {
-        textToInsert = textToInsert.slice(0, remaining);
+      // Preserve rich formatting when the whole copied fragment fits the field limit.
+      // If it does not fit, insert the allowed text prefix rather than losing the whole paste.
+      if (plainText.length > remaining) {
+        execute("insertText", plainText.slice(0, remaining));
         setLimitReached(true);
-      } else {
-        setLimitReached(false);
+        emitMarkdown();
+        return;
       }
     }
 
-    execute("insertText", textToInsert);
+    setLimitReached(false);
+    if (richHtml) {
+      execute("insertHTML", richHtml);
+    } else {
+      execute("insertText", plainText);
+    }
     emitMarkdown();
   };
 

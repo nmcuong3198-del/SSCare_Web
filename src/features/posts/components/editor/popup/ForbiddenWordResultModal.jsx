@@ -1,8 +1,13 @@
-import { AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, EyeOff, X } from "lucide-react";
 
 import "./ForbiddenWordResultModal.css";
 
-export default function ForbiddenWordResultModal({ open, result, onClose }) {
+export default function ForbiddenWordResultModal({
+  open,
+  result,
+  onClose,
+  onIgnoreWord,
+}) {
   if (!open || !result) return null;
 
   const matches = Array.isArray(result.matches) ? result.matches : [];
@@ -32,12 +37,12 @@ export default function ForbiddenWordResultModal({ open, result, onClose }) {
         </div>
 
         <h2 id="forbidden-result-title">
-          {clean ? "Không phát hiện từ cấm" : "Phát hiện nội dung cần chỉnh sửa"}
+          {clean ? "Không còn cụm từ cần xử lý" : "Phát hiện nội dung cần chỉnh sửa"}
         </h2>
 
         <p className="forbidden-result-summary">
           {clean
-            ? "Toàn bộ nội dung bài viết đã vượt qua kiểm tra từ cấm hiện tại trong hệ thống."
+            ? "Các cụm từ còn lại đã vượt qua kiểm tra. Những cụm từ bạn chọn bỏ qua chỉ được bỏ qua cho bài viết này."
             : `Phát hiện ${matches.length} vị trí, thuộc ${uniqueWords.length} từ/cụm từ cấm.`}
         </p>
 
@@ -53,6 +58,16 @@ export default function ForbiddenWordResultModal({ open, result, onClose }) {
                   <span className="forbidden-result-location">{match.location}</span>
                 </div>
                 <div className="forbidden-result-excerpt">“{match.excerpt}”</div>
+                {onIgnoreWord && (
+                  <button
+                    type="button"
+                    className="forbidden-result-ignore"
+                    onClick={() => onIgnoreWord(match.word)}
+                  >
+                    <EyeOff size={15} />
+                    Bỏ qua cụm từ này
+                  </button>
+                )}
               </div>
             ))}
           </div>
