@@ -48,7 +48,7 @@ export default function Footer() {
                 </div>
 
                 <a href="mailto:sscarevn@gmail.com" className="footer-info-row footer-info-link">
-                  <span>Email: <strong>sscarevn@gmail.com</strong></span>
+                  <span>Email: sscarevn@gmail.com</span>
                 </a>
 
                 <div className="footer-info-row">
@@ -56,7 +56,7 @@ export default function Footer() {
                 </div>
 
                 <div className="footer-info-row">
-                  <span>Người chịu trách nhiệm quản lý nội dung: <strong>Nguyễn Thị Hương</strong></span>
+                  <span>Người chịu trách nhiệm quản lý nội dung: Nguyễn Thị Hương</span>
                 </div>
               </div>
             </div>
