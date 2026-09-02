@@ -1,12 +1,11 @@
-
 .download-footer-unified {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   background:
-          radial-gradient(circle at 82% 22%, rgba(96, 196, 255, 0.20), transparent 28%),
-          radial-gradient(circle at 12% 78%, rgba(32, 102, 226, 0.18), transparent 28%),
-          linear-gradient(90deg, #0a347f 0%, #0d54c8 55%, #46aef0 100%);
+          radial-gradient(circle at 83% 17%, rgba(96, 201, 255, 0.24), transparent 28%),
+          radial-gradient(circle at 8% 72%, rgba(22, 95, 218, 0.20), transparent 30%),
+          linear-gradient(105deg, #0a3788 0%, #0c58cb 54%, #42b2ef 100%);
 }
 
 .download-footer-unified::before {
@@ -14,9 +13,9 @@
   inset: 0;
   z-index: 0;
   background-image:
-          linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 68px 68px;
+          linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 72px 72px;
   content: "";
   pointer-events: none;
 }
@@ -24,12 +23,12 @@
 .download-footer-unified::after {
   position: absolute;
   z-index: 0;
-  right: -220px;
-  top: 18%;
-  width: 620px;
-  height: 620px;
+  right: -210px;
+  top: 11%;
+  width: 660px;
+  height: 660px;
   border-radius: 50%;
-  background: rgba(88, 195, 255, 0.12);
+  background: rgba(104, 205, 255, 0.12);
   filter: blur(120px);
   content: "";
   pointer-events: none;
