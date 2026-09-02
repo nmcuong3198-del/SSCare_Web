@@ -44,11 +44,8 @@ export default function Login() {
     try {
       const authResponse = await authService.login(form);
 
-      if (!authService.hasCmsAccessFromResponse(authResponse)) {
-        setLoginError("Tài khoản chưa được Admin cấp quyền truy cập quản trị web.");
-        return;
-      }
-
+      // Mọi tài khoản hợp lệ đều được phép đăng nhập Web.
+      // Role chỉ quyết định các tab/chức năng bổ sung được hiển thị và truy cập.
       authService.saveUser(authResponse);
 
       navigate("/");

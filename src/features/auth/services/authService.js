@@ -5,8 +5,6 @@ const TOKEN_KEY = "token";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const LOGIN_AT_KEY = "loginAt";
 
-const CMS_ROLES = ["ADMIN", "CONTENT_EDITOR", "NOTIFICATION_MANAGER"];
-
 const normalizeSessionUser = (authResponse) => {
   const account = authResponse?.account || {};
 
@@ -88,7 +86,7 @@ const authService = {
     return axiosClient.post("/v1/auth/login", {
       identity: form.username?.trim(),
       password: form.password,
-      deviceLabel: "SSCare Web CMS",
+      deviceLabel: "SSCare Web",
     });
   },
 
@@ -147,11 +145,6 @@ const authService = {
   hasAnyRole(roles = []) {
     const currentRoles = this.getCurrentUser()?.roles || [];
     return roles.some((role) => currentRoles.includes(role));
-  },
-
-  hasCmsAccessFromResponse(authResponse) {
-    const roles = authResponse?.account?.roles || [];
-    return CMS_ROLES.some((role) => roles.includes(role));
   },
 
   isAdmin() {

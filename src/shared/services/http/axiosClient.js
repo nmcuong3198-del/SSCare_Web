@@ -90,7 +90,7 @@ axiosClient.interceptors.response.use(
           refreshPromise = axios
             .post(`${baseURL}/v1/auth/refresh`, {
               refreshToken,
-              deviceLabel: "SSCare Web CMS",
+              deviceLabel: "SSCare Web",
             })
             .then((response) => response.data)
             .finally(() => {
