@@ -34,7 +34,7 @@ const INITIAL_FORM = {
   confirmPassword: "",
 };
 
-const FULL_NAME_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿĀ-ſẠ-ỹĐđ\u0300-\u036f ]+$/u;
+const FULL_NAME_PATTERN = /^[\p{L}\p{M} ]+$/u;
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const OTP_PATTERN = /^\d{6}$/;
 
@@ -73,7 +73,7 @@ export default function Register() {
   const [showServerModal, setShowServerModal] = useState(false);
   const [challenge, setChallenge] = useState(null);
   const [otp, setOtp] = useState("");
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(null);
   const [success, setSuccess] = useState(false);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
 
@@ -86,8 +86,8 @@ export default function Register() {
 
     if (!fullName) {
       errors.fullName = "Vui lòng nhập họ và tên";
-    } else if (fullName.length > 100) {
-      errors.fullName = "Họ và tên tối đa 100 ký tự";
+    } else if (fullName.length > 200) {
+      errors.fullName = "Họ và tên tối đa 200 ký tự";
     } else if (!FULL_NAME_PATTERN.test(fullName)) {
       errors.fullName = "Họ và tên chỉ được chứa chữ cái và khoảng trắng";
     }
@@ -165,8 +165,8 @@ export default function Register() {
 
     if (name === "fullName") {
       nextValue = value
-        .replace(/[^A-Za-zÀ-ÖØ-öø-ÿĀ-ſẠ-ỹĐđ\u0300-\u036f ]/gu, "")
-        .slice(0, 100);
+        .replace(/[^\p{L}\p{M} ]/gu, "")
+        .slice(0, 200);
     }
 
     if (name === "displayName") {
@@ -386,10 +386,10 @@ export default function Register() {
                       value={form.fullName}
                       onChange={updateField}
                       placeholder="Nhập họ và tên của bạn"
-                      maxLength={100}
+                      maxLength={200}
                     />
                   </div>
-                  <small>Tối đa 100 ký tự, chỉ gồm chữ cái và khoảng trắng</small>
+                  <small>Tối đa 200 ký tự, chỉ gồm chữ cái và khoảng trắng</small>
                   {renderError("fullName")}
                 </label>
 
