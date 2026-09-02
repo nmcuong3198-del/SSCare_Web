@@ -736,3 +736,82 @@ input:-webkit-autofill:active{
   opacity: 1;
   border-color: rgba(211, 47, 47, .25);
 }
+/* =========================================================
+   LOGIN SECONDARY ACTIONS
+========================================================= */
+
+.login-password-group {
+  margin-bottom: 4px;
+}
+
+.forgot-password-link {
+  display: block;
+  margin: 10px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.login-register-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 16px;
+  color: #9aa6ba;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.login-register-divider::before,
+.login-register-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e9f1;
+}
+
+.login-register-btn {
+  width: 100%;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1.5px solid #2f6bff;
+  border-radius: 16px;
+  background: #fff;
+  color: #2f6bff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.login-register-btn:hover:not(:disabled) {
+  background: #f2f6ff;
+  box-shadow: 0 12px 24px rgba(47, 107, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.login-register-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+@media (max-width: 576px) {
+  .login-register-btn {
+    height: 54px;
+  }
+}

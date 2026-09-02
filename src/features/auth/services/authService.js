@@ -37,6 +37,31 @@ const authService = {
     return axiosClient.post("/v1/auth/resend-otp", { challengeId });
   },
 
+  requestPasswordReset(identity) {
+    return axiosClient.post("/v1/auth/forgot-password", {
+      identity: identity?.trim(),
+    });
+  },
+
+  resendPasswordResetOtp(challengeId) {
+    return axiosClient.post("/v1/auth/forgot-password/resend", { challengeId });
+  },
+
+  verifyPasswordResetOtp({ challengeId, otp }) {
+    return axiosClient.post("/v1/auth/forgot-password/verify", {
+      challengeId,
+      otp,
+    });
+  },
+
+  resetPassword({ challengeId, resetToken, newPassword }) {
+    return axiosClient.post("/v1/auth/forgot-password/reset", {
+      challengeId,
+      resetToken,
+      newPassword,
+    });
+  },
+
   async verifyRegistration({ challengeId, otp }) {
     const authResponse = await axiosClient.post("/v1/auth/verify-registration", {
       challengeId,
