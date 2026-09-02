@@ -7,7 +7,6 @@ const footerLinks = [
   { label: "Về chúng tôi", to: "/about" },
   { label: "Chính sách bảo mật", href: "#" },
   { label: "Điều khoản sử dụng", href: "#" },
-  { label: "Liên hệ", href: "mailto:sscarevn@gmail.com" },
 ];
 
 export default function Footer() {
