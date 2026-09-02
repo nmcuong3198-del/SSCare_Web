@@ -1,24 +1,17 @@
-import { useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-import AppDownloadModal from "@/features/landing/components/AppDownloadModal/AppDownloadModal";
-import Home from "@/features/landing/pages/Home";
+import DownloadSection from "@/features/landing/components/Download/Download";
+
+import "./DownloadPage.css";
 
 export default function DownloadPage() {
-  const navigate = useNavigate();
-
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
 
-  const closeModal = useCallback(() => {
-    navigate("/", { replace: true });
-  }, [navigate]);
-
   return (
-    <>
-      <Home showFooter={false} />
-      <AppDownloadModal onClose={closeModal} />
-    </>
+    <div className="download-page">
+      <DownloadSection />
+    </div>
   );
 }

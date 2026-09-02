@@ -5,7 +5,7 @@ import Footer from "@/shared/components/layout/Footer/Footer";
 
 export default function MainLayout() {
     const location = useLocation();
-    const showFooter = ["/about", "/privacy-policy", "/terms-of-use"].includes(location.pathname);
+    const showFooter = ["/about", "/download", "/privacy-policy", "/terms-of-use"].includes(location.pathname);
 
     return (
         <>
