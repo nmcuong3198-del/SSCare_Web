@@ -11,11 +11,11 @@ const BLOCK_TAGS = new Set([
 
 function escapeHtml(value) {
   return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
 }
 
 function renderInline(value) {
@@ -29,10 +29,10 @@ function renderInline(value) {
   };
 
   let result = escaped
-    .replace(/\*\*([^*\n]+?)\*\*/g, (_, text) => protect(`<strong>${text}</strong>`))
-    .replace(/__([^_\n]+?)__/g, (_, text) => protect(`<strong>${text}</strong>`))
-    .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, (_, prefix, text) => `${prefix}${protect(`<em>${text}</em>`)}`)
-    .replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, (_, prefix, text) => `${prefix}${protect(`<em>${text}</em>`)}`);
+      .replace(/\*\*([^*\n]+?)\*\*/g, (_, text) => protect(`<strong>${text}</strong>`))
+      .replace(/__([^_\n]+?)__/g, (_, text) => protect(`<strong>${text}</strong>`))
+      .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, (_, prefix, text) => `${prefix}${protect(`<em>${text}</em>`)}`)
+      .replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, (_, prefix, text) => `${prefix}${protect(`<em>${text}</em>`)}`);
 
   tokens.forEach((html, index) => {
     result = result.replace(`§§SSCARETOKEN${index}§§`, html);
@@ -52,10 +52,10 @@ function isOrderedList(line) {
 function isBlockStart(line) {
   const trimmed = line.trim();
   return (
-    /^#{1,3}\s+/.test(trimmed) ||
-    /^>\s?/.test(trimmed) ||
-    isUnorderedList(line) ||
-    isOrderedList(line)
+      /^#{1,3}\s+/.test(trimmed) ||
+      /^>\s?/.test(trimmed) ||
+      isUnorderedList(line) ||
+      isOrderedList(line)
   );
 }
 
@@ -94,9 +94,9 @@ export function markdownToHtml(markdown = "") {
         index += 1;
       }
       html.push(
-        `<blockquote>${quoteLines
-          .map((quoteLine) => renderInline(quoteLine))
-          .join("<br>")}</blockquote>`,
+          `<blockquote>${quoteLines
+              .map((quoteLine) => renderInline(quoteLine))
+              .join("<br>")}</blockquote>`,
       );
       continue;
     }
@@ -124,10 +124,10 @@ export function markdownToHtml(markdown = "") {
     const paragraphLines = [trimmed];
     index += 1;
     while (
-      index < lines.length &&
-      lines[index].trim() &&
-      !isBlockStart(lines[index])
-    ) {
+        index < lines.length &&
+        lines[index].trim() &&
+        !isBlockStart(lines[index])
+        ) {
       paragraphLines.push(lines[index].trim());
       index += 1;
     }
@@ -147,39 +147,72 @@ export function clipboardHtmlToEditorHtml(html = "") {
 
   const documentNode = new DOMParser().parseFromString(String(html), "text/html");
 
-  const renderChildren = (node) =>
-    Array.from(node?.childNodes ?? []).map(renderNode).join("");
+  const parseFontWeight = (value) => {
+    const weight = String(value ?? "").trim().toLowerCase();
+    if (!weight) return null;
+    if (weight === "bold" || weight === "bolder") return true;
+    if (weight === "normal" || weight === "lighter") return false;
 
-  const renderNode = (node) => {
+    const numericWeight = Number.parseInt(weight, 10);
+    if (!Number.isFinite(numericWeight)) return null;
+    return numericWeight >= 600;
+  };
+
+  const parseFontStyle = (value) => {
+    const fontStyle = String(value ?? "").trim().toLowerCase();
+    if (!fontStyle) return null;
+    if (fontStyle === "italic" || fontStyle === "oblique") return true;
+    if (fontStyle === "normal") return false;
+    return null;
+  };
+
+  const resolveInlineFormat = (node, inheritedFormat) => {
+    const tag = node?.tagName?.toUpperCase();
+    let bold = inheritedFormat.bold;
+    let italic = inheritedFormat.italic;
+
+    if (tag === "B" || tag === "STRONG") bold = true;
+    if (tag === "I" || tag === "EM") italic = true;
+
+    const style = node?.style;
+    const explicitBold = parseFontWeight(style?.fontWeight);
+    const explicitItalic = parseFontStyle(style?.fontStyle);
+
+    // Inline CSS has higher priority than inherited/semantic formatting.
+    // This is important for Word/Google Docs clipboard HTML where an outer
+    // bold wrapper may contain child spans that explicitly reset to normal.
+    if (explicitBold !== null) bold = explicitBold;
+    if (explicitItalic !== null) italic = explicitItalic;
+
+    return { bold, italic };
+  };
+
+  const wrapInlineText = (text, format) => {
+    if (!text) return "";
+    let result = escapeHtml(text);
+    if (format.italic) result = `<em>${result}</em>`;
+    if (format.bold) result = `<strong>${result}</strong>`;
+    return result;
+  };
+
+  const renderChildren = (node, inheritedFormat) =>
+      Array.from(node?.childNodes ?? [])
+          .map((child) => renderNode(child, inheritedFormat))
+          .join("");
+
+  const renderNode = (node, inheritedFormat = { bold: false, italic: false }) => {
     if (!node) return "";
-    if (node.nodeType === 3) return escapeHtml(node.nodeValue ?? "");
+    if (node.nodeType === 3) {
+      return wrapInlineText(node.nodeValue ?? "", inheritedFormat);
+    }
     if (node.nodeType !== 1) return "";
 
     const tag = node.tagName?.toUpperCase();
-    const children = renderChildren(node);
+    const format = resolveInlineFormat(node, inheritedFormat);
+    const children = renderChildren(node, format);
 
     if (tag === "BR") return "<br>";
-    if (tag === "B" || tag === "STRONG") return `<strong>${children}</strong>`;
-    if (tag === "I" || tag === "EM") return `<em>${children}</em>`;
-
-    if (tag === "SPAN") {
-      const style = node.style;
-      const weight = String(style?.fontWeight ?? "").toLowerCase();
-      const numericWeight = Number.parseInt(weight, 10);
-      const isBold = weight === "bold" || weight === "bolder" ||
-        (Number.isFinite(numericWeight) && numericWeight >= 600);
-      const fontStyle = String(style?.fontStyle ?? "").toLowerCase();
-      const isItalic = fontStyle === "italic" || fontStyle === "oblique";
-      let result = children;
-      if (isItalic) result = `<em>${result}</em>`;
-      if (isBold) result = `<strong>${result}</strong>`;
-      return result;
-    }
-
     if (tag === "P") return `<p>${children}</p>`;
-    // Keep DIV as a block instead of wrapping it in P. Clipboard HTML from
-    // Word/Google Docs often nests paragraphs in DIVs; converting those DIVs
-    // to P would create invalid <p><p>...</p></p> markup and lose formatting.
     if (tag === "DIV") return `<div>${children}</div>`;
     if (tag === "BLOCKQUOTE") return `<blockquote>${children}</blockquote>`;
     if (tag === "UL") return `<ul>${children}</ul>`;
@@ -189,11 +222,13 @@ export function clipboardHtmlToEditorHtml(html = "") {
       return `<${tag.toLowerCase()}>${children}</${tag.toLowerCase()}>`;
     }
 
-    // Unsupported wrappers (links, font tags, Office-specific elements...) keep only content.
+    // Formatting tags and unsupported wrappers are represented through the
+    // effective format passed to their text descendants. This prevents an
+    // outer <strong>/<span font-weight:bold> from swallowing child resets.
     return children;
   };
 
-  return renderChildren(documentNode.body);
+  return renderChildren(documentNode.body, { bold: false, italic: false });
 }
 
 function normalizeInlineText(value) {
@@ -206,25 +241,25 @@ function serializeChildren(node) {
 
 function prefixQuoteLines(value) {
   return value
-    .trim()
-    .split("\n")
-    .map((line) => (line.trim() ? `> ${line.trim()}` : ">"))
-    .join("\n");
+      .trim()
+      .split("\n")
+      .map((line) => (line.trim() ? `> ${line.trim()}` : ">"))
+      .join("\n");
 }
 
 function serializeList(node, ordered) {
   const items = Array.from(node.children ?? []).filter(
-    (child) => child.tagName === "LI",
+      (child) => child.tagName === "LI",
   );
 
   return items
-    .map((item, index) => {
-      const content = serializeChildren(item)
-        .replace(/\n{2,}/g, "\n")
-        .trim();
-      return `${ordered ? `${index + 1}.` : "-"} ${content}`;
-    })
-    .join("\n");
+      .map((item, index) => {
+        const content = serializeChildren(item)
+            .replace(/\n{2,}/g, "\n")
+            .trim();
+        return `${ordered ? `${index + 1}.` : "-"} ${content}`;
+      })
+      .join("\n");
 }
 
 function serializeNode(node) {
@@ -277,24 +312,24 @@ export function editorElementToMarkdown(element) {
   if (!element) return "";
 
   return serializeChildren(element)
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n[ \t]+/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n[ \t]+/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
 }
 
 /** Visible character count, useful for limits/counters that should ignore Markdown syntax. */
 export function markdownPlainTextLength(markdown = "") {
   return String(markdown ?? "")
-    .replace(/^#{1,3}\s+/gm, "")
-    .replace(/^>\s?/gm, "")
-    .replace(/^\s*[-+*]\s+/gm, "")
-    .replace(/^\s*\d+[.)]\s+/gm, "")
-    .replace(/\*\*/g, "")
-    .replace(/__/g, "")
-    .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, "$1$2")
-    .replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, "$1$2")
-    .length;
+      .replace(/^#{1,3}\s+/gm, "")
+      .replace(/^>\s?/gm, "")
+      .replace(/^\s*[-+*]\s+/gm, "")
+      .replace(/^\s*\d+[.)]\s+/gm, "")
+      .replace(/\*\*/g, "")
+      .replace(/__/g, "")
+      .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, "$1$2")
+      .replace(/(^|[^_])_([^_\n]+?)_(?!_)/g, "$1$2")
+      .length;
 }
 
 export function isSelectionInsideTag(root, tagName) {
