@@ -1,12 +1,5 @@
 import { Link } from "react-router-dom";
-import {
-  FaEnvelope,
-  FaFileAlt,
-  FaMapMarkerAlt,
-  FaPhoneAlt,
-  FaShieldAlt,
-  FaUser,
-} from "react-icons/fa";
+import { FaShieldAlt } from "react-icons/fa";
 import socialNetworkLicense from "@/assets/brand/social-network-license.png";
 import "./Footer.css";
 
@@ -33,43 +26,36 @@ export default function Footer() {
               <Link to="/" className="footer-brand-link" aria-label="Về trang chủ SSCare">
                 <span className="footer-brand-ss">SS</span>
                 <span className="footer-brand-care">Care</span>
-                <span className="footer-brand-sparkle" aria-hidden="true">✦</span>
               </Link>
 
               <h2 className="footer-company-name">Công ty Cổ phần Dịch vụ SSCare</h2>
 
               <div className="footer-company-info">
                 <div className="footer-info-row">
-                  <span className="footer-info-icon" aria-hidden="true"><FaFileAlt /></span>
                   <span>
-                  Mã số doanh nghiệp/MST: <strong>0115546066</strong>
-                  <span className="footer-info-separator"> – </span>
-                  Đăng ký lần đầu: <strong>01/07/2026</strong>
-                </span>
+                    MST: <strong>0115546066</strong>
+                    <span className="footer-info-separator"> – </span>
+                    Đăng ký lần đầu: 01/07/2026
+                  </span>
                 </div>
 
                 <div className="footer-info-row">
-                  <span className="footer-info-icon" aria-hidden="true"><FaShieldAlt /></span>
                   <span>Cơ quan cấp: Phòng Đăng ký kinh doanh và Tài chính doanh nghiệp</span>
                 </div>
 
                 <div className="footer-info-row">
-                  <span className="footer-info-icon" aria-hidden="true"><FaMapMarkerAlt /></span>
                   <span>Số 232, Dãy C13, Tổ 1, Phường Long Biên, Hà Nội</span>
                 </div>
 
                 <a href="mailto:sscarevn@gmail.com" className="footer-info-row footer-info-link">
-                  <span className="footer-info-icon" aria-hidden="true"><FaEnvelope /></span>
                   <span>Email: <strong>sscarevn@gmail.com</strong></span>
                 </a>
 
                 <div className="footer-info-row">
-                  <span className="footer-info-icon" aria-hidden="true"><FaPhoneAlt /></span>
                   <span>Số điện thoại: Đang cập nhật</span>
                 </div>
 
                 <div className="footer-info-row">
-                  <span className="footer-info-icon" aria-hidden="true"><FaUser /></span>
                   <span>Người chịu trách nhiệm quản lý nội dung: <strong>Nguyễn Thị Hương</strong></span>
                 </div>
               </div>
