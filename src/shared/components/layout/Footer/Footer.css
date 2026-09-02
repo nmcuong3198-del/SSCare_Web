@@ -23,17 +23,17 @@
 .footer-container {
   position: relative;
   z-index: 1;
-  width: 980px;
+  width: 1180px;
   max-width: calc(100% - 48px);
   margin: 0 auto;
-  padding: 8px 0 0;
+  padding: 22px 0 0;
 }
 
 .footer-main {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(390px, 1.05fr);
   align-items: start;
-  gap: clamp(58px, 7vw, 94px);
+  gap: clamp(58px, 6vw, 96px);
 }
 
 .footer-company,
@@ -47,7 +47,7 @@
   width: fit-content;
   align-items: center;
   color: #0c448f;
-  font-size: clamp(34px, 2.6vw, 42px);
+  font-size: clamp(38px, 2.8vw, 46px);
   font-weight: 850;
   line-height: 0.95;
   letter-spacing: -1.6px;
@@ -64,16 +64,16 @@
 }
 
 .footer-company-name {
-  margin: 10px 0 17px;
+  margin: 11px 0 20px;
   color: #153d75;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.35;
 }
 
 .footer-company-info {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .footer-info-row {
@@ -84,8 +84,8 @@
   gap: 0;
   padding: 0;
   color: #627189;
-  font-size: 10.5px;
-  line-height: 1.42;
+  font-size: 13px;
+  line-height: 1.5;
   white-space: nowrap;
   text-decoration: none;
 }
@@ -124,7 +124,7 @@
 }
 
 .footer-right {
-  padding-top: 8px;
+  padding-top: 5px;
 }
 
 .footer-quick-links {
@@ -133,7 +133,7 @@
   justify-content: flex-start;
   flex-wrap: nowrap;
   gap: 0;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
   white-space: nowrap;
 }
 
@@ -144,8 +144,8 @@
 
 .footer-quick-link {
   color: #1765c4;
-  font-size: 10px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 680;
   line-height: 1.4;
   text-decoration: none;
   transition: color 0.18s ease;
@@ -205,8 +205,8 @@
   padding: 7px 4px 0;
   border-top: 1px solid #edf1f5;
   color: #69768a;
-  font-size: 9.5px;
-  line-height: 1.45;
+  font-size: 11.5px;
+  line-height: 1.5;
   text-align: center;
 }
 
@@ -216,11 +216,11 @@
 }
 
 .footer-bottom {
-  margin-top: 17px;
-  padding: 13px 0 17px;
+  margin-top: 22px;
+  padding: 14px 0 19px;
   border-top: 0;
   color: #8793a4;
-  font-size: 9.5px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -233,7 +233,7 @@
 }
 
 .footer-testing-inner {
-  width: 980px;
+  width: 1180px;
   max-width: calc(100% - 48px);
   min-height: 56px;
   margin: 0 auto;
@@ -247,7 +247,7 @@
 
 .footer-testing-inner p {
   margin: 0;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
