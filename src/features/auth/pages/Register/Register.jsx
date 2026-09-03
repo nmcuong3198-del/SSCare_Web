@@ -6,6 +6,7 @@ import {
   FaBirthdayCake,
   FaCheckCircle,
   FaEnvelope,
+  FaExclamationTriangle,
   FaEye,
   FaEyeSlash,
   FaLock,
@@ -95,6 +96,10 @@ export default function Register() {
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
 
   const latestAllowedParentBirthDate = getLatestAllowedParentBirthDate();
+  const todayDate = formatDateInputValue(new Date());
+  const isParentAgeInvalid = Boolean(
+      form.dateOfBirth && form.dateOfBirth > latestAllowedParentBirthDate,
+  );
 
   const fieldErrors = useMemo(() => {
     const errors = {};
@@ -120,7 +125,7 @@ export default function Register() {
     if (!form.dateOfBirth) {
       errors.dateOfBirth = "Vui lòng chọn ngày sinh";
     } else if (form.dateOfBirth > latestAllowedParentBirthDate) {
-      errors.dateOfBirth = "Phụ huynh phải trên 18 tuổi";
+      errors.dateOfBirth = "Bố, mẹ, người giám hộ phải trên 18 tuổi";
     }
 
     if (!EMAIL_PATTERN.test(email)) {
@@ -430,17 +435,22 @@ export default function Register() {
 
                     <label className="register-field">
                       <span>Ngày sinh</span>
-                      <div className={`register-input ${submitted && fieldErrors.dateOfBirth ? "has-error" : ""}`}>
+                      <div className={`register-input ${(submitted && fieldErrors.dateOfBirth) || isParentAgeInvalid ? "has-error" : ""}`}>
                         <FaBirthdayCake />
                         <input
                             type="date"
                             name="dateOfBirth"
                             value={form.dateOfBirth}
                             onChange={updateField}
-                            max={latestAllowedParentBirthDate}
+                            max={todayDate}
                         />
                       </div>
-                      {renderError("dateOfBirth")}
+                      {isParentAgeInvalid ? (
+                          <div className="register-age-warning" role="alert">
+                            <FaExclamationTriangle aria-hidden="true" />
+                            <span>Bố, mẹ, người giám hộ phải trên 18 tuổi</span>
+                          </div>
+                      ) : renderError("dateOfBirth")}
                     </label>
 
                     <label className="register-field">
@@ -568,11 +578,22 @@ export default function Register() {
                   <button
                       type="submit"
                       className="register-primary-btn"
-                      disabled={loading || !acceptedPolicies}
-                      title={!acceptedPolicies ? "Vui lòng đồng ý với Chính sách bảo mật và Điều khoản và điều kiện" : undefined}
+                      disabled={loading || !acceptedPolicies || isParentAgeInvalid}
+                      title={
+                        isParentAgeInvalid
+                            ? "Người dùng chưa đủ điều kiện độ tuổi để tạo tài khoản phụ huynh"
+                            : !acceptedPolicies
+                                ? "Vui lòng đồng ý với Chính sách bảo mật và Điều khoản và điều kiện"
+                                : undefined
+                      }
                   >
                     {loading ? "Đang gửi OTP..." : "Gửi mã OTP"}
                   </button>
+                  {isParentAgeInvalid && (
+                      <div className="register-age-button-warning" role="alert">
+                        Nút Gửi mã OTP bị khóa do người dùng chưa đủ 18 tuổi
+                      </div>
+                  )}
                 </form>
             )}
 

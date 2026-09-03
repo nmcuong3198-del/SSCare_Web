@@ -289,6 +289,35 @@
   line-height: 1.4;
 }
 
+.register-age-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+  padding: 9px 11px;
+  border: 1px solid #efc1c1;
+  border-radius: 9px;
+  background: #fff4f4;
+  color: #c93e3e;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.register-age-warning svg {
+  flex: 0 0 auto;
+  font-size: 12px;
+}
+
+.register-age-button-warning {
+  margin-top: 8px;
+  color: #d24b4b;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .register-error-box {
   margin-top: 18px;
   padding: 12px 14px;
