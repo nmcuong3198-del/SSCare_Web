@@ -42,6 +42,23 @@ function normalizePhoneDigits(value) {
   return value.replace(/\D/g, "");
 }
 
+function formatDateInputValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getLatestAllowedParentBirthDate(referenceDate = new Date()) {
+  const latest = new Date(
+      referenceDate.getFullYear() - 18,
+      referenceDate.getMonth(),
+      referenceDate.getDate(),
+  );
+  latest.setDate(latest.getDate() - 1);
+  return formatDateInputValue(latest);
+}
+
 function getApiErrorMessage(error, fallback) {
   const data = error?.response?.data;
 
@@ -77,6 +94,8 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
 
+  const latestAllowedParentBirthDate = getLatestAllowedParentBirthDate();
+
   const fieldErrors = useMemo(() => {
     const errors = {};
     const fullName = form.fullName.trim();
@@ -100,8 +119,8 @@ export default function Register() {
 
     if (!form.dateOfBirth) {
       errors.dateOfBirth = "Vui lòng chọn ngày sinh";
-    } else if (new Date(`${form.dateOfBirth}T00:00:00`) > new Date()) {
-      errors.dateOfBirth = "Ngày sinh không được ở tương lai";
+    } else if (form.dateOfBirth > latestAllowedParentBirthDate) {
+      errors.dateOfBirth = "Phụ huynh phải trên 18 tuổi";
     }
 
     if (!EMAIL_PATTERN.test(email)) {
@@ -123,7 +142,7 @@ export default function Register() {
     }
 
     return errors;
-  }, [form]);
+  }, [form, latestAllowedParentBirthDate]);
 
   const resendAvailableAt = challenge?.resendAvailableAt
       ? new Date(challenge.resendAvailableAt).getTime()
@@ -418,7 +437,7 @@ export default function Register() {
                             name="dateOfBirth"
                             value={form.dateOfBirth}
                             onChange={updateField}
-                            max={new Date().toISOString().slice(0, 10)}
+                            max={latestAllowedParentBirthDate}
                         />
                       </div>
                       {renderError("dateOfBirth")}
