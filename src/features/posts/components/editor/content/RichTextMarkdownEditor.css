@@ -185,3 +185,38 @@
   font-weight: 700;
   color: #b42318;
 }
+
+.rich-markdown-editor__toolbar {
+  flex-wrap: wrap;
+}
+
+.rich-markdown-editor__toolbar-group {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.rich-markdown-editor__color {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 32px;
+  color: #344054;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 7px;
+}
+
+.rich-markdown-editor__color:hover { color: #163c92; background: #eaf0ff; border-color: #d5e0ff; }
+.rich-markdown-editor__color input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.rich-markdown-editor__file-input { display: none; }
+.rich-markdown-editor__content u { text-underline-offset: 2px; }
+.rich-markdown-editor__content a { color: #155eef; text-decoration: underline; cursor: pointer; }
+.rich-markdown-editor__content h1 { margin: 8px 0 10px; font-size: 24px; line-height: 1.35; }
+.rich-markdown-editor__content h2 { margin: 8px 0 10px; font-size: 20px; line-height: 1.4; }
+.rich-markdown-editor__content h3 { margin: 8px 0 10px; font-size: 17px; line-height: 1.45; }
+.rich-markdown-editor__content .sscare-inline-image { margin: 14px 0; padding: 10px; text-align: center; background: #f8faff; border: 1px solid #e1e8f5; border-radius: 10px; }
+.rich-markdown-editor__content .sscare-inline-image img { display: block; max-width: 100%; max-height: 460px; margin: 0 auto; border-radius: 8px; object-fit: contain; }
+.rich-markdown-editor__content .sscare-inline-image figcaption { margin-top: 7px; color: #667085; font-size: 12px; }

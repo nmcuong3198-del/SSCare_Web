@@ -39,7 +39,7 @@ export function buildContentBlocks(sections, conclusion) {
 // counting so syntax does not inflate the estimate.
 export function estimateReadMinutes(blocks) {
   const words = blocks
-    .map((block) => block.markdown.replace(/[#*_>`~[\]()!-]/g, " "))
+    .map((block) => block.markdown.replace(/^:::sscare-image\s+.*$/gm, " ").replace(/^:::align-(?:left|center|right|justify)$|^:::$|[#*_>`~[\]()!+{}]/gm, " "))
     .join(" ")
     .trim()
     .split(/\s+/)

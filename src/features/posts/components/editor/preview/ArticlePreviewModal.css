@@ -225,3 +225,10 @@
   color: #25324a;
   font-weight: 700;
 }
+
+.article-preview__markdown .sscare-align-block { width: 100%; }
+.article-preview__markdown .sscare-inline-image { margin: 16px 0; text-align: center; }
+.article-preview__markdown .sscare-inline-image img { display: block; width: 100%; height: auto; max-height: 420px; object-fit: contain; border-radius: 10px; }
+.article-preview__markdown .sscare-inline-image figcaption { margin-top: 7px; color: #667085; font-size: 12px; line-height: 1.45; }
+.article-preview__markdown u { text-underline-offset: 2px; }
+.article-preview__markdown a { color: #155eef; text-decoration: underline; }

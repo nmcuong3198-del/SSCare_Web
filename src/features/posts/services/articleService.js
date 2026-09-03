@@ -17,6 +17,7 @@ const articleService = {
     });
   },
   getDetail(code) { return axiosClient.get(`/articles/${code}`); },
+  uploadContentImage(formData) { return axiosClient.post("/articles/content-image", formData); },
   getComments(code) { return axiosClient.get(`/articles/${code}/comments`); },
   deleteComment(code, commentId) {
     return axiosClient.delete(`/articles/${code}/comments/${commentId}`);
