@@ -1,3 +1,4 @@
+import { markdownPlainTextLength } from "@/features/posts/utils/markdownEditor";
 import toast from "react-hot-toast";
 
 const MAX_TAGS = 10;
@@ -96,12 +97,16 @@ export function validateArticle(article, imageFile, { requireQuality = true } = 
       toast.error("Tiêu đề mục nội dung không được để trống.");
       return false;
     }
-    if (section.title.trim().length > 200) {
-      toast.error("Tiêu đề mục nội dung tối đa 200 ký tự.");
+    if (section.title.trim().length > 100) {
+      toast.error("Tiêu đề mục nội dung tối đa 100 ký tự.");
       return false;
     }
     if (!hasText(section.content)) {
       toast.error("Nội dung chi tiết không được để trống.");
+      return false;
+    }
+    if (markdownPlainTextLength(section.content) > 1000) {
+      toast.error("Nội dung chi tiết tối đa 1000 ký tự.");
       return false;
     }
   }

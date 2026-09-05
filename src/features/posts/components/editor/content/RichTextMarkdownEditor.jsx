@@ -93,12 +93,22 @@ export default function RichTextMarkdownEditor({
     const editor = editorRef.current;
     if (!editor) return;
     const markdown = editorElementToMarkdown(editor);
-    if (typeof maxLength === "number" && markdownPlainTextLength(markdown) > maxLength) {
-      editor.innerHTML = markdownToHtml(value);
-      setLimitReached(true);
-      return;
+    if (typeof maxLength === "number") {
+      const nextLength = markdownPlainTextLength(markdown);
+      const currentLength = markdownPlainTextLength(value);
+
+      if (nextLength > maxLength && (currentLength <= maxLength || nextLength >= currentLength)) {
+        editor.innerHTML = markdownToHtml(value);
+        setLimitReached(true);
+        return;
+      }
+
+      // Existing articles created before the limit may already be over maxLength.
+      // Allow edits that reduce their length until they are back within the new limit.
+      setLimitReached(nextLength > maxLength);
+    } else {
+      setLimitReached(false);
     }
-    setLimitReached(false);
     lastEmittedValueRef.current = markdown;
     onChange?.(markdown);
   };

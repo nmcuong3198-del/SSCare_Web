@@ -75,3 +75,9 @@
     min-height:120px;
 
 }
+.section-title-counter {
+    margin-top: 6px;
+    text-align: right;
+    color: #7A8799;
+    font-size: 12px;
+}

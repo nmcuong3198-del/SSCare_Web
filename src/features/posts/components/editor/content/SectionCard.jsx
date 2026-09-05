@@ -4,6 +4,9 @@ import RichTextMarkdownEditor from "@/features/posts/components/editor/content/R
 
 import "./SectionCard.css";
 
+const SECTION_TITLE_MAX_LENGTH = 100;
+const SECTION_CONTENT_MAX_LENGTH = 1000;
+
 export default function SectionCard({
   section,
   readOnly,
@@ -54,9 +57,16 @@ export default function SectionCard({
       <input
         value={section.title}
         placeholder={`Tiêu đề ${index + 1}`}
+        maxLength={SECTION_TITLE_MAX_LENGTH}
         onChange={(e) => updateSection("title", e.target.value)}
         readOnly={readOnly}
       />
+
+      {!readOnly && (
+        <div className="section-title-counter">
+          {(section.title ?? "").length}/{SECTION_TITLE_MAX_LENGTH}
+        </div>
+      )}
 
       <RichTextMarkdownEditor
         value={section.content ?? ""}
@@ -64,6 +74,7 @@ export default function SectionCard({
         readOnly={readOnly}
         placeholder="Nhập nội dung..."
         minHeight={140}
+        maxLength={SECTION_CONTENT_MAX_LENGTH}
         ariaLabel={`Nội dung chi tiết ${index + 1}`}
       />
     </div>

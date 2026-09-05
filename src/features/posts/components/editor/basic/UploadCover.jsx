@@ -6,6 +6,7 @@ import "./UploadCover.css";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const VALID_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+const VALID_EXTENSIONS = ["jpg", "jpeg", "png"];
 export default function UploadCover({
                                       imageFile,
                                       setImageFile,
@@ -20,7 +21,14 @@ export default function UploadCover({
   const validateFile = (file) => {
     if (!file) return false;
 
-    if (!VALID_TYPES.includes(file.type)) {
+    const mimeType = String(file.type || "").toLowerCase();
+    const extension = String(file.name || "").split(".").pop()?.toLowerCase();
+    const validMime = VALID_TYPES.includes(mimeType);
+    const validExtension = VALID_EXTENSIONS.includes(extension);
+
+    // Some browsers/OS combinations leave File.type empty for a valid PNG/JPG.
+    // The backend still validates the real file signature, so accepting by extension here is safe.
+    if (!validMime && !validExtension) {
       window.alert("Chỉ hỗ trợ JPG hoặc PNG.");
       return false;
     }
