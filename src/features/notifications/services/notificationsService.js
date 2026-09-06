@@ -19,8 +19,11 @@ const notificationsService = {
       },
     });
   },
-  pushNotification(formData){
-    return axiosClient.post(`/firebase/sendNotification`, formData);
+  pushNotification(payload){
+    return axiosClient.post(`/firebase/sendNotification`, payload);
+  },
+  getRecipients(){
+    return axiosClient.get(`/notifications/recipients`);
   }
 }
 

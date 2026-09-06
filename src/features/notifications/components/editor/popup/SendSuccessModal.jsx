@@ -1,42 +1,28 @@
+import { Calendar, Check } from "lucide-react";
 import "./SendSuccessModal.css";
-import { Check, Calendar } from "lucide-react";
 
 export default function SendSuccessModal({
   open,
   onClose,
   onBackToList,
   updatedAt,
+  status,
+  scheduleTime,
 }) {
   if (!open) return null;
 
-  const formatUpdateTime = (isoString) => {
+  const isScheduled = status === "scheduled";
+
+  const formatTime = (isoString) => {
     if (!isoString) return "Vừa xong";
+    const dateObj = new Date(isoString);
+    if (Number.isNaN(dateObj.getTime())) return "Vừa xong";
 
-    try {
-      const dateObj = new Date(isoString);
-
-      // Lấy giờ và phút (Thêm số 0 phía trước nếu < 10)
-      const hours = String(dateObj.getHours()).padStart(2, "0");
-      const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-      const timeStr = `${hours}:${minutes}`;
-
-      // So sánh ngày để hiển thị "Hôm nay" hoặc Ngày/Tháng
-      const today = new Date();
-      const isToday =
-        dateObj.getDate() === today.getDate() &&
-        dateObj.getMonth() === today.getMonth() &&
-        dateObj.getFullYear() === today.getFullYear();
-
-      if (isToday) {
-        return `${timeStr} Hôm nay`;
-      } else {
-        const day = String(dateObj.getDate()).padStart(2, "0");
-        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-        return `${timeStr} ${day}/${month}/${dateObj.getFullYear()}`;
-      }
-    } catch {
-      return "Vừa xong"; // Fallback nếu chuỗi không hợp lệ
-    }
+    const hours = String(dateObj.getHours()).padStart(2, "0");
+    const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    return `${hours}:${minutes} ${day}/${month}/${dateObj.getFullYear()}`;
   };
 
   return (
@@ -48,11 +34,14 @@ export default function SendSuccessModal({
           </div>
         </div>
 
-        <h2 className="success-modal-title">Gửi thông báo thành công</h2>
+        <h2 className="success-modal-title">
+          {isScheduled ? "Đã lên lịch gửi thông báo" : "Gửi thông báo thành công"}
+        </h2>
 
         <p className="success-modal-desc">
-          Thông báo của bạn đã được gửi đến danh sách người dùng được chỉ định.
-          Quý phụ huynh và học sinh sẽ nhận được cập nhật ngay lập tức.
+          {isScheduled
+            ? `Thông báo sẽ được backend tự động gửi tới người dùng vào ${formatTime(scheduleTime)}.`
+            : "Thông báo đã được gửi qua Firebase tới các thiết bị Android/iOS đang hoạt động của người nhận."}
         </p>
 
         <div className="success-modal-actions">
@@ -69,7 +58,11 @@ export default function SendSuccessModal({
 
         <div className="success-modal-footer">
           <Calendar size={14} className="calendar-icon" />
-          <span>Cập nhật lúc: {formatUpdateTime(updatedAt)}</span>
+          <span>
+            {isScheduled
+              ? `Lịch gửi: ${formatTime(scheduleTime)}`
+              : `Cập nhật lúc: ${formatTime(updatedAt)}`}
+          </span>
         </div>
       </div>
     </div>

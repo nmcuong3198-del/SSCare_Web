@@ -10,7 +10,7 @@ import NotificationPreview from "@/features/notifications/components/editor/prev
 import { createEmptyNotification } from "@/features/notifications/model/notificationDefault";
 import notificationsService from "@/features/notifications/services/notificationsService";
 import {
-  createNotificationFormData,
+  createNotificationPayload,
   normalizeNotification,
 } from "@/features/notifications/utils/notificationPayload";
 import { validateNotification } from "@/features/notifications/utils/notificationValidator";
@@ -38,7 +38,9 @@ export default function NotificationEditor() {
     setNotification(normalized);
     setUpdatedAt(normalized.updatedAt);
     setIsCreated(Boolean(normalized.id || normalized.code));
-    setNotificationSent(normalized.status === "published");
+    setNotificationSent(
+      normalized.status === "published" || normalized.status === "scheduled",
+    );
 
     return normalized;
   }, []);
@@ -69,7 +71,7 @@ export default function NotificationEditor() {
     if (!validateNotification(notification)) return;
 
     try {
-      const formData = createNotificationFormData(notification, {
+      const formData = createNotificationPayload(notification, {
         status: "draft",
         createdBy: currentUsername,
       });
@@ -87,7 +89,7 @@ export default function NotificationEditor() {
     if (!validateNotification(notification)) return;
 
     try {
-      const formData = createNotificationFormData(notification, {
+      const formData = createNotificationPayload(notification, {
         status: "draft",
       });
       const response = await notificationsService.update(formData);
@@ -103,11 +105,10 @@ export default function NotificationEditor() {
     if (!validateNotification(notification)) return;
 
     try {
-      const formData = createNotificationFormData(notification);
+      const formData = createNotificationPayload(notification);
       const response = await notificationsService.pushNotification(formData);
 
       applyNotificationResponse(response);
-      setNotificationSent(true);
       setShowSendModal(true);
     } catch {
       setShowServerModal(true);
@@ -143,6 +144,8 @@ export default function NotificationEditor() {
           onClose={() => setShowSendModal(false)}
           onBackToList={() => navigate("/notifications")}
           updatedAt={updatedAt}
+          status={notification.status}
+          scheduleTime={notification.scheduleTime}
         />
 
         <CreateNotificationSuccessModal

@@ -11,6 +11,21 @@ export default function StatusBadge({ status }) {
       text: "Bản nháp",
       className: "draft",
     },
+
+    scheduled: {
+      text: "Đã lên lịch",
+      className: "draft",
+    },
+
+    sending: {
+      text: "Đang gửi",
+      className: "draft",
+    },
+
+    failed: {
+      text: "Gửi lỗi",
+      className: "default",
+    },
   };
 
   const current = config[status] || {

@@ -61,9 +61,16 @@ export default function NotificationForm({
     content: notification.content,
 
     onUpdate: ({ editor: currentEditor }) => {
+      const text = currentEditor.getText();
+      if (text.length > MAX_LENGTH) {
+        const limited = text.slice(0, MAX_LENGTH);
+        currentEditor.commands.setContent(limited, { emitUpdate: false });
+        setNotification((prev) => ({ ...prev, content: limited }));
+        return;
+      }
       setNotification((prev) => ({
         ...prev,
-        content: currentEditor.getText(),
+        content: text,
       }));
     },
   });
@@ -157,6 +164,7 @@ export default function NotificationForm({
             className="notification-title-input"
             placeholder="Nhập tiêu đề thông báo..."
             value={notification.title || ""}
+            maxLength={100}
             onChange={handleTitleChange}
           />
         </div>

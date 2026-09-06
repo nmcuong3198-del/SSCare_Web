@@ -34,25 +34,27 @@ export function normalizeNotification(notification) {
   };
 }
 
-export function createNotificationFormData(notification, overrides = {}) {
-  const payload = {
+/**
+ * Backend notification endpoints use @RequestBody, therefore this must stay a
+ * plain JSON object. Sending FormData here produces multipart/form-data and can
+ * fail with HTTP 415 depending on Spring's configured converters.
+ */
+export function createNotificationPayload(notification, overrides = {}) {
+  const source = {
     ...notification,
     ...overrides,
   };
-  const formData = new FormData();
 
-  NOTIFICATION_FIELDS.forEach((field) => {
-    const value = payload[field];
-
-    if (value === null || value === undefined) return;
-
-    if (field === "recipients") {
-      formData.append(field, normalizeRecipients(value).join(","));
-      return;
+  return NOTIFICATION_FIELDS.reduce((payload, field) => {
+    const value = source[field];
+    if (value === null || value === undefined) return payload;
+    if (value === "" && ["code", "scheduleTime", "updatedAt", "createdBy"].includes(field)) {
+      return payload;
     }
 
-    formData.append(field, String(value));
-  });
-
-  return formData;
+    payload[field] = field === "recipients"
+      ? normalizeRecipients(value).join(",")
+      : value;
+    return payload;
+  }, {});
 }

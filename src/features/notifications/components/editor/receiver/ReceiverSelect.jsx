@@ -1,57 +1,81 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select, { components } from "react-select";
+
+import notificationsService from "@/features/notifications/services/notificationsService";
+
 import "./ReceiverSelect.css";
 
-const MEMBER_DATA = [
-  { id: "huongnguyen123", name: "huongnguyen123" },
-  { id: "M002", name: "Trần Thị B" },
-  { id: "M003", name: "Lê Văn C" },
-  { id: "M004", name: "Phạm Minh D" },
-  { id: "M005", name: "Nguyễn Văn A" },
-  { id: "M006", name: "Trần Thị B" },
-  { id: "M007", name: "Lê Văn C" },
-  { id: "M008", name: "Phạm Minh D" },
-  { id: "M009", name: "Nguyễn Văn A" },
-  { id: "M010", name: "Trần Thị B" },
-  { id: "M011", name: "Lê Văn C" },
-  { id: "M012", name: "Phạm Minh D" },
-];
+const ALL_OPTION = { value: "ALL", label: "Tất cả tài khoản có thiết bị App" };
 
-const ALL_OPTION = { value: "ALL", label: "Tất cả" };
-const MEMBER_OPTIONS = MEMBER_DATA.map((member) => ({
-  value: member.id,
-  label: member.name,
-}));
-const OPTIONS = [ALL_OPTION, ...MEMBER_OPTIONS];
+const InputOption = (props) => (
+  <components.Option {...props}>
+    <input
+      type="checkbox"
+      checked={props.isSelected}
+      readOnly
+      style={{ marginRight: 8, cursor: "pointer" }}
+    />
+    <label
+      style={{
+        cursor: "pointer",
+        fontWeight: "normal",
+        margin: 0,
+        display: "inline",
+      }}
+    >
+      {props.label}
+    </label>
+  </components.Option>
+);
 
-const InputOption = (props) => {
-  return (
-    <components.Option {...props}>
-      <input
-        type="checkbox"
-        checked={props.isSelected}
-        readOnly
-        style={{ marginRight: 8, cursor: "pointer" }}
-      />
-      <label
-        style={{
-          cursor: "pointer",
-          fontWeight: "normal",
-          margin: 0,
-          display: "inline",
-        }}
-      >
-        {props.label}
-      </label>
-    </components.Option>
-  );
+const accountLabel = (account) => {
+  const contact = account.email || account.phone || account.id;
+  return `${account.fullName || "Tài khoản"} • ${contact}`;
 };
 
 export default function ReceiverSelect({ notification, setNotification }) {
+  const [accountOptions, setAccountOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    notificationsService
+      .getRecipients()
+      .then((response) => {
+        if (cancelled) return;
+        const options = (response?.content || []).map((account) => ({
+          value: account.id,
+          label: accountLabel(account),
+        }));
+        setAccountOptions(options);
+      })
+      .catch((error) => {
+        console.error("Không thể tải danh sách người nhận thông báo:", error);
+        if (!cancelled) setAccountOptions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const options = useMemo(
+    () => [ALL_OPTION, ...accountOptions],
+    [accountOptions],
+  );
+
   const selectedValues = useMemo(() => {
     const currentReceivers = notification.recipients || ["ALL"];
-    return OPTIONS.filter((opt) => currentReceivers.includes(opt.value));
-  }, [notification.recipients]);
+    return currentReceivers.map((value) => {
+      const option = options.find((item) => item.value === value);
+      return option || { value, label: value };
+    });
+  }, [notification.recipients, options]);
 
   const handleChange = (selectedOptions) => {
     if (!selectedOptions || selectedOptions.length === 0) {
@@ -60,15 +84,14 @@ export default function ReceiverSelect({ notification, setNotification }) {
     }
 
     const lastSelected = selectedOptions[selectedOptions.length - 1];
-
     if (lastSelected.value === "ALL") {
       setNotification((prev) => ({ ...prev, recipients: ["ALL"] }));
       return;
     }
 
-    let finalValues = selectedOptions
-      .filter((opt) => opt.value !== "ALL")
-      .map((opt) => opt.value);
+    const finalValues = selectedOptions
+      .filter((option) => option.value !== "ALL")
+      .map((option) => option.value);
 
     setNotification((prev) => ({ ...prev, recipients: finalValues }));
   };
@@ -80,13 +103,15 @@ export default function ReceiverSelect({ notification, setNotification }) {
       <Select
         isMulti
         isSearchable
+        isLoading={loading}
         closeMenuOnSelect={false}
         hideSelectedOptions={false}
-        options={OPTIONS}
+        options={options}
         value={selectedValues}
         onChange={handleChange}
         components={{ Option: InputOption }}
-        placeholder="Tìm kiếm hoặc chọn thành viên..."
+        placeholder="Tìm kiếm hoặc chọn tài khoản..."
+        noOptionsMessage={() => "Không có tài khoản phù hợp"}
         classNamePrefix="react-select"
         menuPortalTarget={document.body}
         styles={{
@@ -94,9 +119,7 @@ export default function ReceiverSelect({ notification, setNotification }) {
           menuList: (base) => ({
             ...base,
             maxHeight: "245px",
-            "&::-webkit-scrollbar": {
-              width: "6px",
-            },
+            "&::-webkit-scrollbar": { width: "6px" },
             "&::-webkit-scrollbar-thumb": {
               backgroundColor: "#cdd5e0",
               borderRadius: "4px",
