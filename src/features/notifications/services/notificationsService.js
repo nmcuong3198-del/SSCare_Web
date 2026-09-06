@@ -20,7 +20,10 @@ const notificationsService = {
     });
   },
   pushNotification(payload){
-    return axiosClient.post(`/firebase/sendNotification`, payload);
+    // Firebase delivery is an outbound network call from Backend -> Google and
+    // may take longer than ordinary CRUD APIs. Keep this timeout isolated to
+    // push delivery instead of increasing the timeout for the whole website.
+    return axiosClient.post(`/firebase/sendNotification`, payload, { timeout: 45000 });
   },
   getRecipients(){
     return axiosClient.get(`/notifications/recipients`);

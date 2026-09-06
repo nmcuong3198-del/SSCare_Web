@@ -23,7 +23,7 @@ export default function NotificationEditor() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showServerModal, setShowServerModal] = useState(false);
+  const [requestError, setRequestError] = useState(null);
   const [isCreated, setIsCreated] = useState(false);
   const [notificationSent, setNotificationSent] = useState(false);
   const [updatedAt, setUpdatedAt] = useState("");
@@ -31,6 +31,92 @@ export default function NotificationEditor() {
   const navigate = useNavigate();
   const { code } = useParams();
   const currentUsername = authService.getCurrentUser()?.username ?? "";
+
+  const showRequestError = useCallback((error, action = "thực hiện thao tác") => {
+    const status = error?.response?.status;
+    const problem = error?.response?.data || {};
+    const code = problem?.code;
+    const detail = problem?.detail || problem?.message;
+
+    if (error?.code === "ECONNABORTED") {
+      setRequestError({
+        title: "⚠️ Gửi thông báo quá thời gian chờ",
+        message: "Backend chưa trả kết quả gửi Firebase trong thời gian cho phép.",
+        details: [
+          "Kiểm tra kết nối Internet outbound từ Backend tới Google/Firebase.",
+          "Kiểm tra log backend để biết Firebase SDK đang chờ hay lỗi.",
+          "Không bấm gửi liên tục để tránh gửi trùng nếu Backend vẫn đang xử lý.",
+        ],
+        tip: "Timeout của riêng API gửi push đã được tăng lên 45 giây.",
+      });
+      return;
+    }
+
+    if (!error?.response) {
+      setRequestError({
+        title: "⚠️ Không thể kết nối tới máy chủ",
+        message: `Không thể ${action} vì trình duyệt không nhận được phản hồi từ Backend.`,
+        details: [
+          "Kiểm tra sscare-backend.service có đang active (running) hay không.",
+          "Kiểm tra Nginx /api/ có proxy tới Backend :8080.",
+          "Kiểm tra kết nối mạng và thử lại.",
+        ],
+        tip: "Nếu Backend vừa deploy Firebase, hãy kiểm tra FIREBASE_CREDENTIALS_PATH và journalctl.",
+      });
+      return;
+    }
+
+    if (status === 409 && code === "PUSH_NO_ACTIVE_DEVICE") {
+      setRequestError({
+        title: "⚠️ Chưa có thiết bị nhận thông báo",
+        message: detail || "Không có thiết bị Android/iOS đang hoạt động cho người nhận đã chọn.",
+        details: [
+          "Đăng nhập SSCare App trên Android/iOS để App đăng ký FCM token.",
+          "Kiểm tra bảng sscare.user_devices có account_id, fcm_token và active=true.",
+          "Nếu vừa logout, token của thiết bị sẽ được chuyển active=false.",
+        ],
+        tip: "Web chỉ có thể gửi push khi ít nhất một thiết bị App đã đăng ký FCM token với Backend.",
+      });
+      return;
+    }
+
+    if (status === 502 && code === "PUSH_DELIVERY_FAILED") {
+      setRequestError({
+        title: "⚠️ Firebase không gửi được thông báo",
+        message: detail || "Backend đã nhận yêu cầu nhưng Firebase không giao được push tới thiết bị.",
+        details: [
+          "Kiểm tra FIREBASE_CREDENTIALS_PATH trên host.",
+          "Kiểm tra service-account thuộc đúng Firebase project của App.",
+          "Kiểm tra FCM token và kết nối outbound từ host tới Google/Firebase.",
+        ],
+        tip: "Xem journalctl của sscare-backend.service để lấy lỗi Firebase chi tiết.",
+      });
+      return;
+    }
+
+    if (status === 401 || status === 403) {
+      setRequestError({
+        title: "⚠️ Không đủ quyền gửi thông báo",
+        message: detail || "Phiên đăng nhập không hợp lệ hoặc tài khoản chưa có quyền NOTIFICATION_MANAGER/ADMIN.",
+        details: [
+          "Đăng nhập lại tài khoản quản trị.",
+          "Kiểm tra role NOTIFICATION_MANAGER hoặc ADMIN của tài khoản.",
+        ],
+        tip: `HTTP ${status}`,
+      });
+      return;
+    }
+
+    setRequestError({
+      title: `⚠️ Không thể ${action}`,
+      message: detail || `Backend trả về lỗi HTTP ${status || "không xác định"}.`,
+      details: [
+        `HTTP status: ${status || "không có phản hồi"}`,
+        code ? `Mã lỗi: ${code}` : "Kiểm tra log Backend để biết nguyên nhân chi tiết.",
+      ],
+      tip: "Thông báo lỗi này phản ánh response thật từ Backend, không còn quy mọi lỗi thành mất kết nối máy chủ.",
+    });
+  }, []);
 
   const applyNotificationResponse = useCallback((response) => {
     const normalized = normalizeNotification(response);
@@ -58,14 +144,14 @@ export default function NotificationEditor() {
       .catch((error) => {
         if (!cancelled) {
           console.error("Không thể tải thông báo:", error);
-          setShowServerModal(true);
+          showRequestError(error, "tải thông báo");
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [applyNotificationResponse, code]);
+  }, [applyNotificationResponse, code, showRequestError]);
 
   const createNotification = async () => {
     if (!validateNotification(notification)) return;
@@ -80,8 +166,8 @@ export default function NotificationEditor() {
 
       navigate(`/notifications/${createdNotification.code}`, { replace: true });
       setShowCreateModal(true);
-    } catch {
-      setShowServerModal(true);
+    } catch (error) {
+      showRequestError(error, "tạo thông báo");
     }
   };
 
@@ -96,8 +182,8 @@ export default function NotificationEditor() {
 
       applyNotificationResponse(response);
       setShowSaveModal(true);
-    } catch {
-      setShowServerModal(true);
+    } catch (error) {
+      showRequestError(error, "lưu thông báo");
     }
   };
 
@@ -110,8 +196,8 @@ export default function NotificationEditor() {
 
       applyNotificationResponse(response);
       setShowSendModal(true);
-    } catch {
-      setShowServerModal(true);
+    } catch (error) {
+      showRequestError(error, "gửi thông báo");
     }
   };
 
@@ -154,8 +240,12 @@ export default function NotificationEditor() {
         />
 
         <ServerUnavailableModal
-          open={showServerModal}
-          onClose={() => setShowServerModal(false)}
+          open={Boolean(requestError)}
+          onClose={() => setRequestError(null)}
+          title={requestError?.title}
+          message={requestError?.message}
+          details={requestError?.details}
+          tip={requestError?.tip}
         />
       </div>
     </div>

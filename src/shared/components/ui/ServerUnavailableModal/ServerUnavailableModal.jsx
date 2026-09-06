@@ -1,11 +1,22 @@
 import { Modal } from "antd";
 import "./ServerUnavailableModal.css";
 
-export default function ServerUnavailableModal({ open, onClose }) {
+export default function ServerUnavailableModal({
+  open,
+  onClose,
+  title = "⚠️ Không thể kết nối tới máy chủ",
+  message = "Dịch vụ thông báo hiện chưa khả dụng. Không thể kết nối tới máy chủ.",
+  details = [
+    "Đảm bảo Backend đã được khởi động.",
+    "Kiểm tra kết nối mạng.",
+    "Thử lại sau vài phút.",
+  ],
+  tip = "Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ quản trị viên hệ thống.",
+}) {
   return (
     <Modal
       open={open}
-      title="⚠️ Không thể kết nối tới máy chủ"
+      title={title}
       onOk={onClose}
       onCancel={onClose}
       okText="Đã hiểu"
@@ -13,19 +24,17 @@ export default function ServerUnavailableModal({ open, onClose }) {
       centered
     >
       <div className="server-unavailable-content">
-        <p>
-          Dịch vụ thông báo hiện chưa khả dụng. Không thể kết nối tới máy chủ.
-        </p>
+        <p>{message}</p>
 
-        <ul>
-          <li>Đảm bảo Backend đã được khởi động.</li>
-          <li>Kiểm tra kết nối mạng.</li>
-          <li>Thử lại sau vài phút.</li>
-        </ul>
+        {details?.length > 0 && (
+          <ul>
+            {details.map((detail) => (
+              <li key={detail}>{detail}</li>
+            ))}
+          </ul>
+        )}
 
-        <div className="tip">
-          Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ quản trị viên hệ thống.
-        </div>
+        {tip && <div className="tip">{tip}</div>}
       </div>
     </Modal>
   );
