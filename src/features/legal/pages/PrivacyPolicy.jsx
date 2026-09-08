@@ -135,7 +135,6 @@ export default function PrivacyPolicy() {
   return (
     <LegalDocumentPage
       title="CHÍNH SÁCH BẢO MẬT"
-      introNote="(Lưu ý: Nội dung đảm bảo yếu tố pháp luật quy định hiện hành, Công ty có thể bổ sung những nội dung cần thiết để phù hợp với chính sách riêng của Công ty)"
       blocks={blocks}
     />
   );
