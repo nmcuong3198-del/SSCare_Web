@@ -19,6 +19,13 @@ const normalizeSessionUser = (authResponse) => {
 };
 
 const authService = {
+  checkIdentityAvailability({ identityType, identity }) {
+    return axiosClient.post("/v1/auth/check-identity", {
+      identityType,
+      identity: identity?.trim(),
+    });
+  },
+
   register(form) {
     return axiosClient.post("/v1/auth/register", {
       displayName: form.displayName?.trim(),

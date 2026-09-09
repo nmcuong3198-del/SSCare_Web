@@ -605,3 +605,11 @@
 .register-primary-btn:disabled {
   box-shadow: none;
 }
+
+.register-field-status {
+  display: block;
+  margin-top: 6px;
+  color: #5f6f86;
+  font-size: 12px;
+  font-weight: 500;
+}

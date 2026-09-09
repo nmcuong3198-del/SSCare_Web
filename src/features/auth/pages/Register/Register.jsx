@@ -94,6 +94,11 @@ export default function Register() {
   const [now, setNow] = useState(null);
   const [success, setSuccess] = useState(false);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
+  const identityCheckSequence = useRef({ email: 0, phone: 0 });
+  const [identityChecks, setIdentityChecks] = useState({
+    email: { checking: false, checkedValue: "", error: "" },
+    phone: { checking: false, checkedValue: "", error: "" },
+  });
 
   const latestAllowedParentBirthDate = getLatestAllowedParentBirthDate();
   const todayDate = formatDateInputValue(new Date());
@@ -198,7 +203,85 @@ export default function Register() {
     }
 
     setForm((current) => ({ ...current, [name]: nextValue }));
+
+    if (name === "email" || name === "phone") {
+      identityCheckSequence.current[name] += 1;
+      setIdentityChecks((current) => ({
+        ...current,
+        [name]: { checking: false, checkedValue: "", error: "" },
+      }));
+    }
+
     if (errorMessage) setErrorMessage("");
+  };
+
+  const checkIdentityAvailability = async (field, { force = false } = {}) => {
+    const isEmail = field === "email";
+    const value = form[field].trim();
+    const localValid = isEmail
+        ? EMAIL_PATTERN.test(value)
+        : (() => {
+          const digits = normalizePhoneDigits(value);
+          return digits.length >= 9 && digits.length <= 15;
+        })();
+
+    if (!localValid) return false;
+
+    const currentCheck = identityChecks[field];
+    if (
+      !force &&
+      currentCheck.checkedValue === value &&
+      !currentCheck.checking &&
+      !currentCheck.error
+    ) {
+      return true;
+    }
+
+    const requestId = ++identityCheckSequence.current[field];
+    setIdentityChecks((current) => ({
+      ...current,
+      [field]: { ...current[field], checking: true, error: "" },
+    }));
+
+    try {
+      const response = await authService.checkIdentityAvailability({
+        identityType: isEmail ? "EMAIL" : "PHONE",
+        identity: value,
+      });
+
+      if (requestId !== identityCheckSequence.current[field]) return false;
+
+      const available = Boolean(response?.available);
+      setIdentityChecks((current) => ({
+        ...current,
+        [field]: {
+          checking: false,
+          checkedValue: value,
+          error: available
+              ? ""
+              : isEmail
+                  ? "Email đã được sử dụng"
+                  : "Số điện thoại đã được sử dụng",
+        },
+      }));
+      return available;
+    } catch (error) {
+      if (requestId !== identityCheckSequence.current[field]) return false;
+
+      setIdentityChecks((current) => ({
+        ...current,
+        [field]: {
+          checking: false,
+          checkedValue: "",
+          error: isEmail
+              ? "Không thể kiểm tra email. Vui lòng thử lại."
+              : "Không thể kiểm tra số điện thoại. Vui lòng thử lại.",
+        },
+      }));
+
+      if (!error?.response) setShowServerModal(true);
+      return false;
+    }
   };
 
   const handleRoleContinue = () => {
@@ -212,6 +295,12 @@ export default function Register() {
     setErrorMessage("");
 
     if (!acceptedPolicies || Object.keys(fieldErrors).length > 0) return;
+
+    const [emailAvailable, phoneAvailable] = await Promise.all([
+      checkIdentityAvailability("email", { force: true }),
+      checkIdentityAvailability("phone", { force: true }),
+    ]);
+    if (!emailAvailable || !phoneAvailable) return;
 
     setLoading(true);
     try {
@@ -231,7 +320,21 @@ export default function Register() {
       setSubmitted(false);
       setStep(2);
     } catch (error) {
-      if (!error?.response) {
+      const code = error?.response?.data?.code;
+      if (code === "AUTH_EMAIL_EXISTS" || code === "AUTH_PHONE_EXISTS") {
+        const field = code === "AUTH_EMAIL_EXISTS" ? "email" : "phone";
+        const message = field === "email"
+            ? "Email đã được sử dụng"
+            : "Số điện thoại đã được sử dụng";
+        setIdentityChecks((current) => ({
+          ...current,
+          [field]: {
+            checking: false,
+            checkedValue: form[field].trim(),
+            error: message,
+          },
+        }));
+      } else if (!error?.response) {
         setShowServerModal(true);
       } else {
         setErrorMessage(
@@ -328,10 +431,20 @@ export default function Register() {
     return `${minutes}:${rest}`;
   };
 
-  const renderError = (name) =>
-      submitted && fieldErrors[name] ? (
-          <span className="register-field-error">{fieldErrors[name]}</span>
-      ) : null;
+  const visibleFieldError = (name) =>
+      identityChecks[name]?.error || (submitted ? fieldErrors[name] : "");
+
+  const renderError = (name) => {
+    const message = visibleFieldError(name);
+    return message ? (
+        <span className="register-field-error">{message}</span>
+    ) : null;
+  };
+
+  const identityChecking = identityChecks.email.checking || identityChecks.phone.checking;
+  const hasIdentityAvailabilityError = Boolean(
+      identityChecks.email.error || identityChecks.phone.error,
+  );
 
   return (
       <div className="register-page">
@@ -455,7 +568,7 @@ export default function Register() {
 
                     <label className="register-field">
                       <span>Email</span>
-                      <div className={`register-input ${submitted && fieldErrors.email ? "has-error" : ""}`}>
+                      <div className={`register-input ${visibleFieldError("email") ? "has-error" : ""}`}>
                         <FaEnvelope />
                         <input
                             type="email"
@@ -463,15 +576,19 @@ export default function Register() {
                             autoComplete="email"
                             value={form.email}
                             onChange={updateField}
+                            onBlur={() => checkIdentityAvailability("email")}
                             placeholder="Nhập địa chỉ email"
                         />
                       </div>
+                      {identityChecks.email.checking && (
+                          <span className="register-field-status">Đang kiểm tra email...</span>
+                      )}
                       {renderError("email")}
                     </label>
 
                     <label className="register-field">
                       <span>Số điện thoại</span>
-                      <div className={`register-input ${submitted && fieldErrors.phone ? "has-error" : ""}`}>
+                      <div className={`register-input ${visibleFieldError("phone") ? "has-error" : ""}`}>
                         <FaPhoneAlt />
                         <input
                             type="tel"
@@ -479,10 +596,14 @@ export default function Register() {
                             autoComplete="tel"
                             value={form.phone}
                             onChange={updateField}
+                            onBlur={() => checkIdentityAvailability("phone")}
                             placeholder="Nhập số điện thoại"
                             maxLength={30}
                         />
                       </div>
+                      {identityChecks.phone.checking && (
+                          <span className="register-field-status">Đang kiểm tra số điện thoại...</span>
+                      )}
                       {renderError("phone")}
                     </label>
 
@@ -578,7 +699,13 @@ export default function Register() {
                   <button
                       type="submit"
                       className="register-primary-btn"
-                      disabled={loading || !acceptedPolicies || isParentAgeInvalid}
+                      disabled={
+                        loading ||
+                        identityChecking ||
+                        hasIdentityAvailabilityError ||
+                        !acceptedPolicies ||
+                        isParentAgeInvalid
+                      }
                       title={
                         isParentAgeInvalid
                             ? "Người dùng chưa đủ điều kiện độ tuổi để tạo tài khoản phụ huynh"
@@ -587,7 +714,11 @@ export default function Register() {
                                 : undefined
                       }
                   >
-                    {loading ? "Đang gửi OTP..." : "Gửi mã OTP"}
+                    {loading
+                        ? "Đang gửi OTP..."
+                        : identityChecking
+                            ? "Đang kiểm tra tài khoản..."
+                            : "Gửi mã OTP"}
                   </button>
                   {isParentAgeInvalid && (
                       <div className="register-age-button-warning" role="alert">
