@@ -1,34 +1,76 @@
 .pagination {
+  width: 100%;
+  min-width: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid #e2e8f1;
+  border-radius: 12px;
   background: #eef4ff;
 }
 
+.pagination-summary {
+  flex: 0 0 auto;
+  color: #526078;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
 .page-group {
+  min-width: 0;
   display: flex;
-  gap: 10px;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.page-group button,
+.page-ellipsis {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
 }
 
 .page-group button {
-  width: 36px;
-  height: 36px;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: #fff;
   color: #31415e;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .page-group button:not(:disabled):hover {
+  border-color: #c7d7f3;
   background: #dfeaff;
   color: #173b92;
 }
 
+.page-group button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(23, 59, 146, 0.16);
+}
+
 .page-group .active,
 .page-group .active:disabled {
+  border-color: #173b92;
   background: #173b92;
   color: #fff;
   cursor: default;
@@ -37,18 +79,54 @@
 
 .page-group button:disabled:not(.active) {
   cursor: not-allowed;
-  opacity: 0.45;
+  opacity: 0.42;
 }
 
-@media (max-width: 640px) {
+.page-nav-button {
+  font-size: 20px !important;
+  font-weight: 500 !important;
+}
+
+.page-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7d8aa2;
+  font-size: 16px;
+  user-select: none;
+}
+
+@media (max-width: 760px) {
   .pagination {
-    align-items: flex-start;
+    align-items: stretch;
     flex-direction: column;
     gap: 12px;
+    padding: 14px;
+  }
+
+  .pagination-summary {
+    text-align: center;
   }
 
   .page-group {
-    max-width: 100%;
-    overflow-x: auto;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-group {
+    gap: 5px;
+  }
+
+  .page-group button,
+  .page-ellipsis {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .page-group button {
+    border-radius: 7px;
+    font-size: 12px;
   }
 }

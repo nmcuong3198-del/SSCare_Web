@@ -144,9 +144,17 @@ export default function PostList() {
       .then((response) => {
         if (cancelled) return;
 
-        setArticles(response.content || []);
-        setTotalPages(response.totalPages || 0);
-        setTotalElements(response.totalElements || 0);
+        const nextTotalPages = Math.max(0, Number(response?.totalPages) || 0);
+        const nextTotalElements = Math.max(0, Number(response?.totalElements) || 0);
+
+        if (page > 0 && page >= nextTotalPages) {
+          setPage(Math.max(0, nextTotalPages - 1));
+          return;
+        }
+
+        setArticles(Array.isArray(response?.content) ? response.content : []);
+        setTotalPages(nextTotalPages);
+        setTotalElements(nextTotalElements);
       })
       .catch((error) => {
         if (!cancelled) {
@@ -343,6 +351,7 @@ export default function PostList() {
         totalElements={totalElements}
         pageSize={PAGE_SIZE}
         onPageChange={handlePageChange}
+        disabled={loading}
       />
     </div>
   );

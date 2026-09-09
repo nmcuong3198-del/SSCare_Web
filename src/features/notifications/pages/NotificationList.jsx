@@ -32,14 +32,25 @@ export default function NotificationList() {
   useEffect(() => {
     let cancelled = false;
 
+    setLoading(true);
+
     notificationService
       .getList(page, PAGE_SIZE)
       .then((response) => {
         if (cancelled) return;
 
-        setNotifications(response.content.map(formatNotification));
-        setTotalPages(response.totalPages);
-        setTotalElements(response.totalElements);
+        const nextTotalPages = Math.max(0, Number(response?.totalPages) || 0);
+        const nextTotalElements = Math.max(0, Number(response?.totalElements) || 0);
+
+        if (page > 0 && page >= nextTotalPages) {
+          setPage(Math.max(0, nextTotalPages - 1));
+          return;
+        }
+
+        const content = Array.isArray(response?.content) ? response.content : [];
+        setNotifications(content.map(formatNotification));
+        setTotalPages(nextTotalPages);
+        setTotalElements(nextTotalElements);
       })
       .catch((error) => {
         if (!cancelled) {
@@ -56,7 +67,7 @@ export default function NotificationList() {
   }, [page]);
 
   const handlePageChange = (nextPage) => {
-    setLoading(true);
+    if (loading || nextPage === page) return;
     setPage(nextPage);
   };
 
@@ -139,6 +150,7 @@ export default function NotificationList() {
         totalElements={totalElements}
         pageSize={PAGE_SIZE}
         onPageChange={handlePageChange}
+        disabled={loading}
       />
     </div>
   );

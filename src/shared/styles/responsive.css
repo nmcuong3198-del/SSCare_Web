@@ -456,15 +456,16 @@ svg {
 
   .page-group {
     max-width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    justify-content: center;
+    overflow: visible;
+    padding-bottom: 0;
   }
 
-  .page-group button {
-    flex: 0 0 38px;
-    width: 38px;
-    height: 38px;
+  .page-group button,
+  .page-ellipsis {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
   }
 
   .notification-editor-page,
@@ -692,6 +693,30 @@ svg {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .pagination {
+    padding: 12px 10px;
+  }
+
+  .page-group {
+    gap: 3px;
+  }
+
+  .page-group button,
+  .page-ellipsis {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .page-group button {
+    border-radius: 6px;
+    font-size: 11px;
+  }
+
+  .page-nav-button {
+    font-size: 17px !important;
   }
 
   .card-body,

@@ -77,6 +77,7 @@ export default function AccountManagement() {
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
 
     accountAdminService
       .getAccounts({
@@ -89,9 +90,20 @@ export default function AccountManagement() {
       })
       .then((response) => {
         if (cancelled) return;
-        setAccounts(response.content || []);
-        setTotalPages(response.totalPages || 0);
-        setTotalElements(response.totalElements || 0);
+
+        const nextTotalPages = Math.max(0, Number(response?.totalPages) || 0);
+        const nextTotalElements = Math.max(0, Number(response?.totalElements) || 0);
+
+        // Nếu dữ liệu thay đổi làm trang hiện tại không còn tồn tại,
+        // tự quay về trang cuối hợp lệ thay vì hiển thị bảng trống/phân trang sai.
+        if (page > 0 && page >= nextTotalPages) {
+          setPage(Math.max(0, nextTotalPages - 1));
+          return;
+        }
+
+        setAccounts(Array.isArray(response?.content) ? response.content : []);
+        setTotalPages(nextTotalPages);
+        setTotalElements(nextTotalElements);
       })
       .catch(() => {
         if (!cancelled) {
@@ -409,6 +421,7 @@ export default function AccountManagement() {
         totalElements={totalElements}
         pageSize={PAGE_SIZE}
         onPageChange={handlePageChange}
+        disabled={loading}
       />
 
       {authorProfileAccount && (
