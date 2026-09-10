@@ -192,12 +192,12 @@ export default function Register() {
     const { name, value } = event.target;
     let nextValue = value;
 
-    if (name === "fullName") {
-      nextValue = value
-          .replace(/[^\p{L}\p{M} ]/gu, "")
-          .slice(0, 100);
-    }
-
+    // Do not sanitize fullName while typing. Vietnamese mobile keyboards
+    // (Gboard/Samsung/iOS) may still be composing a character with accents.
+    // Replacing the controlled value during composition can drop the
+    // neighbouring/base character (e.g. typing "Lê" may become "ê").
+    // maxLength on the input and FULL_NAME_PATTERN validation below are
+    // sufficient to enforce the 100-character/name rules safely.
     if (name === "displayName") {
       nextValue = value.slice(0, 100);
     }
