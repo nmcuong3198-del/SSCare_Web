@@ -56,7 +56,6 @@ function getLatestAllowedParentBirthDate(referenceDate = new Date()) {
       referenceDate.getMonth(),
       referenceDate.getDate(),
   );
-  latest.setDate(latest.getDate() - 1);
   return formatDateInputValue(latest);
 }
 
@@ -130,7 +129,7 @@ export default function Register() {
     if (!form.dateOfBirth) {
       errors.dateOfBirth = "Vui lòng chọn ngày sinh";
     } else if (form.dateOfBirth > latestAllowedParentBirthDate) {
-      errors.dateOfBirth = "Bố, mẹ, người giám hộ phải trên 18 tuổi";
+      errors.dateOfBirth = "Bố, mẹ, người giám hộ phải đủ 18 tuổi";
     }
 
     if (!EMAIL_PATTERN.test(email)) {
@@ -561,7 +560,7 @@ export default function Register() {
                       {isParentAgeInvalid ? (
                           <div className="register-age-warning" role="alert">
                             <FaExclamationTriangle aria-hidden="true" />
-                            <span>Bố, mẹ, người giám hộ phải trên 18 tuổi</span>
+                            <span>Bố, mẹ, người giám hộ phải đủ 18 tuổi</span>
                           </div>
                       ) : renderError("dateOfBirth")}
                     </label>
