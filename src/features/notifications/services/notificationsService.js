@@ -25,8 +25,10 @@ const notificationsService = {
     // push delivery instead of increasing the timeout for the whole website.
     return axiosClient.post(`/firebase/sendNotification`, payload, { timeout: 45000 });
   },
-  getRecipients(){
-    return axiosClient.get(`/notifications/recipients`);
+  getRecipients(page = 0, size = 100){
+    return axiosClient.get(`/notifications/recipients`, {
+      params: { page, size },
+    });
   }
 }
 

@@ -3,7 +3,7 @@ import Select from "react-select";
 import "./NotificationTypeSelect.css";
 
 // Phase hiện tại của tài liệu chỉ cho phép Admin tạo thủ công thông báo Hệ thống.
-// NOTI_OTHER là thông báo tự động do Backend rule engine sinh lúc 10h.
+// NOTI_OTHER là thông báo tự động do Backend rule engine sinh.
 const TYPES = [{ value: "NOTI_GEN", label: "Hệ thống" }];
 
 export default function NotificationTypeSelect({ notification, setNotification }) {
@@ -17,7 +17,6 @@ export default function NotificationTypeSelect({ notification, setNotification }
       setNotification((prev) => ({
         ...prev,
         type: "NOTI_GEN",
-        recipients: ["ALL"],
       }));
     }
   }, [notification.type, setNotification]);

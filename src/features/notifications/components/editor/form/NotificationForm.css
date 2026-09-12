@@ -259,3 +259,17 @@
     grid-template-columns: 1fr;
   }
 }
+.schedule-datepicker:disabled,
+.schedule-time-select:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.schedule-hint {
+  display: block;
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}

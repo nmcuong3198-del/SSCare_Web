@@ -34,5 +34,17 @@ export function validateNotification(notification) {
     return false;
   }
 
+  if (notification?.scheduleTime) {
+    const scheduleDate = new Date(notification.scheduleTime);
+    if (Number.isNaN(scheduleDate.getTime())) {
+      toast.error("Thời gian gửi thông báo không hợp lệ.");
+      return false;
+    }
+    if (scheduleDate.getTime() <= Date.now()) {
+      toast.error('Thời gian đã qua. Vui lòng chọn "Ngay bây giờ" hoặc một thời điểm trong tương lai.');
+      return false;
+    }
+  }
+
   return true;
 }

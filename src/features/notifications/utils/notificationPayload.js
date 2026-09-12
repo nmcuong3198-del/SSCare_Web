@@ -12,18 +12,23 @@ const NOTIFICATION_FIELDS = [
 ];
 
 export function normalizeRecipients(recipients) {
-  if (Array.isArray(recipients)) {
-    return recipients.length > 0 ? recipients : ["ALL"];
-  }
+  const values = Array.isArray(recipients)
+    ? recipients
+    : typeof recipients === "string"
+      ? recipients.split(",")
+      : [];
 
-  if (typeof recipients !== "string" || recipients.trim() === "") {
+  const normalized = [...new Set(
+    values
+      .map((recipient) => String(recipient || "").trim())
+      .filter(Boolean),
+  )];
+
+  if (normalized.some((recipient) => recipient.toUpperCase() === "ALL")) {
     return ["ALL"];
   }
 
-  return recipients
-    .split(",")
-    .map((recipient) => recipient.trim())
-    .filter(Boolean);
+  return normalized.length > 0 ? normalized : ["ALL"];
 }
 
 export function normalizeNotification(notification) {
