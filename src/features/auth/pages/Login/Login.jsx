@@ -45,6 +45,17 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
+
+    const identity = form.username.trim();
+    if (!identity) {
+      setLoginError("Vui lòng nhập email hoặc số điện thoại.");
+      return;
+    }
+    if (!form.password) {
+      setLoginError("Vui lòng nhập mật khẩu.");
+      return;
+    }
+
     setLoading(true);
     try {
       const authResponse = await authService.login(form);

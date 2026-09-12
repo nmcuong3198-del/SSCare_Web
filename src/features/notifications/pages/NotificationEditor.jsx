@@ -15,6 +15,7 @@ import {
 } from "@/features/notifications/utils/notificationPayload";
 import { validateNotification } from "@/features/notifications/utils/notificationValidator";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
+import { translateApiMessage } from "@/shared/utils/apiError";
 
 import "./NotificationEditor.css";
 
@@ -36,18 +37,19 @@ export default function NotificationEditor() {
     const status = error?.response?.status;
     const problem = error?.response?.data || {};
     const code = problem?.code;
-    const detail = problem?.detail || problem?.message;
+    const rawDetail = problem?.detail || problem?.message;
+    const detail = rawDetail ? translateApiMessage(rawDetail, "") : "";
 
     if (error?.code === "ECONNABORTED") {
       setRequestError({
         title: "⚠️ Gửi thông báo quá thời gian chờ",
-        message: "Backend chưa trả kết quả gửi Firebase trong thời gian cho phép.",
+        message: "Máy chủ chưa trả kết quả gửi Firebase trong thời gian cho phép.",
         details: [
-          "Kiểm tra kết nối Internet outbound từ Backend tới Google/Firebase.",
-          "Kiểm tra log backend để biết Firebase SDK đang chờ hay lỗi.",
-          "Không bấm gửi liên tục để tránh gửi trùng nếu Backend vẫn đang xử lý.",
+          "Kiểm tra kết nối Internet từ máy chủ tới Google/Firebase.",
+          "Kiểm tra nhật ký máy chủ để biết Firebase SDK đang chờ hay gặp lỗi.",
+          "Không bấm gửi liên tục để tránh gửi trùng nếu máy chủ vẫn đang xử lý.",
         ],
-        tip: "Timeout của riêng API gửi push đã được tăng lên 45 giây.",
+        tip: "Thời gian chờ của API gửi thông báo đã được tăng lên 45 giây.",
       });
       return;
     }
@@ -55,13 +57,13 @@ export default function NotificationEditor() {
     if (!error?.response) {
       setRequestError({
         title: "⚠️ Không thể kết nối tới máy chủ",
-        message: `Không thể ${action} vì trình duyệt không nhận được phản hồi từ Backend.`,
+        message: `Không thể ${action} vì trình duyệt không nhận được phản hồi từ máy chủ.`,
         details: [
-          "Kiểm tra sscare-backend.service có đang active (running) hay không.",
-          "Kiểm tra Nginx /api/ có proxy tới Backend :8080.",
+          "Kiểm tra dịch vụ sscare-backend.service có đang chạy hay không.",
+          "Kiểm tra Nginx /api/ có chuyển tiếp tới máy chủ ứng dụng ở cổng 8080.",
           "Kiểm tra kết nối mạng và thử lại.",
         ],
-        tip: "Nếu Backend vừa deploy Firebase, hãy kiểm tra FIREBASE_CREDENTIALS_PATH và journalctl.",
+        tip: "Nếu vừa triển khai Firebase, hãy kiểm tra FIREBASE_CREDENTIALS_PATH và nhật ký dịch vụ.",
       });
       return;
     }
@@ -71,11 +73,11 @@ export default function NotificationEditor() {
         title: "⚠️ Chưa có thiết bị nhận thông báo",
         message: detail || "Không có thiết bị Android/iOS đang hoạt động cho người nhận đã chọn.",
         details: [
-          "Đăng nhập SSCare App trên Android/iOS để App đăng ký FCM token.",
+          "Đăng nhập ứng dụng SSCare trên Android/iOS để ứng dụng đăng ký FCM token.",
           "Kiểm tra bảng sscare.user_devices có account_id, fcm_token và active=true.",
-          "Nếu vừa logout, token của thiết bị sẽ được chuyển active=false.",
+          "Nếu vừa đăng xuất, token của thiết bị sẽ được chuyển sang trạng thái không hoạt động.",
         ],
-        tip: "Web chỉ có thể gửi push khi ít nhất một thiết bị App đã đăng ký FCM token với Backend.",
+        tip: "Web chỉ có thể gửi thông báo khi ít nhất một thiết bị đã đăng ký FCM token với máy chủ.",
       });
       return;
     }
@@ -83,13 +85,13 @@ export default function NotificationEditor() {
     if (status === 502 && code === "PUSH_DELIVERY_FAILED") {
       setRequestError({
         title: "⚠️ Firebase không gửi được thông báo",
-        message: detail || "Backend đã nhận yêu cầu nhưng Firebase không giao được push tới thiết bị.",
+        message: detail || "Máy chủ đã nhận yêu cầu nhưng Firebase không gửi được thông báo tới thiết bị.",
         details: [
-          "Kiểm tra FIREBASE_CREDENTIALS_PATH trên host.",
-          "Kiểm tra service-account thuộc đúng Firebase project của App.",
-          "Kiểm tra FCM token và kết nối outbound từ host tới Google/Firebase.",
+          "Kiểm tra FIREBASE_CREDENTIALS_PATH trên máy chủ.",
+          "Kiểm tra tài khoản dịch vụ thuộc đúng dự án Firebase của ứng dụng.",
+          "Kiểm tra FCM token và kết nối từ máy chủ tới Google/Firebase.",
         ],
-        tip: "Xem journalctl của sscare-backend.service để lấy lỗi Firebase chi tiết.",
+        tip: "Xem nhật ký của sscare-backend.service để kiểm tra lỗi Firebase chi tiết.",
       });
       return;
     }
@@ -100,7 +102,7 @@ export default function NotificationEditor() {
         message: detail || "Phiên đăng nhập không hợp lệ hoặc tài khoản chưa có quyền NOTIFICATION_MANAGER/ADMIN.",
         details: [
           "Đăng nhập lại tài khoản quản trị.",
-          "Kiểm tra role NOTIFICATION_MANAGER hoặc ADMIN của tài khoản.",
+          "Kiểm tra quyền NOTIFICATION_MANAGER hoặc ADMIN của tài khoản.",
         ],
         tip: `HTTP ${status}`,
       });
@@ -109,12 +111,12 @@ export default function NotificationEditor() {
 
     setRequestError({
       title: `⚠️ Không thể ${action}`,
-      message: detail || `Backend trả về lỗi HTTP ${status || "không xác định"}.`,
+      message: detail || `Máy chủ trả về lỗi HTTP ${status || "không xác định"}.`,
       details: [
-        `HTTP status: ${status || "không có phản hồi"}`,
-        code ? `Mã lỗi: ${code}` : "Kiểm tra log Backend để biết nguyên nhân chi tiết.",
+        `Trạng thái HTTP: ${status || "không có phản hồi"}`,
+        code ? `Mã lỗi: ${code}` : "Kiểm tra nhật ký máy chủ để biết nguyên nhân chi tiết.",
       ],
-      tip: "Thông báo lỗi này phản ánh response thật từ Backend, không còn quy mọi lỗi thành mất kết nối máy chủ.",
+      tip: "Thông báo lỗi này phản ánh phản hồi thực tế từ máy chủ, không còn quy mọi lỗi thành mất kết nối máy chủ.",
     });
   }, []);
 

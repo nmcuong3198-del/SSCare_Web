@@ -8,6 +8,7 @@ import { createForbiddenWordCheckPayload } from "@/features/posts/utils/articleP
 import { isArticleReadyForQualityCheck } from "@/features/posts/utils/articleValidator";
 
 import "./QualityChecker.css";
+import { getApiErrorMessage } from "@/shared/utils/apiError";
 
 function normalizeWord(value) {
   return String(value ?? "").trim().replace(/\s+/g, " ").toLocaleLowerCase("vi-VN");
@@ -46,9 +47,7 @@ export default function QualityChecker({
     } catch (error) {
       console.error("Không thể kiểm tra từ cấm:", error);
       toast.error(
-        error.response?.data?.detail ||
-          error.response?.data?.message ||
-          "Không thể kiểm tra từ cấm. Vui lòng thử lại.",
+        getApiErrorMessage(error, "Không thể kiểm tra từ cấm. Vui lòng thử lại."),
       );
     } finally {
       setChecking(false);

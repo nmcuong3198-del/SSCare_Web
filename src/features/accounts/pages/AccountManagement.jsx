@@ -5,6 +5,7 @@ import AuthorProfileModal from "@/features/accounts/components/AuthorProfileModa
 import accountAdminService from "@/features/accounts/services/accountAdminService";
 import Pagination from "@/shared/components/ui/Pagination/Pagination";
 import Select from "@/shared/components/ui/Select/Select";
+import { getApiErrorMessage } from "@/shared/utils/apiError";
 
 import "./AccountManagement.css";
 
@@ -77,7 +78,7 @@ export default function AccountManagement() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    let movingToValidPage = false;
 
     accountAdminService
       .getAccounts({
@@ -97,6 +98,8 @@ export default function AccountManagement() {
         // Nếu dữ liệu thay đổi làm trang hiện tại không còn tồn tại,
         // tự quay về trang cuối hợp lệ thay vì hiển thị bảng trống/phân trang sai.
         if (page > 0 && page >= nextTotalPages) {
+          movingToValidPage = true;
+          setLoading(true);
           setPage(Math.max(0, nextTotalPages - 1));
           return;
         }
@@ -111,7 +114,7 @@ export default function AccountManagement() {
         }
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled && !movingToValidPage) setLoading(false);
       });
 
     return () => {
@@ -221,8 +224,10 @@ export default function AccountManagement() {
       setAuthorProfileAccount(null);
     } catch (requestError) {
       setError(
-        requestError?.response?.data?.message ||
+        getApiErrorMessage(
+          requestError,
           "Cập nhật hồ sơ tác giả thất bại. Vui lòng thử lại.",
+        ),
       );
       throw requestError;
     } finally {

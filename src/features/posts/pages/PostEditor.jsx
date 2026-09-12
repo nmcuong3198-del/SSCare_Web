@@ -22,6 +22,7 @@ import {
 } from "@/features/posts/utils/articleValidator";
 
 import "./PostEditor.css";
+import { getApiErrorMessage } from "@/shared/utils/apiError";
 
 export default function PostEditor() {
   const { code } = useParams();
@@ -118,7 +119,7 @@ export default function PostEditor() {
         .catch((error) => {
           if (!cancelled) {
             console.error("Không thể tải chi tiết bài viết:", error);
-            toast.error(error.response?.data?.detail || "Không thể tải bài viết.");
+            toast.error(getApiErrorMessage(error, "Không thể tải bài viết."));
           }
         })
         .finally(() => {
@@ -259,11 +260,7 @@ export default function PostEditor() {
 
       return normalized;
     } catch (error) {
-      toast.error(
-          error.response?.data?.detail ||
-          error.response?.data?.message ||
-          "Không thể lưu bài viết.",
-      );
+      toast.error(getApiErrorMessage(error, "Không thể lưu bài viết."));
       return null;
     } finally {
       requestInFlightRef.current = false;
@@ -337,7 +334,7 @@ export default function PostEditor() {
       toast.success("Đã từ chối bài viết và gửi thông báo cho người viết.");
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.detail || "Không thể từ chối bài viết.");
+      toast.error(getApiErrorMessage(error, "Không thể từ chối bài viết."));
     } finally {
       setLoading(false);
     }
@@ -362,7 +359,7 @@ export default function PostEditor() {
       setShowApproveModal(true);
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.detail || "Không thể duyệt bài viết.");
+      toast.error(getApiErrorMessage(error, "Không thể duyệt bài viết."));
     } finally {
       setLoading(false);
     }
@@ -384,7 +381,7 @@ export default function PostEditor() {
       toast.success("Đã xóa bình luận.");
     } catch (error) {
       console.error("Không thể xóa bình luận:", error);
-      toast.error(error.response?.data?.detail || "Không thể xóa bình luận.");
+      toast.error(getApiErrorMessage(error, "Không thể xóa bình luận."));
     } finally {
       setDeletingCommentId(null);
     }
@@ -398,7 +395,7 @@ export default function PostEditor() {
       navigate("/posts");
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.detail || "Không thể thu hồi bài viết.");
+      toast.error(getApiErrorMessage(error, "Không thể thu hồi bài viết."));
     } finally {
       setLoading(false);
     }

@@ -30,6 +30,7 @@ import {
 } from "@/features/posts/utils/markdownEditor";
 
 import "./RichTextMarkdownEditor.css";
+import { getApiErrorMessage } from "@/shared/utils/apiError";
 
 function escapeEditorHtml(value) {
   return String(value ?? "")
@@ -219,7 +220,7 @@ export default function RichTextMarkdownEditor({
       );
       emitMarkdown();
     } catch (error) {
-      alert(error?.response?.data?.message || error?.message || "Không upload được ảnh nội dung.");
+      alert(getApiErrorMessage(error, "Không tải lên được ảnh nội dung."));
     } finally {
       setUploadingImage(false);
     }
