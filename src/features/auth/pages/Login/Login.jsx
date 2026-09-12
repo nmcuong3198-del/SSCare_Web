@@ -46,7 +46,7 @@ export default function Login() {
 
       // Mọi tài khoản hợp lệ đều được phép đăng nhập Web.
       // Role chỉ quyết định các tab/chức năng bổ sung được hiển thị và truy cập.
-      authService.saveUser(authResponse);
+      authService.saveUser(authResponse, form.remember);
 
       navigate("/");
       window.location.reload();
@@ -125,6 +125,19 @@ export default function Login() {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
+
+        </div>
+
+        <div className="login-options-row">
+          <label className="remember-login-option">
+            <input
+              type="checkbox"
+              name="remember"
+              checked={form.remember}
+              onChange={handleChange}
+            />
+            <span>Ghi nhớ đăng nhập</span>
+          </label>
 
           <button
             type="button"

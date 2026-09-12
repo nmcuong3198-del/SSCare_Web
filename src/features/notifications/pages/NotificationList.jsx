@@ -15,7 +15,11 @@ const PAGE_SIZE = 5;
 
 const formatNotification = (notification) => ({
   ...notification,
-  type: notification.type === "SYSTEM" ? "Hệ thống" : "Khác",
+  type: ["SYSTEM", "NOTI_GEN"].includes(notification.type)
+    ? "Hệ thống"
+    : notification.type === "NOTI_OTHER" || notification.type === "OTHER"
+      ? "Khác"
+      : notification.type,
   recipients:
     notification.recipients === "ALL" ? "Tất cả" : notification.recipients,
 });

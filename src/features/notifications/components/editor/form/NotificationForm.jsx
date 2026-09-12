@@ -14,15 +14,15 @@ import "./NotificationForm.css";
 
 const MAX_LENGTH = 1000;
 
-const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => ({
-  value: hour,
-  label: `${String(hour).padStart(2, "0")}:00`,
-}));
+const SYSTEM_SEND_HOUR = 2;
 
 const getDefaultScheduleDate = () => {
-  const date = new Date();
-  date.setHours(2, 0, 0, 0);
-
+  const now = new Date();
+  const date = new Date(now);
+  date.setHours(SYSTEM_SEND_HOUR, 0, 0, 0);
+  if (date.getTime() <= now.getTime()) {
+    date.setDate(date.getDate() + 1);
+  }
   return date;
 };
 
@@ -37,24 +37,24 @@ const formatLocalDateTime = (date) => {
 };
 
 export default function NotificationForm({
-  notification,
-  setNotification,
-  onCreate,
-  onUpdate,
-  onSend,
-  isCreated = false,
-  notificationSent = false,
-}) {
+                                           notification,
+                                           setNotification,
+                                           onCreate,
+                                           onUpdate,
+                                           onSend,
+                                           isCreated = false,
+                                           notificationSent = false,
+                                         }) {
   const [showEmoji, setShowEmoji] = useState(false);
   const emojiRef = useRef(null);
 
   const parsedScheduleDate = notification.scheduleTime
-    ? new Date(notification.scheduleTime)
-    : getDefaultScheduleDate();
+      ? new Date(notification.scheduleTime)
+      : getDefaultScheduleDate();
 
   const currentScheduleDate = Number.isNaN(parsedScheduleDate.getTime())
-    ? getDefaultScheduleDate()
-    : parsedScheduleDate;
+      ? getDefaultScheduleDate()
+      : parsedScheduleDate;
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -85,6 +85,8 @@ export default function NotificationForm({
   }, [editor, notification.content]);
 
   useEffect(() => {
+    if (notificationSent) return;
+
     if (!notification.scheduleTime) {
       setNotification((prev) => ({
         ...prev,
@@ -96,20 +98,25 @@ export default function NotificationForm({
 
     const scheduleDate = new Date(notification.scheduleTime);
 
-    if (
-      !Number.isNaN(scheduleDate.getTime()) &&
-      (scheduleDate.getMinutes() !== 0 ||
-        scheduleDate.getSeconds() !== 0 ||
-        scheduleDate.getMilliseconds() !== 0)
-    ) {
-      scheduleDate.setMinutes(0, 0, 0);
-
-      setNotification((prev) => ({
-        ...prev,
-        scheduleTime: formatLocalDateTime(scheduleDate),
-      }));
+    if (!Number.isNaN(scheduleDate.getTime())) {
+      scheduleDate.setHours(SYSTEM_SEND_HOUR, 0, 0, 0);
+      const now = new Date();
+      if (scheduleDate.getTime() <= now.getTime()) {
+        const next = getDefaultScheduleDate();
+        scheduleDate.setFullYear(next.getFullYear(), next.getMonth(), next.getDate());
+        scheduleDate.setHours(SYSTEM_SEND_HOUR, 0, 0, 0);
+      }
+      const normalized = formatLocalDateTime(scheduleDate);
+      if (notification.scheduleTime !== normalized) {
+        setNotification((prev) => ({
+          ...prev,
+          type: "NOTI_GEN",
+          recipients: ["ALL"],
+          scheduleTime: normalized,
+        }));
+      }
     }
-  }, [notification.scheduleTime, setNotification]);
+  }, [notification.scheduleTime, notificationSent, setNotification]);
 
   // Click ngoài popup thì đóng
   useEffect(() => {
@@ -143,131 +150,123 @@ export default function NotificationForm({
     }));
   };
 
-  const handleHourChange = (event) => {
-    const selectedHour = Number(event.target.value);
-    const newDate = new Date(currentScheduleDate);
-
-    newDate.setHours(selectedHour, 0, 0, 0);
-    updateScheduleTime(newDate);
-  };
 
   return (
-    <div className="notification-form-card">
-      <div className="card-header" />
+      <div className="notification-form-card">
+        <div className="card-header" />
 
-      <div className="card-body">
-        <div className="title-section">
-          <label htmlFor="notification-title">Tiêu đề thông báo</label>
-          <input
-            id="notification-title"
-            type="text"
-            className="notification-title-input"
-            placeholder="Nhập tiêu đề thông báo..."
-            value={notification.title || ""}
-            maxLength={100}
-            onChange={handleTitleChange}
-          />
-        </div>
+        <div className="card-body">
+          <div className="title-section">
+            <label htmlFor="notification-title">Tiêu đề thông báo</label>
+            <input
+                id="notification-title"
+                type="text"
+                className="notification-title-input"
+                placeholder="Nhập tiêu đề thông báo..."
+                value={notification.title || ""}
+                maxLength={100}
+                onChange={handleTitleChange}
+            />
+          </div>
 
-        <div className="editor-section">
-          <label>Nội dung thông báo</label>
+          <div className="editor-section">
+            <label>Nội dung thông báo</label>
 
-          <div className="notification-editor">
-            <div className="noti-editor-header">
-              <button
-                type="button"
-                className="emoji-button"
-                onClick={() => setShowEmoji(!showEmoji)}
-              >
-                😊
-              </button>
+            <div className="notification-editor">
+              <div className="noti-editor-header">
+                <button
+                    type="button"
+                    className="emoji-button"
+                    onClick={() => setShowEmoji(!showEmoji)}
+                >
+                  😊
+                </button>
 
-              {showEmoji && (
-                <div className="emoji-picker-wrapper" ref={emojiRef}>
-                  <EmojiPicker
-                    width={320}
-                    height={380}
-                    onEmojiClick={handleEmojiClick}
-                  />
-                </div>
-              )}
-            </div>
+                {showEmoji && (
+                    <div className="emoji-picker-wrapper" ref={emojiRef}>
+                      <EmojiPicker
+                          width={320}
+                          height={380}
+                          onEmojiClick={handleEmojiClick}
+                      />
+                    </div>
+                )}
+              </div>
 
-            <EditorContent editor={editor} />
+              <EditorContent editor={editor} />
 
-            <div className="editor-bottom">
+              <div className="editor-bottom">
               <span>
                 {editor?.getText().length || 0}/{MAX_LENGTH}
               </span>
+              </div>
             </div>
-          </div>
 
-          <div className="select-row">
-            <NotificationTypeSelect
-              notification={notification}
-              setNotification={setNotification}
-            />
+            <div className="select-row">
+              <NotificationTypeSelect
+                  notification={notification}
+                  setNotification={setNotification}
+              />
 
-            <ReceiverSelect
-              notification={notification}
-              setNotification={setNotification}
-            />
-          </div>
-        </div>
-
-        <div className="notification-schedule">
-          <div className="schedule-picker-row">
-            <div className="schedule-picker">
-              <label>📅 Ngày gửi thông báo</label>
-
-              <DatePicker
-                selected={currentScheduleDate}
-                minDate={new Date()}
-                dateFormat="dd/MM/yyyy"
-                className="schedule-datepicker"
-                onChange={(date) => {
-                  if (!date) return;
-
-                  const newDate = new Date(currentScheduleDate);
-
-                  newDate.setFullYear(date.getFullYear());
-                  newDate.setMonth(date.getMonth());
-                  newDate.setDate(date.getDate());
-
-                  updateScheduleTime(newDate);
-                }}
+              <ReceiverSelect
+                  notification={notification}
+                  setNotification={setNotification}
               />
             </div>
+          </div>
 
-            <div className="schedule-picker">
-              <label htmlFor="schedule-hour">🕑 Vào lúc</label>
+          <div className="notification-schedule">
+            <div className="schedule-picker-row">
+              <div className="schedule-picker">
+                <label>📅 Ngày gửi thông báo</label>
 
-              <div className="schedule-time-select-wrapper">
-                <select
-                  id="schedule-hour"
-                  className="schedule-time-select"
-                  value={currentScheduleDate.getHours()}
-                  onChange={handleHourChange}
-                >
-                  {HOUR_OPTIONS.map((hour) => (
-                    <option key={hour.value} value={hour.value}>
-                      {hour.label}
-                    </option>
-                  ))}
-                </select>
+                <DatePicker
+                    selected={currentScheduleDate}
+                    minDate={getDefaultScheduleDate()}
+                    dateFormat="dd/MM/yyyy"
+                    showMonthYearDropdown={true}
+                    className="schedule-datepicker"
+                    onChange={(date) => {
+                      if (!date) return;
+
+                      const newDate = new Date(currentScheduleDate);
+
+                      newDate.setFullYear(date.getFullYear());
+                      newDate.setMonth(date.getMonth());
+                      newDate.setDate(date.getDate());
+
+                      newDate.setHours(SYSTEM_SEND_HOUR, 0, 0, 0);
+                      updateScheduleTime(newDate);
+                    }}
+                />
+              </div>
+
+              <div className="schedule-picker">
+                <label htmlFor="schedule-hour">🕑 Vào lúc</label>
+
+                <div className="schedule-time-select-wrapper">
+                  <select
+                      id="schedule-hour"
+                      className="schedule-time-select"
+                      value={SYSTEM_SEND_HOUR}
+                      disabled
+                      aria-label="Giờ gửi thông báo hệ thống"
+                  >
+                    <option value={SYSTEM_SEND_HOUR}>02:00</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <NotificationFooter
-          onCreate={onCreate}
-          onUpdate={onUpdate}
-          onSend={onSend}
-          isCreated={isCreated}
-          notificationSent={notificationSent}
-        />
+          <NotificationFooter
+              onCreate={onCreate}
+              onUpdate={onUpdate}
+              onSend={onSend}
+              isCreated={isCreated}
+              notificationSent={notificationSent}
+          />
+        </div>
       </div>
-    </div>
   );
 }

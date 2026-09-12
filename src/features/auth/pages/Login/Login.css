@@ -744,9 +744,42 @@ input:-webkit-autofill:active{
   margin-bottom: 4px;
 }
 
+.login-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 2px;
+}
+
+.remember-login-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-login-option input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.remember-login-option:focus-within {
+  outline: 2px solid rgba(47, 107, 255, 0.18);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 .forgot-password-link {
   display: block;
-  margin: 10px 0 0;
+  margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -813,5 +846,14 @@ input:-webkit-autofill:active{
 @media (max-width: 576px) {
   .login-register-btn {
     height: 54px;
+  }
+
+  .login-options-row {
+    gap: 10px;
+  }
+
+  .remember-login-option,
+  .forgot-password-link {
+    font-size: 12.5px;
   }
 }

@@ -3,7 +3,7 @@ export const createEmptyNotification = () => ({
   code: "",
   title: "",
   content: "",
-  type: "SYSTEM",
+  type: "NOTI_GEN",
   recipients: ["ALL"],
   scheduleTime: "",
   status: "",

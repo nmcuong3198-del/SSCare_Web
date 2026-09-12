@@ -1,9 +1,5 @@
 import axiosClient from "@/shared/services/http/axiosClient";
-
-const USER_KEY = "user";
-const TOKEN_KEY = "token";
-const REFRESH_TOKEN_KEY = "refreshToken";
-const LOGIN_AT_KEY = "loginAt";
+import authStorage from "@/shared/services/auth/authStorage";
 
 const normalizeSessionUser = (authResponse) => {
   const account = authResponse?.account || {};
@@ -98,14 +94,11 @@ const authService = {
   },
 
   logout() {
-    localStorage.removeItem(USER_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(LOGIN_AT_KEY);
+    authStorage.clear();
   },
 
   getCurrentUser() {
-    const rawUser = localStorage.getItem(USER_KEY);
+    const rawUser = authStorage.getItem(authStorage.keys.user);
 
     if (!rawUser) return null;
 
@@ -118,25 +111,22 @@ const authService = {
   },
 
   getToken() {
-    return localStorage.getItem(TOKEN_KEY);
+    return authStorage.getItem(authStorage.keys.token);
   },
 
   getRefreshToken() {
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
+    return authStorage.getItem(authStorage.keys.refreshToken);
   },
 
-  saveUser(authResponse) {
+  saveUser(authResponse, remember = false) {
     const user = normalizeSessionUser(authResponse);
 
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-    localStorage.setItem(LOGIN_AT_KEY, Date.now().toString());
-
-    if (authResponse?.accessToken) {
-      localStorage.setItem(TOKEN_KEY, authResponse.accessToken);
-    }
-    if (authResponse?.refreshToken) {
-      localStorage.setItem(REFRESH_TOKEN_KEY, authResponse.refreshToken);
-    }
+    authStorage.saveLoginSession({
+      user,
+      accessToken: authResponse?.accessToken,
+      refreshToken: authResponse?.refreshToken,
+      remember,
+    });
 
     return user;
   },

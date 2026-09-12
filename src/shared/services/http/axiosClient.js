@@ -1,10 +1,8 @@
 import axios from "axios";
 
+import authStorage from "@/shared/services/auth/authStorage";
+
 const baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
-const TOKEN_KEY = "token";
-const REFRESH_TOKEN_KEY = "refreshToken";
-const USER_KEY = "user";
-const LOGIN_AT_KEY = "loginAt";
 
 const axiosClient = axios.create({
   baseURL,
@@ -17,36 +15,31 @@ const axiosClient = axios.create({
 let refreshPromise = null;
 
 const clearSession = () => {
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-  localStorage.removeItem(LOGIN_AT_KEY);
+  authStorage.clear();
 };
 
 const saveRefreshedSession = (data) => {
-  localStorage.setItem(TOKEN_KEY, data.accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
-
   const currentUser = (() => {
     try {
-      return JSON.parse(localStorage.getItem(USER_KEY) || "{}");
+      return JSON.parse(authStorage.getItem(authStorage.keys.user) || "{}");
     } catch {
       return {};
     }
   })();
 
-  localStorage.setItem(
-    USER_KEY,
-    JSON.stringify({
+  authStorage.updateSession({
+    accessToken: data.accessToken,
+    refreshToken: data.refreshToken,
+    user: {
       ...currentUser,
       ...data.account,
-      fullName: data.account?.displayName,
+      fullName: data.account?.fullName || data.account?.displayName,
       username: data.account?.email || data.account?.phone,
       accessToken: data.accessToken,
       accessTokenExpiresAt: data.accessTokenExpiresAt,
       refreshTokenExpiresAt: data.refreshTokenExpiresAt,
-    }),
-  );
+    },
+  });
 };
 
 axiosClient.interceptors.request.use(
@@ -59,7 +52,7 @@ axiosClient.interceptors.request.use(
       }
     }
 
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = authStorage.getItem(authStorage.keys.token);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -74,7 +67,7 @@ axiosClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    const refreshToken = authStorage.getItem(authStorage.keys.refreshToken);
     const isAuthRequest = originalRequest?.url?.includes("/v1/auth/");
 
     if (
