@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
+import { createConnectionError, getApiErrorMessage } from "@/shared/utils/apiError";
 
 const ROLE_OPTIONS = [
   { label: "Bố", value: "FATHER", icon: "👨" },
@@ -59,22 +60,6 @@ function getLatestAllowedParentBirthDate(referenceDate = new Date()) {
   return formatDateInputValue(latest);
 }
 
-function getApiErrorMessage(error, fallback) {
-  const data = error?.response?.data;
-
-  if (data?.detail && data.detail !== "One or more fields are invalid.") {
-    return data.detail;
-  }
-
-  if (data?.errors && typeof data.errors === "object") {
-    const firstMessage = Object.values(data.errors).find(Boolean);
-    if (firstMessage) return firstMessage;
-  }
-
-  if (data?.message) return data.message;
-  return fallback;
-}
-
 export default function Register() {
   const navigate = useNavigate();
   const otpInputRef = useRef(null);
@@ -87,7 +72,7 @@ export default function Register() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [showServerModal, setShowServerModal] = useState(false);
+  const [connectionError, setConnectionError] = useState(null);
   const [challenge, setChallenge] = useState(null);
   const [otp, setOtp] = useState("");
   const [now, setNow] = useState(null);
@@ -267,18 +252,21 @@ export default function Register() {
     } catch (error) {
       if (requestId !== identityCheckSequence.current[field]) return false;
 
+      const connectionProblem = createConnectionError(error, "kiểm tra thông tin đăng ký");
       setIdentityChecks((current) => ({
         ...current,
         [field]: {
           checking: false,
           checkedValue: "",
-          error: isEmail
-              ? "Không thể kiểm tra email. Vui lòng thử lại."
-              : "Không thể kiểm tra số điện thoại. Vui lòng thử lại.",
+          error: connectionProblem
+              ? ""
+              : isEmail
+                  ? "Không thể kiểm tra email. Vui lòng thử lại."
+                  : "Không thể kiểm tra số điện thoại. Vui lòng thử lại.",
         },
       }));
 
-      if (!error?.response) setShowServerModal(true);
+      if (connectionProblem) setConnectionError(connectionProblem);
       return false;
     }
   };
@@ -333,9 +321,12 @@ export default function Register() {
             error: message,
           },
         }));
-      } else if (!error?.response) {
-        setShowServerModal(true);
       } else {
+        const connectionProblem = createConnectionError(error, "gửi OTP đăng ký");
+        if (connectionProblem) {
+          setConnectionError(connectionProblem);
+          return;
+        }
         setErrorMessage(
             getApiErrorMessage(error, "Không thể gửi OTP. Vui lòng thử lại."),
         );
@@ -374,8 +365,9 @@ export default function Register() {
         navigate("/login", { replace: true });
       }, 2000);
     } catch (error) {
-      if (!error?.response) {
-        setShowServerModal(true);
+      const connectionProblem = createConnectionError(error, "xác thực OTP đăng ký");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
       } else {
         setErrorMessage(
             getApiErrorMessage(error, "Không thể xác thực OTP. Vui lòng thử lại."),
@@ -398,8 +390,9 @@ export default function Register() {
       setNow(Date.now());
       window.setTimeout(() => otpInputRef.current?.focus(), 0);
     } catch (error) {
-      if (!error?.response) {
-        setShowServerModal(true);
+      const connectionProblem = createConnectionError(error, "gửi lại OTP đăng ký");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
       } else {
         setErrorMessage(
             getApiErrorMessage(error, "Không thể gửi lại OTP. Vui lòng thử lại."),
@@ -813,8 +806,12 @@ export default function Register() {
         </div>
 
         <ServerUnavailableModal
-            open={showServerModal}
-            onClose={() => setShowServerModal(false)}
+            open={Boolean(connectionError)}
+            onClose={() => setConnectionError(null)}
+            title={connectionError?.title}
+            message={connectionError?.message}
+            details={connectionError?.details}
+            tip={connectionError?.tip}
         />
       </div>
   );

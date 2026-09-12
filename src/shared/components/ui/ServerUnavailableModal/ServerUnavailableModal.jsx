@@ -5,11 +5,10 @@ export default function ServerUnavailableModal({
   open,
   onClose,
   title = "⚠️ Không thể kết nối tới máy chủ",
-  message = "Dịch vụ thông báo hiện chưa khả dụng. Không thể kết nối tới máy chủ.",
+  message = "Trình duyệt chưa nhận được phản hồi từ máy chủ.",
   details = [
-    "Đảm bảo Backend đã được khởi động.",
-    "Kiểm tra kết nối mạng.",
-    "Thử lại sau vài phút.",
+    "Kiểm tra kết nối mạng của bạn.",
+    "Thử tải lại trang hoặc thử lại sau ít phút.",
   ],
   tip = "Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ quản trị viên hệ thống.",
 }) {

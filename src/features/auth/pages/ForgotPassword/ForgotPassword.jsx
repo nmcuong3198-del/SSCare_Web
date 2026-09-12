@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
+import { createConnectionError, getApiErrorMessage } from "@/shared/utils/apiError";
 
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const OTP_PATTERN = /^\d{6}$/;
@@ -25,22 +26,6 @@ function normalizePhoneDigits(value) {
 
 function utf8Length(value) {
   return new TextEncoder().encode(value).length;
-}
-
-function getApiErrorMessage(error, fallback) {
-  const data = error?.response?.data;
-
-  if (data?.detail && data.detail !== "One or more fields are invalid.") {
-    return data.detail;
-  }
-
-  if (data?.errors && typeof data.errors === "object") {
-    const firstMessage = Object.values(data.errors).find(Boolean);
-    if (firstMessage) return firstMessage;
-  }
-
-  if (data?.message) return data.message;
-  return fallback;
 }
 
 function formatClock(seconds) {
@@ -66,7 +51,7 @@ export default function ForgotPassword() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [showServerModal, setShowServerModal] = useState(false);
+  const [connectionError, setConnectionError] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [success, setSuccess] = useState(false);
 
@@ -187,8 +172,9 @@ export default function ForgotPassword() {
       setSubmitted(false);
       setStep(1);
     } catch (error) {
-      if (!error?.response) {
-        setShowServerModal(true);
+      const connectionProblem = createConnectionError(error, "gửi OTP đặt lại mật khẩu");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
       } else {
         setErrorMessage(
           getApiErrorMessage(error, "Không thể gửi OTP. Vui lòng thử lại."),
@@ -222,8 +208,9 @@ export default function ForgotPassword() {
       setSubmitted(false);
       setStep(2);
     } catch (error) {
-      if (!error?.response) {
-        setShowServerModal(true);
+      const connectionProblem = createConnectionError(error, "xác thực OTP");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
       } else {
         setErrorMessage(
           getApiErrorMessage(error, "Không thể xác thực OTP. Vui lòng thử lại."),
@@ -249,8 +236,9 @@ export default function ForgotPassword() {
       setNow(Date.now());
       window.setTimeout(() => otpInputRef.current?.focus(), 0);
     } catch (error) {
-      if (!error?.response) {
-        setShowServerModal(true);
+      const connectionProblem = createConnectionError(error, "gửi lại OTP");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
       } else {
         setErrorMessage(
           getApiErrorMessage(error, "Không thể gửi lại OTP. Vui lòng thử lại."),
@@ -295,8 +283,9 @@ export default function ForgotPassword() {
         navigate("/login", { replace: true });
       }, 2000);
     } catch (error) {
-      if (!error?.response) {
-        setShowServerModal(true);
+      const connectionProblem = createConnectionError(error, "đặt lại mật khẩu");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
       } else {
         setErrorMessage(
           getApiErrorMessage(
@@ -564,8 +553,12 @@ export default function ForgotPassword() {
       </main>
 
       <ServerUnavailableModal
-        open={showServerModal}
-        onClose={() => setShowServerModal(false)}
+        open={Boolean(connectionError)}
+        onClose={() => setConnectionError(null)}
+        title={connectionError?.title}
+        message={connectionError?.message}
+        details={connectionError?.details}
+        tip={connectionError?.tip}
       />
     </div>
   );

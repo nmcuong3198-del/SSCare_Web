@@ -12,13 +12,14 @@ import { useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
+import { createConnectionError, getApiErrorMessage } from "@/shared/utils/apiError";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showServerModal, setShowServerModal] = useState(false);
+  const [connectionError, setConnectionError] = useState(null);
   const [loginError, setLoginError] = useState("");
   const [form, setForm] = useState(() => {
     const rememberedLogin = authService.getRememberedLogin();
@@ -55,11 +56,37 @@ export default function Login() {
       navigate("/");
       window.location.reload();
     } catch (error) {
-      if (error.response?.status === 401 || error.response?.status === 403) {
+      const connectionProblem = createConnectionError(error, "đăng nhập");
+      if (connectionProblem) {
+        setConnectionError(connectionProblem);
+        return;
+      }
+
+      const status = error?.response?.status;
+
+      if (status === 401) {
         setLoginError("Email/số điện thoại hoặc mật khẩu không chính xác.");
         return;
       }
-      setShowServerModal(true);
+
+      if (status === 429) {
+        setLoginError("Bạn đã thử đăng nhập quá nhiều lần. Vui lòng chờ một lúc rồi thử lại.");
+        return;
+      }
+
+      if (status >= 500) {
+        setLoginError("Hệ thống đang gặp sự cố. Vui lòng thử lại sau.");
+        return;
+      }
+
+      setLoginError(
+        getApiErrorMessage(
+          error,
+          status === 403
+            ? "Tài khoản hiện không được phép đăng nhập."
+            : "Không thể đăng nhập. Vui lòng kiểm tra thông tin và thử lại.",
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -178,8 +205,12 @@ export default function Login() {
       </form>
 
       <ServerUnavailableModal
-        open={showServerModal}
-        onClose={() => setShowServerModal(false)}
+        open={Boolean(connectionError)}
+        onClose={() => setConnectionError(null)}
+        title={connectionError?.title}
+        message={connectionError?.message}
+        details={connectionError?.details}
+        tip={connectionError?.tip}
       />
     </div>
   );
