@@ -118,7 +118,11 @@ const authService = {
     return authStorage.getItem(authStorage.keys.refreshToken);
   },
 
-  saveUser(authResponse, remember = false) {
+  getRememberedLogin() {
+    return authStorage.getRememberedLogin();
+  },
+
+  saveUser(authResponse, remember = false, username = "") {
     const user = normalizeSessionUser(authResponse);
 
     authStorage.saveLoginSession({
@@ -126,6 +130,7 @@ const authService = {
       accessToken: authResponse?.accessToken,
       refreshToken: authResponse?.refreshToken,
       remember,
+      username: username || authResponse?.account?.email || authResponse?.account?.phone,
     });
 
     return user;

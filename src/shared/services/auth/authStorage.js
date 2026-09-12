@@ -3,6 +3,11 @@ const TOKEN_KEY = "token";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const LOGIN_AT_KEY = "loginAt";
 
+// Đây là preference của màn hình đăng nhập, KHÔNG phải credential/session.
+// Giữ lại qua logout để lần sau mở /login vẫn hiện username + checkbox.
+const REMEMBER_LOGIN_KEY = "rememberLogin";
+const REMEMBERED_USERNAME_KEY = "rememberedUsername";
+
 const AUTH_KEYS = [USER_KEY, TOKEN_KEY, REFRESH_TOKEN_KEY, LOGIN_AT_KEY];
 
 const hasSessionCredential = (storage) =>
@@ -11,8 +16,6 @@ const hasSessionCredential = (storage) =>
 const resolveStorage = () => {
   // localStorage = người dùng đã chọn "Ghi nhớ đăng nhập".
   // sessionStorage = chỉ duy trì trong phiên trình duyệt hiện tại.
-  // Ưu tiên nơi đang có token thực tế; fallback localStorage giúp tương thích
-  // với các phiên đăng nhập cũ trước khi bổ sung tính năng remember-me.
   if (hasSessionCredential(localStorage)) {
     return localStorage;
   }
@@ -32,8 +35,13 @@ const resolveStorage = () => {
   return sessionStorage;
 };
 
-const clearStorage = (storage) => {
+const clearAuthStorage = (storage) => {
   AUTH_KEYS.forEach((key) => storage.removeItem(key));
+};
+
+const clearRememberedLogin = () => {
+  localStorage.removeItem(REMEMBER_LOGIN_KEY);
+  localStorage.removeItem(REMEMBERED_USERNAME_KEY);
 };
 
 const authStorage = {
@@ -42,6 +50,8 @@ const authStorage = {
     token: TOKEN_KEY,
     refreshToken: REFRESH_TOKEN_KEY,
     loginAt: LOGIN_AT_KEY,
+    rememberLogin: REMEMBER_LOGIN_KEY,
+    rememberedUsername: REMEMBERED_USERNAME_KEY,
   },
 
   getItem(key) {
@@ -52,14 +62,35 @@ const authStorage = {
     resolveStorage().setItem(key, value);
   },
 
+  // Chỉ xóa phiên xác thực. Không xóa preference "Ghi nhớ đăng nhập".
   clear() {
-    clearStorage(localStorage);
-    clearStorage(sessionStorage);
+    clearAuthStorage(localStorage);
+    clearAuthStorage(sessionStorage);
   },
 
-  saveLoginSession({ user, accessToken, refreshToken, remember }) {
-    // Không để tồn tại đồng thời session cũ ở cả hai storage.
+  getRememberedLogin() {
+    const remember = localStorage.getItem(REMEMBER_LOGIN_KEY) === "true";
+    const username = remember
+      ? localStorage.getItem(REMEMBERED_USERNAME_KEY) || ""
+      : "";
+
+    return { remember, username };
+  },
+
+  saveRememberedLogin({ remember, username }) {
+    if (!remember) {
+      clearRememberedLogin();
+      return;
+    }
+
+    localStorage.setItem(REMEMBER_LOGIN_KEY, "true");
+    localStorage.setItem(REMEMBERED_USERNAME_KEY, username?.trim() || "");
+  },
+
+  saveLoginSession({ user, accessToken, refreshToken, remember, username }) {
+    // Xóa session cũ ở cả hai nơi nhưng vẫn giữ preference login.
     this.clear();
+    this.saveRememberedLogin({ remember, username });
 
     const targetStorage = remember ? localStorage : sessionStorage;
     targetStorage.setItem(USER_KEY, JSON.stringify(user));

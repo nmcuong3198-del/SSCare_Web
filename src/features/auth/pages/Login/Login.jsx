@@ -20,10 +20,14 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showServerModal, setShowServerModal] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const [form, setForm] = useState({
-    username: "",
-    password: "",
-    remember: false,
+  const [form, setForm] = useState(() => {
+    const rememberedLogin = authService.getRememberedLogin();
+
+    return {
+      username: rememberedLogin.username,
+      password: "",
+      remember: rememberedLogin.remember,
+    };
   });
 
   const handleChange = (e) => {
@@ -46,7 +50,7 @@ export default function Login() {
 
       // Mọi tài khoản hợp lệ đều được phép đăng nhập Web.
       // Role chỉ quyết định các tab/chức năng bổ sung được hiển thị và truy cập.
-      authService.saveUser(authResponse, form.remember);
+      authService.saveUser(authResponse, form.remember, form.username.trim());
 
       navigate("/");
       window.location.reload();
@@ -81,7 +85,7 @@ export default function Login() {
       <div className="wave wave-1" />
       <div className="wave wave-2" />
 
-      <form className="login-card" onSubmit={handleSubmit}>
+      <form className="login-card" onSubmit={handleSubmit} autoComplete="on">
         <h2>Đăng nhập</h2>
 
         <div className="form-group">
@@ -91,6 +95,7 @@ export default function Login() {
             <FaUser className="icon" />
 
             <input
+              id="login-username"
               type="text"
               name="username"
               autoComplete="username"
@@ -108,6 +113,7 @@ export default function Login() {
             <FaLock className="icon" />
 
             <input
+              id="login-password"
               type={showPassword ? "text" : "password"}
               name="password"
               autoComplete="current-password"
