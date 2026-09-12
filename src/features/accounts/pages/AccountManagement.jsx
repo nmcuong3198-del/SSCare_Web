@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCheckCircle, FaFilter, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
+import { FaCheckCircle, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
 
 import AuthorProfileModal from "@/features/accounts/components/AuthorProfileModal";
 import accountAdminService from "@/features/accounts/services/accountAdminService";
@@ -243,10 +243,6 @@ export default function AccountManagement() {
             <FaUsers />
             <h1>Quản lý tài khoản</h1>
           </div>
-          <p>
-            Tài khoản đăng ký từ ứng dụng và tài khoản dùng trên web được quản lý
-            chung tại đây.
-          </p>
         </div>
 
         <div className="account-total-card">
@@ -259,14 +255,6 @@ export default function AccountManagement() {
       </div>
 
       <section className="account-filter-panel" aria-label="Bộ lọc tài khoản">
-        <div className="account-filter-heading">
-          <FaFilter />
-          <div>
-            <strong>Tìm kiếm tài khoản</strong>
-            <span>Ô nhập sẽ tự tìm khi bạn click ra ngoài.</span>
-          </div>
-        </div>
-
         <div className="account-filter-grid">
           <label className="account-filter-field">
             <span>Họ và Tên</span>
