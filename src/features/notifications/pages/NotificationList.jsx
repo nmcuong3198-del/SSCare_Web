@@ -6,6 +6,7 @@ import { IoWarning } from "react-icons/io5";
 import SearchBar from "@/features/notifications/components/list/header/SearchBar";
 import StatisticCard from "@/features/notifications/components/list/statistic/StatisticCard";
 import NotificationTable from "@/features/notifications/components/list/table/NotificationTable";
+import NotificationTimeSettings from "@/features/notifications/components/list/settings/NotificationTimeSettings";
 import notificationService from "@/features/notifications/services/notificationsService";
 import Pagination from "@/shared/components/ui/Pagination/Pagination";
 
@@ -108,6 +109,8 @@ export default function NotificationList() {
           </button>
         </div>
       </div>
+
+      <NotificationTimeSettings />
 
       <div className="statistic-grid">
         <StatisticCard

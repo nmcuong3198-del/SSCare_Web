@@ -19,6 +19,12 @@ const notificationsService = {
       },
     });
   },
+  getTimeSettings() {
+    return axiosClient.get("/notifications/time-settings");
+  },
+  updateTimeSettings(payload) {
+    return axiosClient.put("/notifications/time-settings", payload);
+  },
   pushNotification(payload){
     // Firebase delivery is an outbound network call from Backend -> Google and
     // may take longer than ordinary CRUD APIs. Keep this timeout isolated to
