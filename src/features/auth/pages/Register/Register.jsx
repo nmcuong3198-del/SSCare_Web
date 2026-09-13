@@ -37,8 +37,13 @@ const INITIAL_FORM = {
 };
 
 const FULL_NAME_PATTERN = /^[\p{L}\p{M} ]+$/u;
+const INVALID_FULL_NAME_CHAR_PATTERN = /[^\p{L}\p{M} ]/gu;
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const OTP_PATTERN = /^\d{6}$/;
+
+function sanitizeFullName(value) {
+  return value.replace(INVALID_FULL_NAME_CHAR_PATTERN, "").slice(0, 100);
+}
 
 function normalizePhoneDigits(value) {
   return value.replace(/\D/g, "");
@@ -63,6 +68,7 @@ function getLatestAllowedParentBirthDate(referenceDate = new Date()) {
 export default function Register() {
   const navigate = useNavigate();
   const otpInputRef = useRef(null);
+  const fullNameComposingRef = useRef(false);
 
   const [step, setStep] = useState(0);
   const [role, setRole] = useState("MOTHER");
@@ -176,13 +182,14 @@ export default function Register() {
     const { name, value } = event.target;
     let nextValue = value;
 
-    // Do not sanitize fullName while typing. Vietnamese mobile keyboards
-    // (Gboard/Samsung/iOS) may still be composing a character with accents.
-    // Replacing the controlled value during composition can drop the
-    // neighbouring/base character (e.g. typing "Lê" may become "ê").
-    // maxLength on the input and FULL_NAME_PATTERN validation below are
-    // sufficient to enforce the 100-character/name rules safely.
-    if (name === "displayName") {
+    // Mirror the App rule: Họ và tên chỉ nhận chữ cái tiếng Việt/Latin
+    // và khoảng trắng. Khi bàn phím đang ghép dấu (IME composition), giữ
+    // nguyên giá trị tạm thời để tránh lỗi "Lê" thành "ê", sau đó lọc ở
+    // onCompositionEnd.
+    if (name === "fullName") {
+      const isComposing = fullNameComposingRef.current || event.nativeEvent?.isComposing;
+      nextValue = isComposing ? value : sanitizeFullName(value);
+    } else if (name === "displayName") {
       nextValue = value.slice(0, 100);
     }
 
@@ -213,10 +220,10 @@ export default function Register() {
 
     const currentCheck = identityChecks[field];
     if (
-      !force &&
-      currentCheck.checkedValue === value &&
-      !currentCheck.checking &&
-      !currentCheck.error
+        !force &&
+        currentCheck.checkedValue === value &&
+        !currentCheck.checking &&
+        !currentCheck.error
     ) {
       return true;
     }
@@ -514,6 +521,14 @@ export default function Register() {
                             autoComplete="name"
                             value={form.fullName}
                             onChange={updateField}
+                            onCompositionStart={() => {
+                              fullNameComposingRef.current = true;
+                            }}
+                            onCompositionEnd={(event) => {
+                              fullNameComposingRef.current = false;
+                              const nextValue = sanitizeFullName(event.currentTarget.value);
+                              setForm((current) => ({ ...current, fullName: nextValue }));
+                            }}
                             placeholder="Nhập họ và tên của bạn"
                             maxLength={100}
                         />
@@ -692,11 +707,11 @@ export default function Register() {
                       type="submit"
                       className="register-primary-btn"
                       disabled={
-                        loading ||
-                        identityChecking ||
-                        hasIdentityAvailabilityError ||
-                        !acceptedPolicies ||
-                        isParentAgeInvalid
+                          loading ||
+                          identityChecking ||
+                          hasIdentityAvailabilityError ||
+                          !acceptedPolicies ||
+                          isParentAgeInvalid
                       }
                       title={
                         isParentAgeInvalid
