@@ -10,7 +10,7 @@
 }
 
 .author-profile-modal {
-  width: min(560px, 100%);
+  width: min(600px, 100%);
   overflow: hidden;
   border: 1px solid #e1e8f2;
   border-radius: 18px;
@@ -186,10 +186,11 @@
 }
 
 .author-verified-option small {
-  max-width: 350px;
+  max-width: none;
   color: #8490a4;
   font-size: 11px;
   line-height: 1.45;
+  white-space: nowrap;
 }
 
 .author-verified-switch {
@@ -283,4 +284,5 @@
   .author-profile-modal-backdrop { padding: 12px; }
   .author-profile-account-card { grid-template-columns: 1fr; }
   .author-verified-option { align-items: flex-start; }
+  .author-verified-option small { white-space: normal; }
 }

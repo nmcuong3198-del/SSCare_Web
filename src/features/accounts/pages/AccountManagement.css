@@ -92,7 +92,8 @@
 
 .account-filter-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  align-items: end;
   gap: 12px;
 }
 
@@ -133,6 +134,33 @@
 
 .account-filter-field .ss-select__trigger {
   height: 42px;
+}
+
+.account-search-button {
+  display: inline-flex;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+.account-search-button:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.account-search-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .account-alert {
@@ -220,6 +248,7 @@
 
 @media (max-width: 980px) {
   .account-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .account-search-button { width: 100%; }
 }
 
 @media (max-width: 720px) {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCheckCircle, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
+import { FaCheckCircle, FaSearch, FaShieldAlt, FaUserEdit, FaUsers } from "react-icons/fa";
 
 import AuthorProfileModal from "@/features/accounts/components/AuthorProfileModal";
 import accountAdminService from "@/features/accounts/services/accountAdminService";
@@ -63,7 +63,7 @@ export default function AccountManagement() {
   const [emailInput, setEmailInput] = useState("");
   const [phoneInput, setPhoneInput] = useState("");
 
-  // Giá trị thực sự dùng để gọi API. Text chỉ được áp dụng khi onBlur.
+  // Giá trị thực sự dùng để gọi API. Text chỉ được áp dụng khi bấm Tìm kiếm.
   const [fullNameFilter, setFullNameFilter] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
   const [phoneFilter, setPhoneFilter] = useState("");
@@ -122,33 +122,25 @@ export default function AccountManagement() {
     };
   }, [page, fullNameFilter, emailFilter, phoneFilter, roleFilter]);
 
-  /**
-   * Áp dụng một điều kiện text khi người dùng rời khỏi ô nhập.
-   * @param {"fullName"|"email"|"phone"} field
-   * @param {string} value
-   */
-  const applyTextFilter = (field, value) => {
-    const normalized = value.trim();
-    const currentValue =
-      field === "fullName"
-        ? fullNameFilter
-        : field === "email"
-          ? emailFilter
-          : phoneFilter;
+  const handleSearch = () => {
+    const nextFullName = fullNameInput.trim();
+    const nextEmail = emailInput.trim();
+    const nextPhone = phoneInput.trim();
 
-    if (normalized === currentValue) return;
+    if (
+      nextFullName === fullNameFilter &&
+      nextEmail === emailFilter &&
+      nextPhone === phoneFilter
+    ) {
+      return;
+    }
 
     setLoading(true);
     setError("");
     setPage(0);
-
-    if (field === "fullName") {
-      setFullNameFilter(normalized);
-    } else if (field === "email") {
-      setEmailFilter(normalized);
-    } else {
-      setPhoneFilter(normalized);
-    }
+    setFullNameFilter(nextFullName);
+    setEmailFilter(nextEmail);
+    setPhoneFilter(nextPhone);
   };
 
   /** @param {string} nextRole */
@@ -261,7 +253,9 @@ export default function AccountManagement() {
             <input
               value={fullNameInput}
               onChange={(event) => setFullNameInput(event.target.value)}
-              onBlur={(event) => applyTextFilter("fullName", event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") handleSearch();
+              }}
               placeholder="Nhập họ và tên..."
             />
           </label>
@@ -272,7 +266,9 @@ export default function AccountManagement() {
               type="email"
               value={emailInput}
               onChange={(event) => setEmailInput(event.target.value)}
-              onBlur={(event) => applyTextFilter("email", event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") handleSearch();
+              }}
               placeholder="Nhập email..."
             />
           </label>
@@ -282,7 +278,9 @@ export default function AccountManagement() {
             <input
               value={phoneInput}
               onChange={(event) => setPhoneInput(event.target.value)}
-              onBlur={(event) => applyTextFilter("phone", event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") handleSearch();
+              }}
               placeholder="Nhập số điện thoại..."
             />
           </label>
@@ -297,6 +295,16 @@ export default function AccountManagement() {
               ariaLabel="Lọc theo vai trò"
             />
           </div>
+
+          <button
+            type="button"
+            className="account-search-button"
+            onClick={handleSearch}
+            disabled={loading}
+          >
+            <FaSearch aria-hidden="true" />
+            Tìm kiếm
+          </button>
         </div>
       </section>
 
