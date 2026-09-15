@@ -32,6 +32,21 @@ const getNextOccurrenceForHour = (hour) => {
   return date;
 };
 
+const getDefaultScheduleForDate = (selectedDate) => {
+  const now = new Date();
+  const date = new Date(selectedDate);
+
+  // When the user picks a date before picking an hour, activate scheduled
+  // delivery automatically. Keep the default predictable: use the current
+  // hour for a future day, or the next full hour when the selected day is today.
+  date.setHours(now.getHours(), 0, 0, 0);
+  if (date.getTime() <= now.getTime()) {
+    date.setHours(date.getHours() + 1, 0, 0, 0);
+  }
+
+  return date;
+};
+
 const formatLocalDateTime = (date) => {
   const yyyy = date.getFullYear();
   const MM = String(date.getMonth() + 1).padStart(2, "0");
@@ -147,7 +162,12 @@ export default function NotificationForm({
   };
 
   const handleDateChange = (date) => {
-    if (!date || isSendNow) return;
+    if (!date) return;
+
+    if (isSendNow) {
+      updateScheduleTime(getDefaultScheduleForDate(date));
+      return;
+    }
 
     const next = new Date(currentScheduleDate);
     next.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
@@ -227,7 +247,7 @@ export default function NotificationForm({
                 minDate={startOfToday()}
                 dateFormat="dd/MM/yyyy"
                 showMonthYearDropdown
-                disabled={isSendNow || notificationSent}
+                disabled={notificationSent}
                 className="schedule-datepicker"
                 onChange={handleDateChange}
               />

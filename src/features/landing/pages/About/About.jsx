@@ -1,4 +1,4 @@
-import familyImage from "@/assets/landing/about-family.webp";
+import familyImage from "@/assets/landing/about-family.jpg";
 
 import "./About.css";
 

@@ -29,6 +29,9 @@ const notificationsService = {
     return axiosClient.get(`/notifications/recipients`, {
       params: { page, size },
     });
+  },
+  getRecipientRoles(){
+    return axiosClient.get(`/notifications/recipient-roles`);
   }
 }
 

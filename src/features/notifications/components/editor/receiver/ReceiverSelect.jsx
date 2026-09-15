@@ -6,6 +6,14 @@ import notificationsService from "@/features/notifications/services/notification
 import "./ReceiverSelect.css";
 
 const ALL_OPTION = { value: "ALL", label: "Tất cả người dùng" };
+const DEFAULT_ROLE_OPTIONS = [
+  { value: "ROLE:PARENT", label: "Phụ huynh" },
+  { value: "ROLE:EXPERT", label: "Chuyên gia" },
+  { value: "ROLE:ADMIN", label: "Quản trị viên" },
+  { value: "ROLE:CONTENT_EDITOR", label: "Biên tập nội dung" },
+  { value: "ROLE:NOTIFICATION_MANAGER", label: "Quản lý thông báo" },
+  { value: "ROLE:SUPPORT", label: "Hỗ trợ" },
+];
 const PAGE_SIZE = 100;
 
 const recipientLabel = (account) => {
@@ -20,6 +28,7 @@ const recipientLabel = (account) => {
 
 export default function ReceiverSelect({ notification, setNotification }) {
   const [recipientOptions, setRecipientOptions] = useState([]);
+  const [roleOptions, setRoleOptions] = useState(DEFAULT_ROLE_OPTIONS);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -63,7 +72,7 @@ export default function ReceiverSelect({ notification, setNotification }) {
       } catch (error) {
         if (!cancelled) {
           console.error("Không thể tải danh sách người nhận:", error);
-          setLoadError("Không thể tải danh sách người nhận.");
+          setLoadError("Không thể tải danh sách tài khoản cụ thể. Bạn vẫn có thể chọn nhóm người nhận.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -77,10 +86,50 @@ export default function ReceiverSelect({ notification, setNotification }) {
     };
   }, []);
 
-  const options = useMemo(
-    () => [ALL_OPTION, ...recipientOptions],
-    [recipientOptions],
-  );
+  useEffect(() => {
+    let cancelled = false;
+
+    notificationsService
+      .getRecipientRoles()
+      .then((roles) => {
+        if (cancelled || !Array.isArray(roles)) return;
+
+        const nextRoleOptions = roles
+          .filter((role) => role?.code)
+          .map((role) => ({
+            value: `ROLE:${String(role.code).trim().toUpperCase()}`,
+            label: String(role.name || role.code).trim(),
+          }));
+
+        if (nextRoleOptions.length > 0) {
+          setRoleOptions(nextRoleOptions);
+        }
+      })
+      .catch((error) => {
+        // Keep the built-in SSCare role list as a backward-compatible fallback
+        // when Web is deployed slightly before Backend.
+        console.error("Không thể tải danh sách nhóm người nhận:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const options = useMemo(() => [
+    {
+      label: "Phạm vi",
+      options: [ALL_OPTION],
+    },
+    {
+      label: "Nhóm người nhận",
+      options: roleOptions,
+    },
+    {
+      label: "Tài khoản cụ thể",
+      options: recipientOptions,
+    },
+  ], [recipientOptions, roleOptions]);
 
   const selectedValues = useMemo(() => {
     const recipients = Array.isArray(notification.recipients)
@@ -90,13 +139,22 @@ export default function ReceiverSelect({ notification, setNotification }) {
           .map((value) => value.trim())
           .filter(Boolean);
 
-    if (recipients.includes("ALL")) return [ALL_OPTION];
+    if (recipients.some((value) => String(value).toUpperCase() === "ALL")) {
+      return [ALL_OPTION];
+    }
 
-    const byValue = new Map(options.map((option) => [option.value, option]));
+    const allOptions = [ALL_OPTION, ...roleOptions, ...recipientOptions];
+    const byValue = new Map(allOptions.map((option) => [option.value, option]));
     return recipients
-      .map((value) => byValue.get(String(value)))
+      .map((value) => {
+        const rawValue = String(value);
+        const normalizedValue = rawValue.toUpperCase().startsWith("ROLE:")
+          ? rawValue.toUpperCase()
+          : rawValue;
+        return byValue.get(normalizedValue);
+      })
       .filter(Boolean);
-  }, [notification.recipients, options]);
+  }, [notification.recipients, recipientOptions, roleOptions]);
 
   const handleChange = (selectedOptions, actionMeta) => {
     const selected = Array.isArray(selectedOptions) ? selectedOptions : [];
@@ -126,12 +184,11 @@ export default function ReceiverSelect({ notification, setNotification }) {
         closeMenuOnSelect={false}
         hideSelectedOptions={false}
         isLoading={loading}
-        isDisabled={loading && recipientOptions.length === 0}
         options={options}
         value={selectedValues}
         onChange={handleChange}
-        placeholder={loading ? "Đang tải người nhận..." : "Chọn người nhận..."}
-        noOptionsMessage={() => loadError || "Không tìm thấy người dùng"}
+        placeholder={loading ? "Đang tải người nhận..." : "Chọn nhóm hoặc người nhận..."}
+        noOptionsMessage={() => loadError || "Không tìm thấy người nhận"}
         classNamePrefix="react-select"
         menuPortalTarget={document.body}
         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
