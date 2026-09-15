@@ -5,6 +5,7 @@ import "./SessionTimeout.css";
 
 const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const WARNING_BEFORE_MS = 60 * 1000;
+const ADMIN_SESSION_CHECK_MS = 10 * 1000;
 // const IDLE_TIMEOUT_MS = 2 * 60 * 1000;
 // const WARNING_BEFORE_MS = 30 * 1000;
 const ACTIVITY_EVENTS = [
@@ -114,6 +115,35 @@ export default function SessionTimeout() {
 
     return () => window.removeEventListener("auth:logout", handleForcedLogout);
   }, [logout]);
+
+  useEffect(() => {
+    if (!authService.isAuthenticated() || !authService.isAdmin()) {
+      return undefined;
+    }
+
+    let stopped = false;
+
+    const checkAdminSession = async () => {
+      try {
+        await authService.validateSession();
+      } catch {
+        // Axios interceptor handles AUTH_SESSION_REPLACED and emits auth:logout.
+        // Other transient errors are ignored so a short network outage does not log Admin out.
+      }
+    };
+
+    checkAdminSession();
+    const interval = window.setInterval(() => {
+      if (!stopped) {
+        checkAdminSession();
+      }
+    }, ADMIN_SESSION_CHECK_MS);
+
+    return () => {
+      stopped = true;
+      window.clearInterval(interval);
+    };
+  }, [location.pathname]);
 
   if (!showWarning) {
     return null;

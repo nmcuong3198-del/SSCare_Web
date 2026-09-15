@@ -38,11 +38,11 @@ export default function SendSuccessModal({
           {isScheduled ? "Đã lên lịch gửi thông báo" : "Gửi thông báo thành công"}
         </h2>
 
-        <p className="success-modal-desc">
-          {isScheduled
-            ? `Thông báo sẽ được backend tự động gửi tới người dùng vào ${formatTime(scheduleTime)}.`
-            : "Thông báo đã được gửi qua Firebase tới các thiết bị Android/iOS đang hoạt động của người nhận."}
-        </p>
+        {isScheduled && (
+          <p className="success-modal-desc">
+            {`Thông báo sẽ được backend tự động gửi tới người dùng vào ${formatTime(scheduleTime)}.`}
+          </p>
+        )}
 
         <div className="success-modal-actions">
           <button className="success-btn btn-primary" onClick={onBackToList}>

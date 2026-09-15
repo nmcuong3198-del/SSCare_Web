@@ -69,6 +69,17 @@ axiosClient.interceptors.response.use(
     const originalRequest = error.config;
     const refreshToken = authStorage.getItem(authStorage.keys.refreshToken);
     const isAuthRequest = originalRequest?.url?.includes("/v1/auth/");
+    const problemCode = error.response?.data?.code;
+
+    // ADMIN chỉ được có một phiên đăng nhập. Khi một nơi khác đăng nhập thành công,
+    // backend trả mã riêng để phiên cũ thoát ngay, không thử refresh token nữa.
+    if (error.response?.status === 401 && problemCode === "AUTH_SESSION_REPLACED") {
+      clearSession();
+      window.dispatchEvent(
+        new CustomEvent("auth:logout", { detail: { reason: "replaced" } }),
+      );
+      return Promise.reject(error);
+    }
 
     if (
       error.response?.status === 401 &&
@@ -97,8 +108,15 @@ axiosClient.interceptors.response.use(
         return axiosClient(originalRequest);
       } catch (refreshError) {
         clearSession();
+        const refreshProblemCode = refreshError.response?.data?.code;
         window.dispatchEvent(
-          new CustomEvent("auth:logout", { detail: { reason: "expired" } }),
+          new CustomEvent("auth:logout", {
+            detail: {
+              reason: refreshProblemCode === "AUTH_SESSION_REPLACED"
+                ? "replaced"
+                : "expired",
+            },
+          }),
         );
         return Promise.reject(refreshError);
       }

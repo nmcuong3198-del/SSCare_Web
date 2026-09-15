@@ -115,12 +115,53 @@
 .notification-title-input {
   box-sizing: border-box;
   width: 100%;
-  padding: 10px 14px;
+  padding: 10px 48px 10px 14px;
   border: 1px solid #ced4da;
   border-radius: 6px;
   outline: none;
   font-size: 15px;
   transition: border-color 0.2s;
+}
+
+
+.notification-title-wrapper {
+  position: relative;
+}
+
+.title-emoji-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.title-emoji-button:hover {
+  background: #f1f5f9;
+}
+
+.title-emoji-button:focus-visible {
+  outline: 2px solid #4dabf7;
+  outline-offset: 2px;
+}
+
+.title-emoji-picker-wrapper {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 110;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .notification-title-input:focus {

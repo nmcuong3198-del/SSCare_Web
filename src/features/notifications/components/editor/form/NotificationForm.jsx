@@ -13,6 +13,7 @@ import ReceiverSelect from "@/features/notifications/components/editor/receiver/
 import "./NotificationForm.css";
 
 const MAX_LENGTH = 1000;
+const TITLE_MAX_LENGTH = 100;
 const SEND_NOW_VALUE = "NOW";
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => hour);
 
@@ -73,7 +74,10 @@ export default function NotificationForm({
   notificationSent = false,
 }) {
   const [showEmoji, setShowEmoji] = useState(false);
+  const [showTitleEmoji, setShowTitleEmoji] = useState(false);
   const emojiRef = useRef(null);
+  const titleEmojiRef = useRef(null);
+  const titleInputRef = useRef(null);
 
   const scheduledDate = parseScheduleDate(notification.scheduleTime);
   const isSendNow = !scheduledDate;
@@ -115,6 +119,12 @@ export default function NotificationForm({
       if (emojiRef.current && !emojiRef.current.contains(event.target)) {
         setShowEmoji(false);
       }
+      if (
+        titleEmojiRef.current &&
+        !titleEmojiRef.current.contains(event.target)
+      ) {
+        setShowTitleEmoji(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -124,6 +134,28 @@ export default function NotificationForm({
   const handleEmojiClick = (emojiData) => {
     editor?.chain().focus().insertContent(emojiData.emoji).run();
     setShowEmoji(false);
+  };
+
+  const handleTitleEmojiClick = (emojiData) => {
+    const input = titleInputRef.current;
+    const currentTitle = notification.title || "";
+    const selectionStart = input?.selectionStart ?? currentTitle.length;
+    const selectionEnd = input?.selectionEnd ?? selectionStart;
+    const nextTitle = `${currentTitle.slice(0, selectionStart)}${emojiData.emoji}${currentTitle.slice(selectionEnd)}`;
+
+    if (nextTitle.length > TITLE_MAX_LENGTH) return;
+
+    setNotification((prev) => ({
+      ...prev,
+      title: nextTitle,
+    }));
+    setShowTitleEmoji(false);
+
+    const nextCaret = selectionStart + emojiData.emoji.length;
+    requestAnimationFrame(() => {
+      titleInputRef.current?.focus();
+      titleInputRef.current?.setSelectionRange(nextCaret, nextCaret);
+    });
   };
 
   const handleTitleChange = (event) => {
@@ -182,32 +214,62 @@ export default function NotificationForm({
       <div className="card-body">
         <div className="title-section">
           <label htmlFor="notification-title">Tiêu đề thông báo</label>
-          <input
-            id="notification-title"
-            type="text"
-            className="notification-title-input"
-            placeholder="Nhập tiêu đề thông báo..."
-            value={notification.title || ""}
-            maxLength={100}
-            onChange={handleTitleChange}
-          />
+
+          <div className="notification-title-wrapper" ref={titleEmojiRef}>
+            <input
+              ref={titleInputRef}
+              id="notification-title"
+              type="text"
+              className="notification-title-input"
+              placeholder="Nhập tiêu đề thông báo..."
+              value={notification.title || ""}
+              maxLength={TITLE_MAX_LENGTH}
+              onChange={handleTitleChange}
+            />
+
+            <button
+              type="button"
+              className="title-emoji-button"
+              aria-label="Chèn biểu tượng vào tiêu đề"
+              title="Chèn biểu tượng"
+              onClick={() => {
+                setShowTitleEmoji((visible) => !visible);
+                setShowEmoji(false);
+              }}
+            >
+              😊
+            </button>
+
+            {showTitleEmoji && (
+              <div className="title-emoji-picker-wrapper">
+                <EmojiPicker
+                  width={320}
+                  height={380}
+                  onEmojiClick={handleTitleEmojiClick}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="editor-section">
           <label>Nội dung thông báo</label>
 
           <div className="notification-editor">
-            <div className="noti-editor-header">
+            <div className="noti-editor-header" ref={emojiRef}>
               <button
                 type="button"
                 className="emoji-button"
-                onClick={() => setShowEmoji(!showEmoji)}
+                onClick={() => {
+                  setShowEmoji((visible) => !visible);
+                  setShowTitleEmoji(false);
+                }}
               >
                 😊
               </button>
 
               {showEmoji && (
-                <div className="emoji-picker-wrapper" ref={emojiRef}>
+                <div className="emoji-picker-wrapper">
                   <EmojiPicker
                     width={320}
                     height={380}

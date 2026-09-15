@@ -8,7 +8,7 @@ import {
   FaUser,
   FaUserPlus,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
@@ -16,11 +16,16 @@ import { createConnectionError, getApiErrorMessage } from "@/shared/utils/apiErr
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
-  const [loginError, setLoginError] = useState("");
+  const [loginError, setLoginError] = useState(() =>
+    location.state?.logoutReason === "replaced"
+      ? "Tài khoản Admin đã được đăng nhập ở nơi khác. Phiên đăng nhập trước đã kết thúc."
+      : "",
+  );
   const [form, setForm] = useState(() => {
     const rememberedLogin = authService.getRememberedLogin();
 

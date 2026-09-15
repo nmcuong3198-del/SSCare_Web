@@ -93,6 +93,10 @@ const authService = {
     });
   },
 
+  validateSession() {
+    return axiosClient.get("/v1/auth/me");
+  },
+
   logout() {
     authStorage.clear();
   },
