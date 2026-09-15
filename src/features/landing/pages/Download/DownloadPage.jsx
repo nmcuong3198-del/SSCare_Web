@@ -82,10 +82,7 @@ export default function DownloadPage() {
             Ứng dụng chính thức
           </span>
 
-          <h1 id="app-download-title">
-            Tải ứng dụng SSCare
-            <span>ngay</span>
-          </h1>
+          <h1 id="app-download-title">Tải ứng dụng SSCare ngay</h1>
 
           <p id="app-download-description">
             Bắt đầu hành trình kết nối và phát triển cùng gia đình bạn.

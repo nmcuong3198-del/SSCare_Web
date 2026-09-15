@@ -39,7 +39,7 @@ export default function PostEditor() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [comments, setComments] = useState([]);
-  const [commentsLoading, setCommentsLoading] = useState(Boolean(code));
+  const [commentsLoading, setCommentsLoading] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   const requestInFlightRef = useRef(false);
@@ -57,7 +57,7 @@ export default function PostEditor() {
   }, [code]);
 
   const loadComments = useCallback(async () => {
-    if (!code) return;
+    if (!code || article.status !== "published") return;
 
     try {
       setCommentsLoading(true);
@@ -69,12 +69,20 @@ export default function PostEditor() {
     } finally {
       setCommentsLoading(false);
     }
-  }, [code, fetchComments]);
+  }, [article.status, code, fetchComments]);
 
   useEffect(() => {
-    if (!code) return undefined;
+    if (!code || article.status !== "published") {
+      return undefined;
+    }
 
     let cancelled = false;
+
+    // Defer the loading-state update so this effect does not synchronously
+    // call setState, which is disallowed by react-hooks/set-state-in-effect.
+    Promise.resolve().then(() => {
+      if (!cancelled) setCommentsLoading(true);
+    });
 
     fetchComments()
         .then((data) => {
@@ -93,7 +101,7 @@ export default function PostEditor() {
     return () => {
       cancelled = true;
     };
-  }, [code, fetchComments]);
+  }, [article.status, code, fetchComments]);
 
   useEffect(() => {
     if (!code) return undefined;
@@ -449,7 +457,7 @@ export default function PostEditor() {
           </div>
         </div>
 
-        {isExisting && (
+        {isExisting && article.status === "published" && (
             <ArticleCommentsPanel
                 comments={comments}
                 loading={commentsLoading}

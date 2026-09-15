@@ -10,7 +10,8 @@
 }
 
 .approve-modal{
-    width:430px;
+    width:520px;
+    max-width:calc(100vw - 32px);
     background:#fff;
     border-radius:18px;
     padding:38px 36px;
@@ -43,6 +44,7 @@
     color:#5F6472;
     line-height:1.7;
     font-size:16px;
+    white-space:nowrap;
 }
 
 .backToListPost{
@@ -73,4 +75,14 @@
 
 .text-btn:hover{
     color:#111827;
+}
+@media (max-width: 560px){
+    .approve-modal{
+        width:calc(100vw - 32px);
+        padding:32px 24px;
+    }
+
+    .approve-modal p{
+        white-space:normal;
+    }
 }

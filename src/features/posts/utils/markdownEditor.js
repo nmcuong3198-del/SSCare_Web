@@ -43,7 +43,19 @@ function renderInline(value) {
 }
 
 function isUnorderedList(line) { return /^\s*[-+*]\s+/.test(line); }
-function isOrderedList(line) { return /^\s*\d+[.)]\s+/.test(line); }
+function parseOrderedListItem(line) {
+  const match = /^\s*(\d+)[.)]\s+(.+)$/.exec(String(line ?? ""));
+  if (!match) return null;
+
+  const number = Number(match[1]);
+  if (!Number.isSafeInteger(number) || number < 1) return null;
+
+  return {
+    number,
+    content: match[2],
+  };
+}
+function isOrderedList(line) { return parseOrderedListItem(line) !== null; }
 function isBlockStart(line) {
   const trimmed = line.trim();
   return /^#{1,3}\s+/.test(trimmed) || /^>\s?/.test(trimmed) || isUnorderedList(line) || isOrderedList(line) || ALIGN_OPEN_RE.test(trimmed) || IMAGE_RE.test(trimmed);
@@ -105,8 +117,24 @@ export function markdownToHtml(markdown = "") {
 
     if (isOrderedList(line)) {
       const items = [];
-      while (index < lines.length && isOrderedList(lines[index])) { items.push(lines[index].replace(/^\s*\d+[.)]\s+/, "")); index += 1; }
-      html.push(`<ol>${items.map((item) => `<li>${renderInline(item)}</li>`).join("")}</ol>`); continue;
+      while (index < lines.length && isOrderedList(lines[index])) {
+        const item = parseOrderedListItem(lines[index]);
+        if (item) items.push(item);
+        index += 1;
+      }
+
+      const start = items[0]?.number ?? 1;
+      const startAttribute = start === 1 ? "" : ` start="${start}"`;
+      const itemHtml = items.map((item, itemIndex) => {
+        const expectedNumber = start + itemIndex;
+        const valueAttribute = item.number === expectedNumber
+          ? ""
+          : ` value="${item.number}"`;
+        return `<li${valueAttribute}>${renderInline(item.content)}</li>`;
+      }).join("");
+
+      html.push(`<ol${startAttribute}>${itemHtml}</ol>`);
+      continue;
     }
 
     const paragraphLines = [trimmed]; index += 1;
@@ -136,7 +164,14 @@ export function clipboardHtmlToEditorHtml(html = "") {
     if (tag === "BR") return "<br>";
     if (["P", "DIV", "BLOCKQUOTE", "UL", "OL", "LI", "H1", "H2", "H3"].includes(tag)) {
       const align = style?.textAlign;
-      return `<${tag.toLowerCase()}${align ? ` style="text-align:${escapeAttribute(align)}"` : ""}>${wrapped}</${tag.toLowerCase()}>`;
+      const alignAttribute = align ? ` style="text-align:${escapeAttribute(align)}"` : "";
+      const startAttribute = tag === "OL" && /^\d+$/.test(node.getAttribute("start") || "")
+        ? ` start="${escapeAttribute(node.getAttribute("start"))}"`
+        : "";
+      const valueAttribute = tag === "LI" && /^\d+$/.test(node.getAttribute("value") || "")
+        ? ` value="${escapeAttribute(node.getAttribute("value"))}"`
+        : "";
+      return `<${tag.toLowerCase()}${startAttribute}${valueAttribute}${alignAttribute}>${wrapped}</${tag.toLowerCase()}>`;
     }
     return wrapped;
   };
@@ -160,7 +195,23 @@ function wrapAlignment(markdown, node) {
 }
 function serializeList(node, ordered) {
   const items = Array.from(node.children ?? []).filter((child) => child.tagName === "LI");
-  return items.map((item, index) => `${ordered ? `${index + 1}.` : "-"} ${serializeChildren(item).replace(/\n{2,}/g, "\n").trim()}`).join("\n");
+  if (!ordered) {
+    return items
+      .map((item) => `- ${serializeChildren(item).replace(/\n{2,}/g, "\n").trim()}`)
+      .join("\n");
+  }
+
+  const parsedStart = Number(node.getAttribute?.("start"));
+  let nextNumber = Number.isSafeInteger(parsedStart) && parsedStart > 0 ? parsedStart : 1;
+
+  return items.map((item) => {
+    const explicitValue = Number(item.getAttribute?.("value"));
+    const number = Number.isSafeInteger(explicitValue) && explicitValue > 0
+      ? explicitValue
+      : nextNumber;
+    nextNumber = number + 1;
+    return `${number}. ${serializeChildren(item).replace(/\n{2,}/g, "\n").trim()}`;
+  }).join("\n");
 }
 function serializeNode(node) {
   if (!node) return "";

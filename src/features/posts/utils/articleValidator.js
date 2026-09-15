@@ -93,11 +93,7 @@ export function validateArticle(article, imageFile, { requireQuality = true } = 
     }
     ids.add(section.id);
 
-    if (!hasText(section.title)) {
-      toast.error("Tiêu đề mục nội dung không được để trống.");
-      return false;
-    }
-    if (section.title.trim().length > 100) {
+    if (hasText(section.title) && section.title.trim().length > 100) {
       toast.error("Tiêu đề mục nội dung tối đa 100 ký tự.");
       return false;
     }
@@ -113,6 +109,10 @@ export function validateArticle(article, imageFile, { requireQuality = true } = 
 
   if (!hasText(article.conclusion)) {
     toast.error("Vui lòng nhập lời kết.");
+    return false;
+  }
+  if (markdownPlainTextLength(article.conclusion) > 500) {
+    toast.error("Lời kết tối đa 500 ký tự.");
     return false;
   }
 
