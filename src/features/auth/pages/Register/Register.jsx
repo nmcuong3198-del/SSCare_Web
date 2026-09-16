@@ -1,6 +1,6 @@
 import "./Register.css";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FaArrowLeft,
   FaBirthdayCake,
@@ -17,6 +17,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 import authService from "@/features/auth/services/authService";
+import legalService from "@/features/legal/services/legalService";
 import ServerUnavailableModal from "@/shared/components/ui/ServerUnavailableModal/ServerUnavailableModal";
 import { createConnectionError, getApiErrorMessage } from "@/shared/utils/apiError";
 
@@ -84,6 +85,9 @@ export default function Register() {
   const [now, setNow] = useState(null);
   const [success, setSuccess] = useState(false);
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
+  const [legalDocuments, setLegalDocuments] = useState(null);
+  const [legalLoading, setLegalLoading] = useState(true);
+  const [legalError, setLegalError] = useState("");
   const identityCheckSequence = useRef({ email: 0, phone: 0 });
   const [identityChecks, setIdentityChecks] = useState({
     email: { checking: false, checkedValue: "", error: "" },
@@ -94,6 +98,9 @@ export default function Register() {
   const todayDate = formatDateInputValue(new Date());
   const isParentAgeInvalid = Boolean(
       form.dateOfBirth && form.dateOfBirth > latestAllowedParentBirthDate,
+  );
+  const hasCurrentLegalVersions = Boolean(
+      legalDocuments?.termsOfUse?.id && legalDocuments?.privacyPolicy?.id,
   );
 
   const fieldErrors = useMemo(() => {
@@ -143,6 +150,40 @@ export default function Register() {
 
     return errors;
   }, [form, latestAllowedParentBirthDate]);
+
+  const loadLegalDocuments = useCallback(async ({ resetAcceptance = false } = {}) => {
+    setLegalLoading(true);
+    setLegalError("");
+
+    try {
+      const response = await legalService.getCurrentDocuments();
+      if (!response?.termsOfUse?.id || !response?.privacyPolicy?.id) {
+        setLegalDocuments(null);
+        setAcceptedPolicies(false);
+        setLegalError("Không thể tải Chính sách bảo mật và Điều khoản và điều kiện.");
+        return null;
+      }
+
+      setLegalDocuments(response);
+      if (resetAcceptance) setAcceptedPolicies(false);
+      return response;
+    } catch {
+      setLegalDocuments(null);
+      setAcceptedPolicies(false);
+      setLegalError("Không thể tải Chính sách bảo mật và Điều khoản và điều kiện.");
+      return null;
+    } finally {
+      setLegalLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadLegalDocuments();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [loadLegalDocuments]);
 
   const resendAvailableAt = challenge?.resendAvailableAt
       ? new Date(challenge.resendAvailableAt).getTime()
@@ -290,6 +331,13 @@ export default function Register() {
 
     if (!acceptedPolicies || Object.keys(fieldErrors).length > 0) return;
 
+    if (!hasCurrentLegalVersions) {
+      setErrorMessage(
+          legalError || "Không thể xác định phiên bản Chính sách bảo mật và Điều khoản và điều kiện.",
+      );
+      return;
+    }
+
     const [emailAvailable, phoneAvailable] = await Promise.all([
       checkIdentityAvailability("email", { force: true }),
       checkIdentityAvailability("phone", { force: true }),
@@ -306,6 +354,10 @@ export default function Register() {
         email: form.email.trim(),
         phone: form.phone.trim(),
         password: form.password,
+        legalConsent: {
+          termsVersionId: legalDocuments.termsOfUse.id,
+          privacyVersionId: legalDocuments.privacyPolicy.id,
+        },
       });
 
       setChallenge(response);
@@ -315,7 +367,15 @@ export default function Register() {
       setStep(2);
     } catch (error) {
       const code = error?.response?.data?.code;
-      if (code === "AUTH_EMAIL_EXISTS" || code === "AUTH_PHONE_EXISTS") {
+      if (code === "LEGAL_VERSION_OUTDATED") {
+        await loadLegalDocuments({ resetAcceptance: true });
+        setErrorMessage(
+            getApiErrorMessage(
+                error,
+                "Điều khoản hoặc chính sách đã được cập nhật. Vui lòng đọc và đồng ý lại.",
+            ),
+        );
+      } else if (code === "AUTH_EMAIL_EXISTS" || code === "AUTH_PHONE_EXISTS") {
         const field = code === "AUTH_EMAIL_EXISTS" ? "email" : "phone";
         const message = field === "email"
             ? "Email đã được sử dụng"
@@ -669,6 +729,7 @@ export default function Register() {
                       <input
                           type="checkbox"
                           checked={acceptedPolicies}
+                          disabled={legalLoading || !hasCurrentLegalVersions}
                           onChange={(event) => {
                             setAcceptedPolicies(event.target.checked);
                             if (errorMessage) setErrorMessage("");
@@ -699,6 +760,30 @@ export default function Register() {
                         Điều khoản và điều kiện
                       </Link>
                     </div>
+
+                    {legalLoading && (
+                        <div className="register-policy-status">Đang tải phiên bản chính sách...</div>
+                    )}
+                    {!legalLoading && legalError && (
+                        <div className="register-policy-status register-policy-status-error">
+                          {legalError}
+                          <button
+                              type="button"
+                              onClick={() => {
+                                void loadLegalDocuments();
+                              }}
+                          >
+                            Thử lại
+                          </button>
+                        </div>
+                    )}
+                    {!legalLoading && hasCurrentLegalVersions && (
+                        <div className="register-policy-status">
+                          Chính sách bảo mật v{legalDocuments.privacyPolicy.version}
+                          {" • "}
+                          Điều khoản v{legalDocuments.termsOfUse.version}
+                        </div>
+                    )}
                   </div>
 
                   {errorMessage && <div className="register-error-box">{errorMessage}</div>}
@@ -710,15 +795,19 @@ export default function Register() {
                           loading ||
                           identityChecking ||
                           hasIdentityAvailabilityError ||
+                          legalLoading ||
+                          !hasCurrentLegalVersions ||
                           !acceptedPolicies ||
                           isParentAgeInvalid
                       }
                       title={
                         isParentAgeInvalid
                             ? "Người dùng chưa đủ điều kiện độ tuổi để tạo tài khoản phụ huynh"
-                            : !acceptedPolicies
-                                ? "Vui lòng đồng ý với Chính sách bảo mật và Điều khoản và điều kiện"
-                                : undefined
+                            : legalLoading || !hasCurrentLegalVersions
+                                ? "Đang tải phiên bản Chính sách bảo mật và Điều khoản và điều kiện"
+                                : !acceptedPolicies
+                                    ? "Vui lòng đồng ý với Chính sách bảo mật và Điều khoản và điều kiện"
+                                    : undefined
                       }
                   >
                     {loading

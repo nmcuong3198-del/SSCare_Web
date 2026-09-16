@@ -153,3 +153,40 @@
     text-align: left;
   }
 }
+
+
+.legal-version {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+  color: #6b7890;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.legal-state {
+  padding: 24px 0;
+  color: #5f6d82;
+  text-align: center;
+}
+
+.legal-state p {
+  margin: 0 0 14px;
+  text-align: center;
+}
+
+.legal-state button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid #17458d;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #17458d;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.legal-state-error {
+  color: #9d2d2d;
+}

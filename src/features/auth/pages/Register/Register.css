@@ -613,3 +613,33 @@
   font-size: 12px;
   font-weight: 500;
 }
+
+
+.register-policy-consent input:disabled + .register-policy-check {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+
+.register-policy-status {
+  margin-top: 8px;
+  color: #6c7890;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.register-policy-status-error {
+  color: #a43a3a;
+}
+
+.register-policy-status button {
+  margin-left: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #17458d;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -31,6 +31,7 @@ const authService = {
       email: form.email?.trim(),
       phone: form.phone?.trim(),
       password: form.password,
+      legalConsent: form.legalConsent,
     });
   },
 
