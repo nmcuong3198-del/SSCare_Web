@@ -68,7 +68,9 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     const refreshToken = authStorage.getItem(authStorage.keys.refreshToken);
-    const isAuthRequest = originalRequest?.url?.includes("/v1/auth/");
+    const isAuthRequest =
+      originalRequest?.url?.includes("/v1/auth/") ||
+      originalRequest?.url?.includes("/v1/phone-otp/");
     const problemCode = error.response?.data?.code;
 
     // ADMIN chỉ được có một phiên đăng nhập. Khi một nơi khác đăng nhập thành công,

@@ -23,7 +23,7 @@ const authService = {
   },
 
   register(form) {
-    return axiosClient.post("/v1/auth/register", {
+    return axiosClient.post("/v1/phone-otp/register", {
       displayName: form.displayName?.trim(),
       fullName: form.fullName?.trim(),
       parentRelationCode: form.parentRelationCode,
@@ -36,7 +36,7 @@ const authService = {
   },
 
   resendRegistrationOtp(challengeId) {
-    return axiosClient.post("/v1/auth/resend-otp", { challengeId });
+    return axiosClient.post("/v1/phone-otp/resend", { challengeId });
   },
 
   requestPasswordReset(identity) {
@@ -65,7 +65,7 @@ const authService = {
   },
 
   async verifyRegistration({ challengeId, otp }) {
-    const authResponse = await axiosClient.post("/v1/auth/verify-registration", {
+    const authResponse = await axiosClient.post("/v1/phone-otp/verify-registration", {
       challengeId,
       otp,
       deviceLabel: "SSCare Web Registration",

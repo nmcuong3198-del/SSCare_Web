@@ -835,11 +835,11 @@ export default function Register() {
                   ) : (
                       <>
                         <div className="register-heading compact centered">
-                          <span className="register-heading-icon"><FaEnvelope /></span>
+                          <span className="register-heading-icon"><FaPhoneAlt /></span>
                           <div>
-                            <h1 id="register-title">Xác thực email</h1>
+                            <h1 id="register-title">Xác thực số điện thoại</h1>
                             <p>
-                              Nhập mã OTP 6 số đã gửi tới <strong>{challenge?.destination}</strong>.
+                              Nhập mã OTP 6 số đã gửi qua SMS tới <strong>{challenge?.destination}</strong>.
                             </p>
                           </div>
                         </div>
