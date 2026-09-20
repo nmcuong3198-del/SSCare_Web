@@ -14,6 +14,32 @@ const normalizeSessionUser = (authResponse) => {
   };
 };
 
+const normalizeAccount = (account = {}, sessionMeta = {}) => ({
+  ...account,
+  fullName: account.fullName || account.displayName,
+  username: account.email || account.phone,
+  ...sessionMeta,
+});
+
+const persistUpdatedAccount = (account, sessionMeta = {}) => {
+  const currentUser = (() => {
+    try {
+      return JSON.parse(authStorage.getItem(authStorage.keys.user) || "{}");
+    } catch {
+      return {};
+    }
+  })();
+
+  const user = normalizeAccount(
+    { ...currentUser, ...account },
+    sessionMeta,
+  );
+
+  authStorage.updateSession({ user });
+  window.dispatchEvent(new CustomEvent("auth:user-updated", { detail: user }));
+  return user;
+};
+
 const authService = {
   checkIdentityAvailability({ identityType, identity }) {
     return axiosClient.post("/v1/auth/check-identity", {
@@ -96,6 +122,40 @@ const authService = {
 
   validateSession() {
     return axiosClient.get("/v1/auth/me");
+  },
+
+  async getProfile() {
+    const account = await axiosClient.get("/v1/auth/me");
+    persistUpdatedAccount(account);
+    return account;
+  },
+
+  async updateProfile(profile) {
+    const account = await axiosClient.put("/v1/auth/me", {
+      displayName: profile.displayName?.trim(),
+      fullName: profile.fullName?.trim(),
+      parentRelationCode: profile.parentRelationCode,
+      dateOfBirth: profile.dateOfBirth,
+    });
+
+    persistUpdatedAccount(account);
+    return account;
+  },
+
+  async changePassword({ currentPassword, newPassword }) {
+    const authResponse = await axiosClient.post("/v1/auth/change-password", {
+      currentPassword,
+      newPassword,
+    });
+
+    const user = normalizeSessionUser(authResponse);
+    authStorage.updateSession({
+      user,
+      accessToken: authResponse?.accessToken,
+      refreshToken: authResponse?.refreshToken,
+    });
+    window.dispatchEvent(new CustomEvent("auth:user-updated", { detail: user }));
+    return authResponse;
   },
 
   logout() {

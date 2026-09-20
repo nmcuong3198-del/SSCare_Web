@@ -8,7 +8,7 @@ import "./UserMenu.css";
 
 export default function UserMenu({ onNavigate }) {
   const navigate = useNavigate();
-  const user = authService.getCurrentUser();
+  const [user, setUser] = useState(() => authService.getCurrentUser());
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -25,6 +25,15 @@ export default function UserMenu({ onNavigate }) {
     navigate("/");
     window.location.reload();
   };
+
+  useEffect(() => {
+    const handleUserUpdated = (event) => {
+      setUser(event.detail || authService.getCurrentUser());
+    };
+
+    window.addEventListener("auth:user-updated", handleUserUpdated);
+    return () => window.removeEventListener("auth:user-updated", handleUserUpdated);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

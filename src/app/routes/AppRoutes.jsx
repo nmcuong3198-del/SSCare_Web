@@ -6,6 +6,7 @@ import Login from "@/features/auth/pages/Login/Login";
 import ForgotPassword from "@/features/auth/pages/ForgotPassword/ForgotPassword";
 import Register from "@/features/auth/pages/Register/Register";
 import AccountManagement from "@/features/accounts/pages/AccountManagement";
+import Profile from "@/features/accounts/pages/Profile/Profile";
 import Home from "@/features/landing/pages/Home";
 import About from "@/features/landing/pages/About/About";
 import DownloadPage from "@/features/landing/pages/Download/DownloadPage";
@@ -29,6 +30,11 @@ export default function AppRoutes() {
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-use" element={<TermsOfUse />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Profile />} />
+        </Route>
 
         <Route element={<ProtectedRoute roles={["ADMIN", "CONTENT_EDITOR"]} />}>
           <Route path="/posts" element={<PostList />} />
