@@ -777,13 +777,6 @@ export default function Register() {
                           </button>
                         </div>
                     )}
-                    {!legalLoading && hasCurrentLegalVersions && (
-                        <div className="register-policy-status">
-                          Chính sách bảo mật v{legalDocuments.privacyPolicy.version}
-                          {" • "}
-                          Điều khoản v{legalDocuments.termsOfUse.version}
-                        </div>
-                    )}
                   </div>
 
                   {errorMessage && <div className="register-error-box">{errorMessage}</div>}
