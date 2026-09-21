@@ -41,12 +41,13 @@
 }
 
 .app-download-header h1 {
-  max-width: 620px;
+  width: 100%;
+  max-width: 100%;
   margin: 20px auto 10px;
   color: #062879;
-  font-size: clamp(42px, 5vw, 58px);
+  font-size: clamp(34px, 3.5vw, 48px);
   font-weight: 800;
-  letter-spacing: -2.1px;
+  letter-spacing: -1.8px;
   line-height: 1.05;
   white-space: nowrap;
 }
@@ -233,8 +234,8 @@
   }
 
   .app-download-header h1 {
-    font-size: clamp(24px, 7.5vw, 48px);
-    letter-spacing: -1.5px;
+    font-size: clamp(24px, 6vw, 40px);
+    letter-spacing: -1.2px;
   }
 
   .app-download-header p {
