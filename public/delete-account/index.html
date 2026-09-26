@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Trang yêu cầu xóa tài khoản và dữ liệu SSCare." />
+  <title>Yêu cầu xóa tài khoản | SSCare</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #075985;
+      --primary-strong: #0c4a6e;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --danger-soft: #fff7ed;
+      --danger-line: #fed7aa;
+      --ok: #166534;
+      --ok-soft: #f0fdf4;
+      --ok-line: #bbf7d0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #f0f9ff 0, #f8fafc 320px, #f8fafc 100%);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    a { color: var(--primary); }
+    .shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 64px; }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .mark {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: grid; place-items: center; background: var(--primary); color: white;
+      font-weight: 800; letter-spacing: -0.04em;
+      box-shadow: 0 10px 28px rgba(7, 89, 133, .22);
+    }
+    .brand strong { font-size: 20px; }
+    .brand span { display: block; color: var(--muted); font-size: 13px; margin-top: -2px; }
+    .card {
+      background: var(--surface); border: 1px solid rgba(226, 232, 240, .9);
+      border-radius: 24px; box-shadow: 0 18px 50px rgba(15, 23, 42, .08); overflow: hidden;
+    }
+    .hero { padding: 34px 34px 26px; border-bottom: 1px solid var(--line); }
+    h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0 0 12px; letter-spacing: -.03em; }
+    h2 { font-size: 20px; margin: 0 0 12px; }
+    p { margin: 0 0 14px; }
+    .lead { font-size: 17px; color: #334155; max-width: 760px; }
+    .content { padding: 30px 34px 36px; }
+    .notice {
+      background: var(--danger-soft); border: 1px solid var(--danger-line); border-radius: 16px;
+      padding: 16px 18px; margin-bottom: 24px; color: #7c2d12;
+    }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 28px; }
+    .step { border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--surface-soft); }
+    .step b { display: block; margin-bottom: 5px; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+      background: #e0f2fe; color: var(--primary-strong); font-weight: 800; margin-bottom: 10px;
+    }
+    form { margin: 24px 0 30px; padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+    label { display: block; font-weight: 700; margin-bottom: 8px; }
+    .hint { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+    .row { display: flex; gap: 10px; }
+    input[type="email"] {
+      min-width: 0; flex: 1; border: 1px solid #cbd5e1; border-radius: 12px;
+      padding: 13px 14px; font: inherit; outline: none;
+    }
+    input[type="email"]:focus { border-color: #38bdf8; box-shadow: 0 0 0 4px rgba(56, 189, 248, .14); }
+    button {
+      appearance: none; border: 0; border-radius: 12px; padding: 13px 18px; font: inherit;
+      font-weight: 800; background: var(--primary); color: white; cursor: pointer; white-space: nowrap;
+    }
+    button:hover { background: var(--primary-strong); }
+    button:disabled { opacity: .6; cursor: wait; }
+    .message { display: none; margin-top: 14px; border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+    .message.ok { display: block; background: var(--ok-soft); border: 1px solid var(--ok-line); color: var(--ok); }
+    .message.error { display: block; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .info { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 6px; }
+    ul { padding-left: 20px; margin: 10px 0 0; }
+    li + li { margin-top: 7px; }
+    footer { text-align: center; color: var(--muted); font-size: 13px; padding: 22px 12px 0; }
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 20px, 920px); padding-top: 20px; }
+      .hero, .content { padding-left: 20px; padding-right: 20px; }
+      .steps, .grid { grid-template-columns: 1fr; }
+      .row { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand" aria-label="SSCare">
+      <div class="mark">SS</div>
+      <div><strong>SSCare</strong><span>Hỗ trợ phụ huynh đồng hành cùng con</span></div>
+    </div>
+
+    <section class="card">
+      <div class="hero">
+        <h1>Yêu cầu xóa tài khoản SSCare</h1>
+        <p class="lead">Bạn có thể yêu cầu xóa tài khoản mà không cần đăng nhập hoặc cài lại ứng dụng.</p>
+      </div>
+
+      <div class="content">
+        <div class="notice">
+          <strong>Lưu ý:</strong> sau khi bạn xác nhận qua email, tài khoản sẽ ngừng hoạt động ngay và dữ liệu được lên lịch xóa vĩnh viễn trong vòng 30 ngày.
+        </div>
+
+        <h2>Cách thực hiện</h2>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><b>Nhập email</b>Dùng email đang liên kết với tài khoản SSCare cần xóa.</div>
+          <div class="step"><div class="step-num">2</div><b>Xác nhận qua email</b>SSCare gửi một liên kết xác nhận có thời hạn tới email đó.</div>
+          <div class="step"><div class="step-num">3</div><b>Xóa dữ liệu</b>Sau khi xác nhận, tài khoản bị vô hiệu hóa và dữ liệu được xóa theo lịch.</div>
+        </div>
+
+        <form id="deleteForm" novalidate>
+          <label for="email">Email tài khoản SSCare</label>
+          <div class="hint">Vì lý do bảo mật, trang này không cho biết một email có tồn tại trong hệ thống hay không.</div>
+          <div class="row">
+            <input id="email" name="email" type="email" maxlength="320" autocomplete="email" placeholder="vidu@email.com" required />
+            <button id="submitBtn" type="submit">Gửi yêu cầu xóa</button>
+          </div>
+          <div id="formMessage" class="message" role="status" aria-live="polite"></div>
+        </form>
+
+        <div class="grid info">
+          <div>
+            <h2>Dữ liệu được xóa</h2>
+            <ul>
+              <li>Thông tin tài khoản, danh tính đăng nhập, phiên đăng nhập và thông tin xác thực sinh trắc học trên hệ thống.</li>
+              <li>Dữ liệu cập nhật/check-in, số đo, chu kỳ, hành động và trạng thái đọc/lưu bài gắn riêng với tài khoản.</li>
+              <li>Hồ sơ con do tài khoản sở hữu nếu không còn thành viên SSCare khác đang cùng quản lý hồ sơ đó.</li>
+            </ul>
+          </div>
+          <div>
+            <h2>Dữ liệu có thể được giữ lại</h2>
+            <ul>
+              <li>Hồ sơ con đang được chia sẻ với thành viên SSCare khác có thể được giữ lại và chuyển quyền sở hữu cho thành viên còn lại.</li>
+              <li>Một số nhật ký bảo mật/kỹ thuật có thể tiếp tục được lưu ở dạng không còn tham chiếu trực tiếp tới tài khoản để phục vụ an toàn hệ thống.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info">
+          <h2>Cần hỗ trợ?</h2>
+          <p>Nếu không truy cập được email đã đăng ký, hãy liên hệ <a href="mailto:sscarevn@gmail.com?subject=H%E1%BB%97%20tr%E1%BB%A3%20x%C3%B3a%20t%C3%A0i%20kho%E1%BA%A3n%20SSCare">sscarevn@gmail.com</a>.</p>
+          <p><a href="/privacy-policy">Xem Chính sách quyền riêng tư của SSCare</a></p>
+        </div>
+      </div>
+    </section>
+
+    <footer>© 2026 SSCare</footer>
+  </main>
+
+  <script>
+    const form = document.getElementById('deleteForm');
+    const emailInput = document.getElementById('email');
+    const button = document.getElementById('submitBtn');
+    const message = document.getElementById('formMessage');
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = type === 'ok' ? 'message ok' : 'message error';
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+      }
+
+      button.disabled = true;
+      message.className = 'message';
+      message.textContent = '';
+
+      try {
+        const response = await fetch('/api/v1/account-safety/delete-account-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email: emailInput.value.trim() })
+        });
+
+        if (response.ok) {
+          showMessage(
+            'Nếu email này đang được dùng cho một tài khoản SSCare, chúng tôi sẽ gửi email xác nhận xóa tài khoản. Vui lòng kiểm tra cả thư mục Spam/Junk.',
+            'ok'
+          );
+          form.reset();
+        } else {
+          showMessage('Chưa thể gửi yêu cầu lúc này. Vui lòng thử lại sau hoặc liên hệ sscarevn@gmail.com.', 'error');
+        }
+      } catch (_) {
+        showMessage('Chưa thể gửi yêu cầu lúc này. Vui lòng thử lại sau hoặc liên hệ sscarevn@gmail.com.', 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
