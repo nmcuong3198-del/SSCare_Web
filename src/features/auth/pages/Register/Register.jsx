@@ -737,7 +737,7 @@ export default function Register() {
                       />
                       <span className="register-policy-check" aria-hidden="true" />
                       <span className="register-policy-text">
-                    Bạn đồng ý với Chính sách bảo mật và Điều khoản và điều kiện của chúng tôi.
+                    Tôi đã đọc và đồng ý với Chính sách bảo mật và Điều khoản và điều kiện của SSCare.
                   </span>
                     </label>
 

@@ -117,6 +117,7 @@ const authService = {
       identity: form.username?.trim(),
       password: form.password,
       deviceLabel: "SSCare Web",
+      clientType: "WEB",
     });
   },
 
