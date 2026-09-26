@@ -11,10 +11,14 @@ import ApproveSuccessModal from "@/features/posts/components/editor/popup/Approv
 import ArticlePreviewModal from "@/features/posts/components/editor/preview/ArticlePreviewModal";
 import RejectReasonModal from "@/features/posts/components/editor/popup/RejectReasonModal";
 import SubmitSuccessModal from "@/features/posts/components/editor/popup/SubmitSuccessModal";
+import ForbiddenWordResultModal from "@/features/posts/components/editor/popup/ForbiddenWordResultModal";
 import Sidebar from "@/features/posts/components/editor/sidebar/Sidebar";
 import { createEmptyArticle } from "@/features/posts/model/articleDefault";
 import articleService from "@/features/posts/services/articleService";
-import { createArticleFormData } from "@/features/posts/utils/articlePayload";
+import {
+  createArticleFormData,
+  createForbiddenWordCheckPayload,
+} from "@/features/posts/utils/articlePayload";
 import { canEditArticle } from "@/features/posts/utils/articlePermissions";
 import {
   getQualityTextSignature,
@@ -37,12 +41,14 @@ export default function PostEditor() {
   const [showRejectReasonModal, setShowRejectReasonModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [finalForbiddenResult, setFinalForbiddenResult] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   const requestInFlightRef = useRef(false);
+  const submitInFlightRef = useRef(false);
   const loadedRef = useRef(null);
   const articleRef = useRef(article);
 
@@ -196,9 +202,14 @@ export default function PostEditor() {
     setIsEditing(false);
   };
 
-  const persistArticle = async (status, { requireQuality = false } = {}) => {
+  const persistArticle = async (
+      status,
+      { requireQuality = false, articleOverride = null } = {},
+  ) => {
+    const sourceArticle = articleOverride ?? articleRef.current;
+
     if (
-        !validateArticle(article, imageFile, { requireQuality }) ||
+        !validateArticle(sourceArticle, imageFile, { requireQuality }) ||
         requestInFlightRef.current
     ) {
       return null;
@@ -208,7 +219,7 @@ export default function PostEditor() {
       requestInFlightRef.current = true;
       setLoading(true);
 
-      const formData = createArticleFormData(article, imageFile, { status });
+      const formData = createArticleFormData(sourceArticle, imageFile, { status });
 
       if (isExisting) {
         const updated = await articleService.update(code, formData);
@@ -306,13 +317,67 @@ export default function PostEditor() {
       toast.error("Vui lòng lưu bài viết trước khi gửi duyệt.");
       return;
     }
+    if (submitInFlightRef.current) return;
 
-    const saved = await persistArticle("pending", {
-      requireQuality: true,
-    });
+    const currentArticle = articleRef.current;
 
-    if (saved) {
-      setShowSubmitModal(true);
+    // Trước khi gửi duyệt, luôn kiểm tra lại toàn bộ nội dung hiện tại.
+    // Không dùng kết quả qualityChecked cũ vì bài viết có thể đã được lưu/chỉnh sửa
+    // hoặc danh sách từ cấm trên backend có thể đã thay đổi.
+    if (!validateArticle(currentArticle, imageFile, { requireQuality: false })) {
+      return;
+    }
+
+    try {
+      submitInFlightRef.current = true;
+      setLoading(true);
+
+      const result = await articleService.checkForbiddenWords(
+          createForbiddenWordCheckPayload(currentArticle),
+      );
+
+      if (result?.clean !== true) {
+        const nextArticle = {
+          ...currentArticle,
+          qualityChecked: false,
+        };
+        articleRef.current = nextArticle;
+        setArticle(nextArticle);
+        setFinalForbiddenResult(result);
+        setIsEditing(true);
+        toast.error("Bài viết còn từ/cụm từ cấm. Vui lòng chỉnh sửa trước khi gửi duyệt.");
+        return;
+      }
+
+      // Kết quả kiểm tra cuối cùng sạch: đánh dấu đúng chính nội dung vừa quét
+      // rồi mới tạo payload gửi sang backend. Backend vẫn kiểm tra lại một lần nữa.
+      const checkedArticle = {
+        ...currentArticle,
+        qualityChecked: true,
+      };
+      articleRef.current = checkedArticle;
+      setArticle(checkedArticle);
+      setFinalForbiddenResult(null);
+
+      const saved = await persistArticle("pending", {
+        requireQuality: true,
+        articleOverride: checkedArticle,
+      });
+
+      if (saved) {
+        setShowSubmitModal(true);
+      }
+    } catch (error) {
+      console.error("Không thể kiểm tra từ cấm trước khi gửi bài:", error);
+      toast.error(
+          getApiErrorMessage(
+              error,
+              "Không thể kiểm tra từ cấm trước khi gửi bài. Vui lòng thử lại.",
+          ),
+      );
+    } finally {
+      submitInFlightRef.current = false;
+      setLoading(false);
     }
   };
 
@@ -490,6 +555,12 @@ export default function PostEditor() {
             onClose={() => setShowPreview(false)}
             article={article}
             imageFile={imageFile}
+        />
+
+        <ForbiddenWordResultModal
+            open={Boolean(finalForbiddenResult)}
+            result={finalForbiddenResult}
+            onClose={() => setFinalForbiddenResult(null)}
         />
 
         <SubmitSuccessModal

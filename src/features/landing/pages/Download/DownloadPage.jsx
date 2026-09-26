@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { FaApple, FaGooglePlay } from "react-icons/fa";
-import { FiCheckCircle } from "react-icons/fi";
 
 import qrCode from "@/assets/landing/qr.png";
 
@@ -28,10 +27,7 @@ function StoreButton({ type, href, children }) {
       aria-label={isApple ? "Mở SSCare trên App Store" : "Mở SSCare trên Google Play"}
     >
       {isApple ? <FaApple aria-hidden="true" /> : <FaGooglePlay aria-hidden="true" />}
-      <span>
-        <small>{isApple ? "DOWNLOAD ON THE" : "GET IT ON"}</small>
-        <strong>{children}</strong>
-      </span>
+      <strong>{children}</strong>
     </a>
   );
 }
@@ -48,9 +44,6 @@ function DownloadOption({ type, title, href }) {
             {isApple ? <FaApple /> : <FaGooglePlay />}
           </span>
         </div>
-        <span className="app-download-qr-caption">
-          {isApple ? "Download on the App Store" : "Google Play Store"}
-        </span>
       </div>
 
       <p className="app-download-option-title">
@@ -77,15 +70,10 @@ export default function DownloadPage() {
         aria-describedby="app-download-description"
       >
         <header className="app-download-header">
-          <span className="app-download-official-badge">
-            <FiCheckCircle aria-hidden="true" />
-            Ứng dụng chính thức
-          </span>
-
           <h1 id="app-download-title">Tải ứng dụng SSCare ngay</h1>
 
           <p id="app-download-description">
-            Bắt đầu hành trình kết nối và phát triển cùng gia đình bạn.
+            Bắt đầu hành trình đồng hành cùng con tuổi dậy thì!
           </p>
         </header>
 
@@ -93,10 +81,6 @@ export default function DownloadPage() {
           <DownloadOption type="apple" title="App Store" href={APP_STORE_URL} />
           <DownloadOption type="google" title="Google Play" href={GOOGLE_PLAY_URL} />
         </div>
-
-        <footer className="app-download-quote">
-          “SSCare: Đồng hành cùng gia đình bạn trên hành trình trưởng thành.”
-        </footer>
       </section>
     </div>
   );
