@@ -51,7 +51,7 @@ export default function Footer() {
                 </a>
 
                 <div className="footer-info-row">
-                  <span>Số điện thoại: Đang cập nhật</span>
+                  <span>Số điện thoại: 0902155562</span>
                 </div>
 
                 <div className="footer-info-row">
