@@ -1,3 +1,4 @@
+import OperationalReport from '@/features/reports/pages/OperationalReport';
 import { Route, Routes } from "react-router-dom";
 
 import MainLayout from "@/app/layouts/MainLayout";
@@ -49,6 +50,7 @@ export default function AppRoutes() {
         </Route>
 
         <Route element={<ProtectedRoute roles={["ADMIN"]} />}>
+          <Route path="/report" element={<OperationalReport />} />
           <Route path="/accounts" element={<AccountManagement />} />
         </Route>
       </Route>

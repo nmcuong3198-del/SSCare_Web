@@ -8,6 +8,7 @@ const axiosClient = axios.create({
   baseURL,
   timeout: 10000,
   headers: {
+    "X-App-Platform": "WEB",
     "Content-Type": "application/json",
   },
 });
