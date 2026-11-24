@@ -13,6 +13,7 @@ const publicMenus = [
 const adminMenus = [
   { title: "Bài viết", path: "/posts" },
   { title: "Báo cáo", path: "/report" },
+  { title: "Xử lý báo cáo vi phạm", path: "/violation-reports" },
   { title: "Thông báo", path: "/notifications" },
   { title: "Tài khoản", path: "/accounts" },
 ];
@@ -23,7 +24,11 @@ const roleMenus = [
 ];
 
 export default function Navigation({ onNavigate }) {
-  const location = useLocation();
+  const { pathname } = useLocation();
+  return <NavigationMenu key={pathname} pathname={pathname} onNavigate={onNavigate} />;
+}
+
+function NavigationMenu({ pathname, onNavigate }) {
   const user = authService.getCurrentUser();
   const roles = user?.roles || [];
   const isAdmin = roles.includes("ADMIN");
@@ -41,10 +46,6 @@ export default function Navigation({ onNavigate }) {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  useEffect(() => {
-    setAdminOpen(false);
-  }, [location.pathname]);
-
   const handleNavigate = () => {
     setAdminOpen(false);
     onNavigate?.();
@@ -55,7 +56,7 @@ export default function Navigation({ onNavigate }) {
   );
 
   const isAdminSectionActive = adminMenus.some(
-    (menu) => location.pathname === menu.path || location.pathname.startsWith(`${menu.path}/`),
+    (menu) => pathname === menu.path || pathname.startsWith(`${menu.path}/`),
   );
 
   return (
