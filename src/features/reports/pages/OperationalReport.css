@@ -10,3 +10,13 @@
   .op-export .op-filters {display:grid;grid-template-columns:minmax(0,1fr)}
   .op-export {padding:20px 14px}
 }
+
+.op-file-download {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 12px;
+  color: #17673d;
+  font-weight: 600;
+}
+.op-export .op-table-scroll { max-width: 100%; max-height: 60vh; }
